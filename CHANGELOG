@@ -1,0 +1,22 @@
+11.04.2021:
+* “Opis zakładanej funkcjonalności” został zapisany w punktach.
+* Typ macierzy zostanie zrealizowany za pomocą typu wektora (w poprzedniej wersji było odwrotnie).
+* Dodane zostały funkcje main() w każdym z przykładów.
+* Metoda rzutowania została zmieniona, z koncepcji opartej na języku C do koncepcji opartej na języku Python (np. zamiast “(int)zmienna” poprawną konstrukcją jest “int(zmienna)”).
+* Funkcja print będzie mogła wyświetlać naraz wiele wartości - wprowadzono operator “%”.
+* W sekcji “Przykłady wykorzystania języka” pojawił się bardziej złożony przykład: algorytm MergeSort.
+* Łańcuchy znaków będą mogły zawierać wszystkie znaki z systemu kodowania UTF-8.
+* Macierze i wektory będą mogły być kolekcjami bardziej złożonych typów np. można będzie utworzyć wektor wektorów.
+* Zmieniono niektóre nazwy w gramatyce z “constant” na “literal”.
+* Wprowadzono w gramatyce pojęcia lvalue i rvalue.
+* Wyrażenia porównania (np. “==”) i relacji (np. “<”) mają teraz ten sam priorytet.
+* Naprawiono błąd w gramatyce, który nie pozwalał na wywołanie funkcji bez parametrów.
+* Wymagania funkcjonalne i niefunkcjonalne zostały zmienione tak, aby łatwiejsza była ich weryfikacja.
+* Dodane zostały wymagania funkcjonalne dotyczące funkcjonalności samego interpretera, a nie języka, który interpretuje.
+* Zmienione zostały wymagania niefunkcjonalne.
+* Sekcja “Obsługa błędów” została zapisana w punktach.
+* Zmieniono koncepcję obsługi tokenów w sekcji “Obsługa błędów” - żaden token nie będzie pomijany, a każdy błąd powodować będzie przerwanie pracy interpretera.
+* Zmieniono przykład ilustrujący rozpoznanie nieprawidłowego tokena w sekcji “Obsługa błędów”.
+* Dodano informację o sposobie informowania o błędach występujących na poziomie egzekutora.
+* W sekcji “Sposób realizacji” pojawił się diagram klas, który zastąpił tekst opisujący przewidziany sposób realizacji interpretera.
+* Sekcja “Sposób testowania” została zapisana w punktach.
