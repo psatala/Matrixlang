@@ -22,3 +22,6 @@ add_executable(MatrixlangTests ${TESTS}) # add test executable
 
 # link google test to this executable
 target_link_libraries(MatrixlangTests PRIVATE gtest) 
+
+set_property(TARGET Matrixlang PROPERTY CXX_STANDARD 17)
+set_property(TARGET MatrixlangTests PROPERTY CXX_STANDARD 17)
