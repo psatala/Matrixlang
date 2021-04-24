@@ -6,9 +6,10 @@ class Interpreter {
     std::stringstream& inStream;
     std::stringstream& errStream;
     std::stringstream& outStream;
-    Lexer lexer;
+    
 
 public:
+    Lexer lexer;
 
     Interpreter(std::stringstream& inStream, std::stringstream& errStream, 
         std::stringstream& outStream) : 

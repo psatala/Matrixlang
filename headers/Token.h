@@ -10,6 +10,7 @@ enum TokenType {
     COMMENT,
     EOT,
     UNKNOWN,
+    INCORRECT,
 
     //keywords
     IF,
