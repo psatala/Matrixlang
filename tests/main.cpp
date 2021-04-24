@@ -27,12 +27,57 @@ TEST(Lexer, basic)
 
     assertTokenType(interpreter.lexer, INT);
     assertTokenType(interpreter.lexer, IDENTIFIER);
-    assertTokenType(interpreter.lexer, UNKNOWN);
+    assertTokenType(interpreter.lexer, ASSIGN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 10);
-    assertTokenType(interpreter.lexer, UNKNOWN);
+    assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenType(interpreter.lexer, EOT);
 }
 
+TEST(Lexer, operators)
+{
+    // This test does not test any real code in Matrixlang, but checks
+    // if operators are parsed correctly.
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "+ += ++ - -= -- * *= / /= % %= < <= > >= ! != = == && || \
+    : ; , . { } [ ] ( )";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+
+    assertTokenType(interpreter.lexer, PLUS);
+    assertTokenType(interpreter.lexer, PLUS_ASSIGN);
+    assertTokenType(interpreter.lexer, INCREMENT);
+    assertTokenType(interpreter.lexer, MINUS);
+    assertTokenType(interpreter.lexer, MINUS_ASSIGN);
+    assertTokenType(interpreter.lexer, DECREMENT);
+    assertTokenType(interpreter.lexer, MULTIPLY);
+    assertTokenType(interpreter.lexer, MULTIPLY_ASSIGN);
+    assertTokenType(interpreter.lexer, DIVIDE);
+    assertTokenType(interpreter.lexer, DIVIDE_ASSIGN);
+    assertTokenType(interpreter.lexer, MODULO);
+    assertTokenType(interpreter.lexer, MODULO_ASSIGN);
+    assertTokenType(interpreter.lexer, LESS_THAN);
+    assertTokenType(interpreter.lexer, LESS_EQUAL);
+    assertTokenType(interpreter.lexer, MORE_THAN);
+    assertTokenType(interpreter.lexer, MORE_EQUAL);
+    assertTokenType(interpreter.lexer, NOT);
+    assertTokenType(interpreter.lexer, NOT_EQUAL);
+    assertTokenType(interpreter.lexer, ASSIGN);
+    assertTokenType(interpreter.lexer, EQUAL);
+    assertTokenType(interpreter.lexer, AND);
+    assertTokenType(interpreter.lexer, OR);
+    assertTokenType(interpreter.lexer, COLON);
+    assertTokenType(interpreter.lexer, SEMICOLON);
+    assertTokenType(interpreter.lexer, COMMA);
+    assertTokenType(interpreter.lexer, DOT);
+    assertTokenType(interpreter.lexer, L_BRACKET);
+    assertTokenType(interpreter.lexer, R_BRACKET);
+    assertTokenType(interpreter.lexer, L_SQUARE_BRACKET);
+    assertTokenType(interpreter.lexer, R_SQUARE_BRACKET);
+    assertTokenType(interpreter.lexer, L_PARENT);
+    assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, EOT);
+}
 
 int main(int argc, char* argv[])
 {

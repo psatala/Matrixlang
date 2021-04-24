@@ -74,7 +74,7 @@ class Lexer {
         
         if(isdigit(currentChar) && 0 == integerPart) {
             errStream << "Line: " << lineNumber << " Column: " << columnNumber 
-                << " Leading zeros not allowed!";
+                << " Leading zeros not allowed";
             return new Token(INCORRECT);
         }
         
@@ -98,9 +98,93 @@ class Lexer {
 
         float fullNumber = static_cast<float>(integerPart) + floatingPointPart;
         return new Token(FLOAT_NUMBER, fullNumber);
+    }
 
+    Token* buildBasicOperator(TokenType basicType, TokenType assignType,
+        TokenType incrementType = UNKNOWN) {
+
+            if(currentChar != basicType)
+                return nullptr;
+
+            getNextChar();
+            if('=' == currentChar) {
+                getNextChar();
+                return new Token(assignType);
+            }
+            if(incrementType != UNKNOWN && currentChar == basicType) {
+                getNextChar();
+                return new Token(incrementType);
+            }
+            return new Token(basicType);
+        }
+
+    Token* buildAndOr(TokenType type, char targetChar) {
+        if(targetChar != currentChar)
+            return nullptr;
+
+        getNextChar();
+        if(targetChar == currentChar){
+            getNextChar();
+            return new Token(type);
+        }
+        errStream << "Line: " << lineNumber << " Column: " << columnNumber 
+            << " Got '" << targetChar << "' but another '" << targetChar 
+            << "' did not follow";
+        return new Token(INCORRECT);
         
+    }
+
+    Token* buildSpecialOperator() {
+        if( currentChar == COLON            ||
+            currentChar == SEMICOLON        ||
+            currentChar == COMMA            ||
+            currentChar == DOT              ||
+            currentChar == L_BRACKET        ||
+            currentChar == R_BRACKET        ||
+            currentChar == L_SQUARE_BRACKET ||
+            currentChar == R_SQUARE_BRACKET ||
+            currentChar == L_PARENT         ||
+            currentChar == R_PARENT         ) {
+            
+            TokenType type = static_cast<TokenType>(currentChar);
+            getNextChar();
+            return new Token(type);
+        }
+            
+
+        return nullptr;
+    }
+
+    Token* buildOperator() {
+        Token* token;
+        token = buildBasicOperator(PLUS, PLUS_ASSIGN, INCREMENT);
+        if(token) return token;
+        token = buildBasicOperator(MINUS, MINUS_ASSIGN, DECREMENT);
+        if(token) return token;
+        token = buildBasicOperator(MULTIPLY, MULTIPLY_ASSIGN);
+        if(token) return token;
+        token = buildBasicOperator(DIVIDE, DIVIDE_ASSIGN);
+        if(token) return token;
+        token = buildBasicOperator(MODULO, MODULO_ASSIGN);
+        if(token) return token;
+        token = buildBasicOperator(LESS_THAN, LESS_EQUAL);
+        if(token) return token;
+        token = buildBasicOperator(MORE_THAN, MORE_EQUAL);
+        if(token) return token;
+        token = buildBasicOperator(NOT, NOT_EQUAL);
+        if(token) return token;
+        token = buildBasicOperator(ASSIGN, EQUAL);
+        if(token) return token;
         
+        token = buildAndOr(AND, '&');
+        if(token) return token;
+        token = buildAndOr(OR, '|');
+        if(token) return token;
+
+        token = buildSpecialOperator();
+        if(token) return token;
+
+        return nullptr;
     }
 
 public:
@@ -125,6 +209,9 @@ public:
 
         token = buildIdentifierOrKeyword();
         if(token) return token;      
+
+        token = buildOperator();
+        if(token) return token;
 
         getNextChar();
         return new Token(UNKNOWN);

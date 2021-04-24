@@ -32,12 +32,11 @@ enum TokenType {
     COMMA = ',',
     DOT = '.',
     L_BRACKET = '{',
-    R_BRACKET = '{',
+    R_BRACKET = '}',
     L_SQUARE_BRACKET = '[',
     R_SQUARE_BRACKET = ']',
     L_PARENT = '(',
     R_PARENT = ')',
-    EXCLAMATION = '!',
     
     //operators
     PLUS = '+',
@@ -49,17 +48,18 @@ enum TokenType {
     INCREMENT,
     DECREMENT,
     
-    LESS_THAN,
+    LESS_THAN = '<',
     LESS_EQUAL,
-    MORE_THAN,
+    MORE_THAN = '>',
     MORE_EQUAL,
     EQUAL,
     NOT_EQUAL,
 
     AND,
     OR,
+    NOT = '!',
 
-    ASSIGN,
+    ASSIGN = '=',
     PLUS_ASSIGN,
     MINUS_ASSIGN,
     MULTIPLY_ASSIGN,
