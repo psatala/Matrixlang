@@ -28,6 +28,7 @@ enum TokenType {
     STRING,
     VECTOR,
     MATRIX,
+    VOID,
 
     //special
     COLON = ':',

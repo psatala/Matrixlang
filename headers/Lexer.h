@@ -118,6 +118,7 @@ class Lexer {
         if("string"     == identifierString)    return new Token(STRING);
         if("Vector"     == identifierString)    return new Token(VECTOR);
         if("Matrix"     == identifierString)    return new Token(MATRIX);
+        if("void"       == identifierString)    return new Token(VOID);
 
         return new Token(IDENTIFIER, identifierString);
     }
@@ -144,6 +145,7 @@ class Lexer {
         //float part
         float floatingPointPart = 0.0;
         int decimalPlaces = 1;
+        getNextChar();
         while(isdigit(currentChar)) {
             floatingPointPart += (currentChar - '0') * pow(10, -decimalPlaces);
             ++decimalPlaces;
