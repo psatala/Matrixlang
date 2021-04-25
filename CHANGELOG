@@ -1,3 +1,10 @@
+25.04.2021:
+* Napisany został lekser.
+* Przygotowane zostały testy dla leksera.
+* Usunięto z gramatyki termin "factor", którego obecność była wynikiem błędu.
+* Zmieniono sposób korzystania z macierzy: poprawną konstrucją jest teraz matrix[0, 0], a nie matrix[0][0].
+* Ograniczono rekursję w gramatyce języka.
+
 11.04.2021:
 * “Opis zakładanej funkcjonalności” został zapisany w punktach.
 * Typ macierzy zostanie zrealizowany za pomocą typu wektora (w poprzedniej wersji było odwrotnie).
