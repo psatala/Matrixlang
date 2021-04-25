@@ -15,7 +15,10 @@ file(GLOB SOURCES
 # all test files
 file(GLOB TESTS
     tests/*.cpp
+    src/*.cpp
 )
+
+list(FILTER TESTS EXCLUDE REGEX ".*src/main.cpp")
 
 add_executable(Matrixlang ${SOURCES}) # add main executable
 add_executable(MatrixlangTests ${TESTS}) # add test executable

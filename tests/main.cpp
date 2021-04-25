@@ -16,6 +16,13 @@ void assertTokenType(Lexer& lexer, TokenType type) {
     delete token;
 }
 
+void assertTokenPosition(Lexer& lexer, int lineNumber, int columnNumber) {
+    Token* token = lexer.getToken();
+    GTEST_ASSERT_EQ(token->lineNumber, lineNumber);
+    GTEST_ASSERT_EQ(token->columnNumber, columnNumber);
+    delete token;
+}
+
 TEST(Lexer, basic) {
     std::stringstream inStream("");
     std::stringstream errStream("");
@@ -112,6 +119,70 @@ TEST (Lexer, stringConstants) {
         "\"Full string\"");
     assertTokenType(interpreter.lexer, EOT);
 }
+
+TEST (Lexer, numbers) {
+    //No real Matrixlang code here either
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << 
+    R"(1234
+        24.
+        3.5
+        103.23
+    )";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 1234);
+    assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 24.0f);
+    assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 3.5f);
+    assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 103.23f);
+    assertTokenType(interpreter.lexer, EOT);
+}
+
+TEST (Lexer, leadingZeroError) {
+    //No real Matrixlang code here either
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "01";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    while(!interpreter.lexer.getIsProcessed()) {
+        Token* token = interpreter.lexer.getToken();
+        delete token;
+    }
+    GTEST_ASSERT_EQ(errStream.str(), 
+        "Line: 1 Column: 2 -> Leading zeros not allowed\n");
+}
+
+TEST (Lexer, andError) {
+    //No real Matrixlang code here either
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "\n\nif(1 == 1 & 3 > 2);\nprint(\"OK\");";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    while(!interpreter.lexer.getIsProcessed()) {
+        Token* token = interpreter.lexer.getToken();
+        delete token;
+    }
+    GTEST_ASSERT_EQ(errStream.str(), 
+        "Line: 3 Column: 12 -> Got '&' but another '&' did not follow\n");
+}
+
+TEST (Lexer, tokenPosition) {
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "int a = \n10;";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    assertTokenPosition(interpreter.lexer, 1, 1);
+    assertTokenPosition(interpreter.lexer, 1, 5);
+    assertTokenPosition(interpreter.lexer, 1, 7);
+    assertTokenPosition(interpreter.lexer, 2, 1);
+    assertTokenPosition(interpreter.lexer, 2, 3);
+    assertTokenPosition(interpreter.lexer, 2, 4);
+}
+
 
 TEST (Lexer, fibonacciRec) {
     std::stringstream inStream("");
@@ -1005,7 +1076,7 @@ TEST (Lexer, includeFile) {
     std::stringstream errStream("");
     std::stringstream outStream("");
     inStream << 
-    R"(@include "../examples/yearInfo.ml"
+    R"(@include "../examples/YearInfo.ml"
 
     int main() {
     	printYearInfo(2021);

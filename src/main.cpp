@@ -4,21 +4,23 @@
 #include <fstream>
 int main()
 {
-    //std::stringstream inStream("");
-    //std::stringstream errStream("");
-    //std::stringstream outStream("");
-    //inStream << "int a = 10;";
-    //Interpreter interpreter = Interpreter(inStream, errStream, outStream);
-    std::ifstream f;
-    std::stringstream s("");
-    f.open("../examples/yearInfo.ml", std::ifstream::in);
-    if(f) {
-        s << f.rdbuf();
-        f.close();
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    
+    std::ifstream fileStream;
+    fileStream.open("../examples/HelloWorld.ml", std::ifstream::in);
+    if(fileStream) {
+        inStream << fileStream.rdbuf();
+        fileStream.close();
     }
-    std::string res;
-    while(s >> res)
-        std::cout << res << std::endl;
+    
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
 
+    while(!interpreter.lexer.getIsProcessed()) {
+        Token* token = interpreter.lexer.getToken();
+        std::cout << token->type << std::endl;
+        delete token;
+    }
     return 0;
 }

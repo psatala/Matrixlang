@@ -77,9 +77,17 @@ class Token {
 public:
     TokenType type;
     std::variant<int, float, std::string> value;
+    int lineNumber = -1;
+    int columnNumber = -1;
 
     Token() {}
     Token(TokenType type): type(type) {}
     Token(TokenType type, std::variant<int, float, std::string> value):
         type(type), value(value) {}
+
+    Token* setPosition(int lineNumber, int columnNumber) {
+        this->lineNumber = lineNumber;
+        this->columnNumber = columnNumber;
+        return this;
+    }
 };
