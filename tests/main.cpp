@@ -16,8 +16,7 @@ void assertTokenType(Lexer& lexer, TokenType type) {
     delete token;
 }
 
-TEST(Lexer, basic)
-{
+TEST(Lexer, basic) {
     std::stringstream inStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
@@ -33,8 +32,7 @@ TEST(Lexer, basic)
     assertTokenType(interpreter.lexer, EOT);
 }
 
-TEST(Lexer, operators)
-{
+TEST(Lexer, operators) {
     // This test does not test any real code in Matrixlang, but checks
     // if operators are parsed correctly.
     std::stringstream inStream("");
@@ -76,6 +74,42 @@ TEST(Lexer, operators)
     assertTokenType(interpreter.lexer, R_SQUARE_BRACKET);
     assertTokenType(interpreter.lexer, L_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, EOT);
+}
+
+TEST (Lexer, comments) {
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "# This is a single line comment\n\
+        ``` This is a multi\nline comment```\n\
+        # This is yet another single line comment";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
+        "# This is a single line comment");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
+        "``` This is a multi\nline comment```");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
+        "# This is yet another single line comment");
+    assertTokenType(interpreter.lexer, EOT);
+}
+
+TEST (Lexer, stringConstants) {
+    //No real Matrixlang code here either
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "\"String begin$ $string middle$ $string end\"\
+        \"Full string\"";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT_BEGIN, 
+        "\"String begin$");
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT_MID, 
+        "$string middle$");
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT_END, 
+        "$string end\"");
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, 
+        "\"Full string\"");
     assertTokenType(interpreter.lexer, EOT);
 }
 

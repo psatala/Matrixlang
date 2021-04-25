@@ -15,6 +15,14 @@ class Lexer {
     int columnNumber = 1;
     char currentChar = '\0';
 
+    Token* generateError(std::string errorMessage, bool skipCharacter = false) {
+        errStream << "Line: " << lineNumber << " Column: " << columnNumber 
+            << " " << errorMessage;
+        if(skipCharacter)
+            getNextChar();
+        return new Token(INCORRECT);
+    }
+
     char getNextChar() {
         currentChar = inStream.get();
         
@@ -36,6 +44,55 @@ class Lexer {
     Token* buildEOT() {
         if(-1 == currentChar)
             return new Token(EOT);
+        return nullptr;
+    }
+
+    Token* buildComment() {
+        //single line
+        if('#' == currentChar) {
+            int currentLineNumber = lineNumber;
+            std::string text;
+            while(lineNumber == currentLineNumber && -1 != currentChar) {
+                text += currentChar;
+                getNextChar();
+            }
+            return new Token(COMMENT, text);
+        }
+
+        //multi line
+        if('`' == currentChar){
+            std::string text;
+            text += currentChar;
+            for(int i = 0; i < 2; ++i) {
+                getNextChar();
+                text += currentChar;
+                if('`' != currentChar)
+                    return generateError("Beginning of comment: expected a '`'",
+                        true);
+            }
+            //comment now opened
+            getNextChar();
+            bool isClosed = false;
+            while(!isClosed) {
+                text += currentChar;
+                if('`' != currentChar) {
+                    getNextChar();
+                    continue;
+                }
+                for(int i = 0; i < 2; ++i) {
+                    getNextChar();
+                    text += currentChar;
+                    if('`' != currentChar)
+                        return generateError(" End of comment: expected a '`'", 
+                            true);
+                }
+                isClosed = true;
+            }
+            getNextChar();
+            return new Token(COMMENT, text);
+        }
+
+        //no comment
         return nullptr;
     }
 
@@ -72,11 +129,8 @@ class Lexer {
         int integerPart = currentChar - '0';
         getNextChar();
         
-        if(isdigit(currentChar) && 0 == integerPart) {
-            errStream << "Line: " << lineNumber << " Column: " << columnNumber 
-                << " Leading zeros not allowed";
-            return new Token(INCORRECT);
-        }
+        if(isdigit(currentChar) && 0 == integerPart)
+            return generateError("Leading zeros not allowed");
         
         //TODO: limit int value
         while(isdigit(currentChar)) {
@@ -98,6 +152,36 @@ class Lexer {
 
         float fullNumber = static_cast<float>(integerPart) + floatingPointPart;
         return new Token(FLOAT_NUMBER, fullNumber);
+    }
+
+    Token* buildStringConstant() {
+        std::string text;
+        char startChar = currentChar;
+        if('\"' != currentChar && '$' != currentChar)
+            return nullptr;
+    
+        text += currentChar;
+        getNextChar();
+        while('\"' != currentChar && '$' != currentChar) {
+            text += currentChar;
+            getNextChar();
+        }
+        text += currentChar;
+        if('\"' == startChar && '\"' == currentChar) {
+            getNextChar();
+            return new Token(STRING_CONSTANT, text);
+        }
+        if('\"' == startChar && '$' == currentChar) {
+            getNextChar();
+            return new Token(STRING_CONSTANT_BEGIN, text);
+        }
+        if('$' == startChar && '$' == currentChar) {
+            getNextChar();
+            return new Token(STRING_CONSTANT_MID, text);
+        }
+        getNextChar();
+        return new Token(STRING_CONSTANT_END, text);
+        
     }
 
     Token* buildBasicOperator(TokenType basicType, TokenType assignType,
@@ -127,11 +211,8 @@ class Lexer {
             getNextChar();
             return new Token(type);
         }
-        errStream << "Line: " << lineNumber << " Column: " << columnNumber 
-            << " Got '" << targetChar << "' but another '" << targetChar 
-            << "' did not follow";
-        return new Token(INCORRECT);
-        
+        return generateError("Got '" + std::string(1, targetChar) + 
+            "' but another '"+ std::string(1, targetChar) + "' did not follow");      
     }
 
     Token* buildSpecialOperator() {
@@ -204,7 +285,13 @@ public:
         token = buildEOT();
         if(token) return token;
 
+        token = buildComment();
+        if(token) return token;
+
         token = buildNumber();
+        if(token) return token;
+
+        token = buildStringConstant();
         if(token) return token;
 
         token = buildIdentifierOrKeyword();
