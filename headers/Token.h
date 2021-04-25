@@ -14,6 +14,7 @@ enum TokenType {
     EOT,
     UNKNOWN,
     INCORRECT,
+    LEXER_COMMAND,
 
     //keywords
     IF,

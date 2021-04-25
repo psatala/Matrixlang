@@ -1000,6 +1000,62 @@ TEST (Lexer, printAgeDescription) {
     assertTokenType(interpreter.lexer, EOT);   
 }
 
+TEST (Lexer, includeFile) {
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << 
+    R"(@include "../examples/yearInfo.ml"
+
+    int main() {
+    	printYearInfo(2021);
+    	return 0;
+    })";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    assertTokenType(interpreter.lexer, LEXER_COMMAND);
+    assertTokenType(interpreter.lexer, VOID);
+    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "printYearInfo");
+    assertTokenType(interpreter.lexer, L_PARENT);
+    assertTokenType(interpreter.lexer, INT);
+    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "currentYear");
+    assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, L_BRACKET);
+    
+    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "print");
+    assertTokenType(interpreter.lexer, L_PARENT);
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, 
+        "\"Hello from year \"");
+    assertTokenType(interpreter.lexer, PLUS);
+    assertTokenType(interpreter.lexer, STRING);
+    assertTokenType(interpreter.lexer, L_PARENT);
+    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "currentYear");
+    assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, SEMICOLON);
+
+    assertTokenType(interpreter.lexer, R_BRACKET);
+    assertTokenType(interpreter.lexer, EOT);
+
+    assertTokenType(interpreter.lexer, INT);
+    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "main");
+    assertTokenType(interpreter.lexer, L_PARENT);
+    assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, L_BRACKET);
+
+    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "printYearInfo");
+    assertTokenType(interpreter.lexer, L_PARENT);
+    assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 2021);
+    assertTokenType(interpreter.lexer, R_PARENT);
+    assertTokenType(interpreter.lexer, SEMICOLON);
+
+    assertTokenType(interpreter.lexer, RETURN);
+    assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
+    assertTokenType(interpreter.lexer, SEMICOLON);
+
+    assertTokenType(interpreter.lexer, R_BRACKET);
+    assertTokenType(interpreter.lexer, EOT);   
+}
+
 TEST (Lexer, copyByValue) {
     std::stringstream inStream("");
     std::stringstream errStream("");

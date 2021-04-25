@@ -1,12 +1,13 @@
 #pragma once
 
 #include <sstream>
+#include <fstream>
 #include <cmath>
-
+#include <stack>
 #include "Token.h"
 
 class Lexer {
-    std::stringstream& inStream;
+    std::stack<std::stringstream*> inStreamStack;
     std::stringstream& errStream;
 
     std::stringstream placeholderStringstream;
@@ -14,6 +15,7 @@ class Lexer {
     int lineNumber = 1;
     int columnNumber = 1;
     char currentChar = '\0';
+    bool isProcessed = false;
 
     Token* generateError(std::string errorMessage, bool skipCharacter = false) {
         errStream << "Line: " << lineNumber << " Column: " << columnNumber 
@@ -24,7 +26,7 @@ class Lexer {
     }
 
     char getNextChar() {
-        currentChar = inStream.get();
+        currentChar = inStreamStack.top()->get();
         
         if('\n' == currentChar) {
             lineNumber++;
@@ -42,8 +44,16 @@ class Lexer {
     }
 
     Token* buildEOT() {
-        if(-1 == currentChar)
+        if(-1 == currentChar) {
+            std::stringstream* inStreamStackTop = inStreamStack.top();
+            inStreamStack.pop();
+            delete inStreamStackTop;
+            if(inStreamStack.empty())
+                isProcessed = true;
+            if(!isProcessed)
+                getNextChar();
             return new Token(EOT);
+        }
         return nullptr;
     }
 
@@ -270,14 +280,57 @@ class Lexer {
         return nullptr;
     }
 
+
+
+    Token* buildLexerCommand() {
+        if('@' != currentChar)
+            return nullptr;
+
+        getNextChar();
+        Token* commandToken = buildIdentifierOrKeyword();
+        if(IDENTIFIER != commandToken->type || 
+            "include" != std::get<std::string>(commandToken->value)) {
+            delete commandToken;
+            return generateError("No such lexer command");
+        }
+        delete commandToken;
+
+        skipWhites();
+        Token* pathToken = buildStringConstant();
+        if(STRING_CONSTANT != pathToken->type) {
+            delete pathToken;
+            return generateError("Expected path to file");
+        }
+        
+        std::ifstream fileStream;
+        std::stringstream* stringStream = new std::stringstream("");
+        
+        std::string path = std::get<std::string>(pathToken->value);
+        path = path.substr(1, path.size() - 2);
+        
+        fileStream.open(path, std::ifstream::in);
+        if(fileStream) {
+            *stringStream << fileStream.rdbuf();
+            fileStream.close();
+        }
+        inStreamStack.push(stringStream);
+        delete pathToken;
+        return new Token(LEXER_COMMAND);
+    }
+
 public:
     Lexer(): 
-        inStream(placeholderStringstream), errStream(placeholderStringstream) {}
+        errStream(placeholderStringstream) {}
     
     Lexer(std::stringstream& inStream, std::stringstream& errStream) : 
-        inStream(inStream), errStream(errStream) {
+        errStream(errStream) {
+            inStreamStack.push(new std::stringstream(std::move(inStream)));
             getNextChar();
         }
+
+    bool getIsProcessed() {
+        return isProcessed;
+    }
 
     Token* getToken() {
         Token* token;
@@ -285,6 +338,9 @@ public:
         skipWhites();
 
         token = buildEOT();
+        if(token) return token;
+
+        token = buildLexerCommand();
         if(token) return token;
 
         token = buildComment();
