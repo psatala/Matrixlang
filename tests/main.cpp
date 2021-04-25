@@ -154,6 +154,21 @@ TEST (Lexer, leadingZeroError) {
         "Line: 1 Column: 2 -> Leading zeros not allowed\n");
 }
 
+
+TEST (Lexer, numberTooBigError) {
+    //No real Matrixlang code here either
+    std::stringstream inStream("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    inStream << "999999999999999999999999";
+    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    
+    delete interpreter.lexer.getToken();
+    
+    GTEST_ASSERT_EQ(errStream.str(), 
+        "Line: 1 Column: 10 -> Number too big\n");
+}
+
 TEST (Lexer, andError) {
     //No real Matrixlang code here either
     std::stringstream inStream("");

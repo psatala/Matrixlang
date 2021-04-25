@@ -144,8 +144,9 @@ Token* Lexer::buildNumber() {
     if(isdigit(currentChar) && 0 == integerPart)
         return generateError("Leading zeros not allowed");
     
-    //TODO: limit int value
     while(isdigit(currentChar)) {
+        if((INT32_MAX - (currentChar - '0')) / 10 < integerPart)
+            return generateError("Number too big");
         integerPart = integerPart * 10 + currentChar - '0';
         getNextChar();
     }
