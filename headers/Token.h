@@ -82,9 +82,8 @@ public:
     Token(TokenType type, std::variant<int, float, std::string> value):
         type(type), value(value) {}
 
-    Token* setPosition(int lineNumber, int columnNumber) {
+    void setPosition(const int& lineNumber, const int& columnNumber) {
         this->lineNumber = lineNumber;
         this->columnNumber = columnNumber;
-        return this;
     }
 };

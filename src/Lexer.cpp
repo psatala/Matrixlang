@@ -307,32 +307,22 @@ Token* Lexer::buildSpecialOperator() {
 
 Token* Lexer::buildOperator() {
     Token* token;
-    token = buildBasicOperator(PLUS, PLUS_ASSIGN, INCREMENT);
-    if(token) return token;
-    token = buildBasicOperator(MINUS, MINUS_ASSIGN, DECREMENT);
-    if(token) return token;
-    token = buildBasicOperator(MULTIPLY, MULTIPLY_ASSIGN);
-    if(token) return token;
-    token = buildBasicOperator(DIVIDE, DIVIDE_ASSIGN);
-    if(token) return token;
-    token = buildBasicOperator(MODULO, MODULO_ASSIGN);
-    if(token) return token;
-    token = buildBasicOperator(LESS_THAN, LESS_EQUAL);
-    if(token) return token;
-    token = buildBasicOperator(MORE_THAN, MORE_EQUAL);
-    if(token) return token;
-    token = buildBasicOperator(NOT, NOT_EQUAL);
-    if(token) return token;
-    token = buildBasicOperator(ASSIGN, EQUAL);
-    if(token) return token;
-    
-    token = buildAndOr(AND, '&');
-    if(token) return token;
-    token = buildAndOr(OR, '|');
-    if(token) return token;
 
-    token = buildSpecialOperator();
-    if(token) return token;
+    if(
+        (token = buildBasicOperator(PLUS, PLUS_ASSIGN, INCREMENT))    ||
+        (token = buildBasicOperator(MINUS, MINUS_ASSIGN, DECREMENT))  ||
+        (token = buildBasicOperator(MULTIPLY, MULTIPLY_ASSIGN))       ||
+        (token = buildBasicOperator(DIVIDE, DIVIDE_ASSIGN))           ||
+        (token = buildBasicOperator(MODULO, MODULO_ASSIGN))           ||
+        (token = buildBasicOperator(LESS_THAN, LESS_EQUAL))           ||
+        (token = buildBasicOperator(MORE_THAN, MORE_EQUAL))           ||
+        (token = buildBasicOperator(NOT, NOT_EQUAL))                  ||
+        (token = buildBasicOperator(ASSIGN, EQUAL))                   ||
+        (token = buildAndOr(AND, '&'))                                ||
+        (token = buildAndOr(OR, '|'))                                 ||
+        (token = buildSpecialOperator())                              
+    )
+        return token;
 
     return nullptr;
 }
@@ -383,7 +373,7 @@ Token* Lexer::buildLexerCommand() {
 
 
 
-bool Lexer::getIsProcessed() {
+bool Lexer::getIsProcessed() const {
     return isProcessed;
 }
 
@@ -394,29 +384,21 @@ Token* Lexer::getToken() {
 
     skipWhites();
 
-    int tokenLineNumber = lineNumber;
-    int tokenColumnNumber = columnNumber;
+    const int tokenLineNumber = lineNumber;
+    const int tokenColumnNumber = columnNumber;
 
-    token = buildEOT();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
-
-    token = buildLexerCommand();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
-
-    token = buildComment();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
-
-    token = buildNumber();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
-
-    token = buildStringConstant();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
-
-    token = buildIdentifierOrKeyword();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
-
-    token = buildOperator();
-    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
+    if (
+        (token = buildEOT())                   ||
+        (token = buildLexerCommand())          ||
+        (token = buildComment())               ||
+        (token = buildNumber())                ||
+        (token = buildStringConstant())        ||
+        (token = buildIdentifierOrKeyword())   ||
+        (token = buildOperator())
+    ) {
+        token->setPosition(tokenLineNumber, tokenColumnNumber);
+        return token;
+    }
 
     getNextChar();
     return new Token(UNKNOWN);

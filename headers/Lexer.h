@@ -49,6 +49,6 @@ public:
             getNextChar();
         }
 
-    bool getIsProcessed();    
+    bool getIsProcessed() const;
     Token* getToken();
 };
