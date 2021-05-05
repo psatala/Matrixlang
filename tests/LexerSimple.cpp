@@ -157,10 +157,8 @@ TEST (LexerSimple, leadingZeroError) {
     *inStream << "01";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    while(!interpreter.lexer.getIsProcessed()) {
-        Token* token = interpreter.lexer.getToken();
-        delete token;
-    }
+    while(!interpreter.lexer.getIsProcessed())
+        const std::optional<Token> token = interpreter.lexer.getToken();
     GTEST_ASSERT_EQ(errStream.str(), 
         "Line: 1 Column: 2 -> Leading zeros not allowed\n");
 }
@@ -176,7 +174,7 @@ TEST (LexerSimple, numberTooBigError) {
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
     
-    delete interpreter.lexer.getToken();
+    interpreter.lexer.getToken();
     
     GTEST_ASSERT_EQ(errStream.str(), 
         "Line: 1 Column: 10 -> Number too big\n");
@@ -191,10 +189,8 @@ TEST (LexerSimple, andError) {
     *inStream << "\n\nif(1 == 1 & 3 > 2);\nprint(\"OK\");";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    while(!interpreter.lexer.getIsProcessed()) {
-        Token* token = interpreter.lexer.getToken();
-        delete token;
-    }
+    while(!interpreter.lexer.getIsProcessed())
+        const std::optional<Token> token = interpreter.lexer.getToken();
     GTEST_ASSERT_EQ(errStream.str(), 
         "Line: 3 Column: 12 -> Got '&' but another '&' did not follow\n");
 }

@@ -15,9 +15,8 @@ int main()
         std::cout);
 
     while(!interpreter.lexer.getIsProcessed()) {
-        Token* token = interpreter.lexer.getToken();
+        const std::optional<Token> token = interpreter.lexer.getToken();
         std::cout << token->type << std::endl;
-        delete token;
     }
     return 0;
 }

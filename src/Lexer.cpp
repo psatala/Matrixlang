@@ -8,12 +8,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-Token* Lexer::generateError(std::string errorMessage, bool skipCharacter) {
+std::optional<Token> Lexer::generateError(std::string errorMessage, 
+    bool skipCharacter) {
+    
     errStream << "Line: " << lineNumber << " Column: " << columnNumber 
         << " -> " << errorMessage << "\n";
     if(skipCharacter)
         getNextChar();
-    return new Token(INCORRECT);
+    return Token(INCORRECT);
 }
 
 
@@ -59,22 +61,22 @@ std::optional<char> Lexer::escapeCharacter(char previousCharacter,
 
 
 
-Token* Lexer::buildEOT() {
+std::optional<Token> Lexer::buildEOT() {
     while(-1 == currentChar) {
         inStreamStack.pop();
         
         if(inStreamStack.empty()) {
             isProcessed = true;
-            return new Token(EOT);
+            return Token(EOT);
         }
 
         getNextChar();
         skipWhites();
     }   
-    return nullptr;
+    return std::nullopt;
 }
 
-Token* Lexer::buildComment() {
+std::optional<Token> Lexer::buildComment() {
     //single line
     if('#' == currentChar) {
         int currentLineNumber = lineNumber;
@@ -84,7 +86,7 @@ Token* Lexer::buildComment() {
             text += currentChar;
             getNextChar();
         }
-        return new Token(COMMENT, text);
+        return Token(COMMENT, text);
     }
 
     //multi line
@@ -103,7 +105,7 @@ Token* Lexer::buildComment() {
         while(!isClosed) {
             text += currentChar;
             if(-1 == currentChar)
-                return new Token(INCORRECT);
+                return Token(INCORRECT);
             if('`' != currentChar) {
                 backtickCount = 0;
                 getNextChar();
@@ -119,47 +121,47 @@ Token* Lexer::buildComment() {
         text = text.substr(0, text.size() - 3);
 
         getNextChar();
-        return new Token(COMMENT, text);
+        return Token(COMMENT, text);
     }
 
     //no comment
-    return nullptr;
+    return std::nullopt;
 }
 
 
 
-Token* Lexer::buildIdentifierOrKeyword() {
+std::optional<Token> Lexer::buildIdentifierOrKeyword() {
     std::string identifierString;
     if(!isalpha(currentChar))
-        return nullptr;
+        return std::nullopt;
 
     do {
         identifierString += currentChar;
         getNextChar();
     } while(isalnum(currentChar) || '_' == currentChar);
 
-    if("if"         == identifierString)    return new Token(IF);
-    if("else"       == identifierString)    return new Token(ELSE);
-    if("switch"     == identifierString)    return new Token(SWITCH);
-    if("case"       == identifierString)    return new Token(CASE);
-    if("default"    == identifierString)    return new Token(DEFAULT);
-    if("for"        == identifierString)    return new Token(FOR);
-    if("return"     == identifierString)    return new Token(RETURN);
-    if("int"        == identifierString)    return new Token(INT);
-    if("float"      == identifierString)    return new Token(FLOAT);
-    if("string"     == identifierString)    return new Token(STRING);
-    if("Vector"     == identifierString)    return new Token(VECTOR);
-    if("Matrix"     == identifierString)    return new Token(MATRIX);
-    if("void"       == identifierString)    return new Token(VOID);
+    if("if"         == identifierString)    return Token(IF);
+    if("else"       == identifierString)    return Token(ELSE);
+    if("switch"     == identifierString)    return Token(SWITCH);
+    if("case"       == identifierString)    return Token(CASE);
+    if("default"    == identifierString)    return Token(DEFAULT);
+    if("for"        == identifierString)    return Token(FOR);
+    if("return"     == identifierString)    return Token(RETURN);
+    if("int"        == identifierString)    return Token(INT);
+    if("float"      == identifierString)    return Token(FLOAT);
+    if("string"     == identifierString)    return Token(STRING);
+    if("Vector"     == identifierString)    return Token(VECTOR);
+    if("Matrix"     == identifierString)    return Token(MATRIX);
+    if("void"       == identifierString)    return Token(VOID);
 
-    return new Token(IDENTIFIER, identifierString);
+    return Token(IDENTIFIER, identifierString);
 }
 
 
 
-Token* Lexer::buildNumber() {
+std::optional<Token> Lexer::buildNumber() {
     if(!isdigit(currentChar))
-        return nullptr;
+        return std::nullopt;
     
     int integerPart = currentChar - '0';
     getNextChar();
@@ -176,7 +178,7 @@ Token* Lexer::buildNumber() {
     }
     
     if('.' != currentChar)
-        return new Token(INT_NUMBER, integerPart);
+        return Token(INT_NUMBER, integerPart);
     
     //float part
     int floatingPointPart = 0;
@@ -198,26 +200,26 @@ Token* Lexer::buildNumber() {
     float fullNumber = static_cast<float>(integerPart) 
         + static_cast<float>(floatingPointPart) 
         / pow(10, static_cast<float>(decimalPlaces));
-    return new Token(FLOAT_NUMBER, fullNumber);
+    return Token(FLOAT_NUMBER, fullNumber);
 }
 
 
 
-Token* Lexer::buildStringConstant() {
+std::optional<Token> Lexer::buildStringConstant() {
     std::string text;
     
     if('\"' != currentChar)
-        return nullptr;
+        return std::nullopt;
 
     getNextChar();
 
     // process first char - this is separate from the main loop to simplify
     // escaping code
     if(-1 == currentChar)
-        return new Token(INCORRECT);
+        return Token(INCORRECT);
     if('\"' == currentChar) {
         getNextChar();
-        return new Token(STRING_CONSTANT, "");
+        return Token(STRING_CONSTANT, "");
     }
 
     text += currentChar;
@@ -225,7 +227,7 @@ Token* Lexer::buildStringConstant() {
 
     while(true) {
         if(-1 == currentChar)
-            return new Token(INCORRECT);
+            return Token(INCORRECT);
 
         //if unescaped quote then end of string
         if('\"' == currentChar && '\\' != text.back())
@@ -243,39 +245,39 @@ Token* Lexer::buildStringConstant() {
     }
     
     getNextChar();
-    return new Token(STRING_CONSTANT, text);
+    return Token(STRING_CONSTANT, text);
 }
 
 
 
-Token* Lexer::buildBasicOperator(TokenType basicType, TokenType assignType,
-    TokenType incrementType) {
+std::optional<Token> Lexer::buildBasicOperator(TokenType basicType, 
+    TokenType assignType, TokenType incrementType) {
 
         if(currentChar != basicType)
-            return nullptr;
+            return std::nullopt;
 
         getNextChar();
         if('=' == currentChar) {
             getNextChar();
-            return new Token(assignType);
+            return Token(assignType);
         }
         if(incrementType != UNKNOWN && currentChar == basicType) {
             getNextChar();
-            return new Token(incrementType);
+            return Token(incrementType);
         }
-        return new Token(basicType);
+        return Token(basicType);
     }
 
 
 
-Token* Lexer::buildAndOr(TokenType type, char targetChar) {
+std::optional<Token> Lexer::buildAndOr(TokenType type, char targetChar) {
     if(targetChar != currentChar)
-        return nullptr;
+        return std::nullopt;
 
     getNextChar();
     if(targetChar == currentChar){
         getNextChar();
-        return new Token(type);
+        return Token(type);
     }
     return generateError("Got '" + std::string(1, targetChar) + 
         "' but another '"+ std::string(1, targetChar) + "' did not follow");      
@@ -283,7 +285,7 @@ Token* Lexer::buildAndOr(TokenType type, char targetChar) {
 
 
 
-Token* Lexer::buildSpecialOperator() {
+std::optional<Token> Lexer::buildSpecialOperator() {
     if( currentChar == COLON            ||
         currentChar == SEMICOLON        ||
         currentChar == COMMA            ||
@@ -297,16 +299,16 @@ Token* Lexer::buildSpecialOperator() {
         
         TokenType type = static_cast<TokenType>(currentChar);
         getNextChar();
-        return new Token(type);
+        return Token(type);
     }
         
-    return nullptr;
+    return std::nullopt;
 }
 
 
 
-Token* Lexer::buildOperator() {
-    Token* token;
+std::optional<Token> Lexer::buildOperator() {
+    std::optional<Token> token;
 
     if(
         (token = buildBasicOperator(PLUS, PLUS_ASSIGN, INCREMENT))    ||
@@ -324,30 +326,30 @@ Token* Lexer::buildOperator() {
     )
         return token;
 
-    return nullptr;
+    return std::nullopt;
 }
 
 
 
-Token* Lexer::buildLexerCommand() {
+std::optional<Token> Lexer::buildLexerCommand() {
     if('@' != currentChar)
-        return nullptr;
+        return std::nullopt;
 
     getNextChar();
-    Token* commandToken = buildIdentifierOrKeyword();
+    std::optional<Token> commandToken = buildIdentifierOrKeyword();
+    if(!commandToken)
+        return generateError("Expected a lexer command");
     if(IDENTIFIER != commandToken->type || 
         "include" != std::get<std::string>(commandToken->value)) {
-        delete commandToken;
         return generateError("No such lexer command");
     }
-    delete commandToken;
 
     skipWhites();
-    Token* pathToken = buildStringConstant();
-    if(STRING_CONSTANT != pathToken->type) {
-        delete pathToken;
+    std::optional<Token> pathToken = buildStringConstant();
+    if(!pathToken)
         return generateError("Expected path to file");
-    }
+    if(STRING_CONSTANT != pathToken->type)
+        return generateError("Expected path to file");
     
     
     std::string path = std::get<std::string>(pathToken->value);
@@ -357,12 +359,11 @@ Token* Lexer::buildLexerCommand() {
     fileStream->open(path, std::ifstream::in);
 
     if(!fileStream)
-        return new Token(INCORRECT);
+        return Token(INCORRECT);
     
     inStreamStack.push(std::move(fileStream));
 
-    delete pathToken;
-    return new Token(LEXER_COMMAND);
+    return Token(LEXER_COMMAND);
 }
 
 
@@ -379,8 +380,8 @@ bool Lexer::getIsProcessed() const {
 
 
 
-Token* Lexer::getToken() {
-    Token* token;
+std::optional<Token> Lexer::getToken() {
+    std::optional<Token> token;
 
     skipWhites();
 
@@ -401,5 +402,5 @@ Token* Lexer::getToken() {
     }
 
     getNextChar();
-    return new Token(UNKNOWN);
+    return Token(UNKNOWN);
 }

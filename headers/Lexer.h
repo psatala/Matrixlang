@@ -21,23 +21,24 @@ class Lexer {
     char currentChar = '\0';
     bool isProcessed = false;
 
-    Token* generateError(std::string errorMessage, bool skipCharacter = false);
+    std::optional<Token> generateError(std::string errorMessage, 
+        bool skipCharacter = false);
     char getNextChar();
     void skipWhites();
     std::optional<char> escapeCharacter(char previousCharacter, 
         char currentCharacter);
     
-    Token* buildEOT();
-    Token* buildComment();
-    Token* buildIdentifierOrKeyword();
-    Token* buildNumber();
-    Token* buildStringConstant();
-    Token* buildBasicOperator(TokenType basicType, TokenType assignType,
-        TokenType incrementType = UNKNOWN);
-    Token* buildAndOr(TokenType type, char targetChar);
-    Token* buildSpecialOperator();
-    Token* buildOperator();
-    Token* buildLexerCommand();
+    std::optional<Token> buildEOT();
+    std::optional<Token> buildComment();
+    std::optional<Token> buildIdentifierOrKeyword();
+    std::optional<Token> buildNumber();
+    std::optional<Token> buildStringConstant();
+    std::optional<Token> buildBasicOperator(TokenType basicType, 
+        TokenType assignType, TokenType incrementType = UNKNOWN);
+    std::optional<Token> buildAndOr(TokenType type, char targetChar);
+    std::optional<Token> buildSpecialOperator();
+    std::optional<Token> buildOperator();
+    std::optional<Token> buildLexerCommand();
 
 public:
     Lexer(): 
@@ -50,5 +51,5 @@ public:
         }
 
     bool getIsProcessed() const;
-    Token* getToken();
+    std::optional<Token> getToken();
 };
