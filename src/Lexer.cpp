@@ -187,31 +187,20 @@ Token* Lexer::buildNumber() {
 Token* Lexer::buildStringConstant() {
     std::string text;
     char startChar = currentChar;
-    if('\"' != currentChar && '$' != currentChar)
+    if('\"' != currentChar)
         return nullptr;
 
-    text += currentChar;
     getNextChar();
-    while('\"' != currentChar && '$' != currentChar) {
+    while('\"' != currentChar) {
+        if(-1 == currentChar)
+            return new Token(INCORRECT);
+
         text += currentChar;
         getNextChar();
     }
-    text += currentChar;
-    if('\"' == startChar && '\"' == currentChar) {
-        getNextChar();
-        return new Token(STRING_CONSTANT, text);
-    }
-    if('\"' == startChar && '$' == currentChar) {
-        getNextChar();
-        return new Token(STRING_CONSTANT_BEGIN, text);
-    }
-    if('$' == startChar && '$' == currentChar) {
-        getNextChar();
-        return new Token(STRING_CONSTANT_MID, text);
-    }
-    getNextChar();
-    return new Token(STRING_CONSTANT_END, text);
     
+    getNextChar();
+    return new Token(STRING_CONSTANT, text);
 }
 
 
@@ -329,7 +318,6 @@ Token* Lexer::buildLexerCommand() {
     
     
     std::string path = std::get<std::string>(pathToken->value);
-    path = path.substr(1, path.size() - 2);
     
     std::unique_ptr<std::ifstream> fileStream = 
         std::make_unique<std::ifstream>();
