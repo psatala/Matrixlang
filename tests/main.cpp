@@ -23,7 +23,7 @@ void assertTokenPosition(Lexer& lexer, int lineNumber, int columnNumber) {
     delete token;
 }
 
-TEST(Lexer, basic) {
+TEST (Lexer, basic) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
@@ -41,7 +41,7 @@ TEST(Lexer, basic) {
     assertTokenType(interpreter.lexer, EOT);
 }
 
-TEST(Lexer, operators) {
+TEST (Lexer, operators) {
     // This test does not test any real code in Matrixlang, but checks
     // if operators are parsed correctly.
     std::unique_ptr<std::stringstream> inStream = 
@@ -95,15 +95,18 @@ TEST (Lexer, comments) {
     std::stringstream outStream("");
     *inStream << "# This is a single line comment\n\
         ``` This is a multi\nline comment```\n\
+        ``` Multiline with `` in the middle```\n\
         # This is yet another single line comment";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "# This is a single line comment");
+        " This is a single line comment");
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "``` This is a multi\nline comment```");
+        " This is a multi\nline comment");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT,
+        " Multiline with `` in the middle");
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "# This is yet another single line comment");
+        " This is yet another single line comment");
     assertTokenType(interpreter.lexer, EOT);
 }
 
@@ -302,7 +305,7 @@ TEST (Lexer, fibonacciRec) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#prints 55");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "prints 55");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -352,7 +355,7 @@ TEST (Lexer, fibonacciIter) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, L_BRACKET);
 
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#special cases");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "special cases");
 
     assertTokenType(interpreter.lexer, IF);
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -378,7 +381,7 @@ TEST (Lexer, fibonacciIter) {
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenType(interpreter.lexer, R_BRACKET);
 
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#declare variables");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "declare variables");
 
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "prevprev");
@@ -396,7 +399,7 @@ TEST (Lexer, fibonacciIter) {
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "current");
     assertTokenType(interpreter.lexer, SEMICOLON);
 
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#main loop");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "main loop");
 
     assertTokenType(interpreter.lexer, FOR);
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -456,7 +459,7 @@ TEST (Lexer, fibonacciIter) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#prints 55");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "prints 55");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -513,7 +516,7 @@ TEST (Lexer, findMax) {
     assertTokenType(interpreter.lexer, L_BRACKET);
 
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "#n_cols and n_rows always an int");
+        "n_cols and n_rows always an int");
     
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "max");
@@ -521,7 +524,7 @@ TEST (Lexer, findMax) {
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "INT_MIN");
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "#environmental constant");
+        "environmental constant");
 
     assertTokenType(interpreter.lexer, FOR);
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -659,7 +662,7 @@ TEST (Lexer, findMax) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#prints 14");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "prints 14");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -839,7 +842,7 @@ TEST (Lexer, concatStringMatrix) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "#prints \"ala ma kota i psa\"");
+        "prints \"ala ma kota i psa\"");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -972,7 +975,7 @@ TEST (Lexer, average) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#prints 2.5");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "prints 2.5");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -1022,10 +1025,10 @@ TEST (Lexer, printAgeDescription) {
     assertTokenType(interpreter.lexer, L_BRACKET);
 
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-    R"(```
+    R"(
     	In this function a switch statement is used to print information about 
         your age.
-    	```)");
+    	)");
 
     assertTokenType(interpreter.lexer, SWITCH);
     assertTokenType(interpreter.lexer, L_BRACKET);
@@ -1152,7 +1155,6 @@ TEST (Lexer, includeFile) {
     assertTokenType(interpreter.lexer, SEMICOLON);
 
     assertTokenType(interpreter.lexer, R_BRACKET);
-    assertTokenType(interpreter.lexer, EOT);
 
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "main");
@@ -1242,7 +1244,7 @@ TEST (Lexer, copyByValue) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#prints 3");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "prints 3");
 
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "a");
     assertTokenType(interpreter.lexer, ASSIGN);
@@ -1260,7 +1262,7 @@ TEST (Lexer, copyByValue) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#prints 4");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "prints 4");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -1320,7 +1322,7 @@ TEST (Lexer, copying) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        R"(#prints "0: 0, 1: 0")");
+        R"(prints "0: 0, 1: 0")");
 
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "vector");
     assertTokenType(interpreter.lexer, L_SQUARE_BRACKET);
@@ -1366,7 +1368,7 @@ TEST (Lexer, copying) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        R"(#prints "0: 3, 1: 5")");
+        R"(prints "0: 3, 1: 5")");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -1416,7 +1418,7 @@ TEST (Lexer, scope) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "#error - no such variable \"a\"");
+        "error - no such variable \"a\"");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -1452,7 +1454,7 @@ TEST (Lexer, divideByZero) {
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "#error - cannot divide by 0");
+        "error - cannot divide by 0");
     
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);
@@ -1497,7 +1499,7 @@ TEST (Lexer, strongTyping) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#ok");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "ok");
 
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "print");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -1506,7 +1508,7 @@ TEST (Lexer, strongTyping) {
     assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT_END, "$\"");
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "#ok");
+    assertTokenTypeAndValue(interpreter.lexer, COMMENT, "ok");
 
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "print");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -1514,7 +1516,7 @@ TEST (Lexer, strongTyping) {
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
-        "#error - value to print must be of type string");
+        "error - value to print must be of type string");
 
     assertTokenType(interpreter.lexer, RETURN);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 0);

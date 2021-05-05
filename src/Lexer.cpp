@@ -41,14 +41,17 @@ void Lexer::skipWhites() {
 
 
 Token* Lexer::buildEOT() {
-    if(-1 == currentChar) {
+    while(-1 == currentChar) {
         inStreamStack.pop();
-        if(inStreamStack.empty())
+        
+        if(inStreamStack.empty()) {
             isProcessed = true;
-        if(!isProcessed)
-            getNextChar();
-        return new Token(EOT);
-    }
+            return new Token(EOT);
+        }
+
+        getNextChar();
+        skipWhites();
+    }   
     return nullptr;
 }
 
@@ -57,6 +60,7 @@ Token* Lexer::buildComment() {
     if('#' == currentChar) {
         int currentLineNumber = lineNumber;
         std::string text;
+        getNextChar();
         while(lineNumber == currentLineNumber && -1 != currentChar) {
             text += currentChar;
             getNextChar();
@@ -67,10 +71,8 @@ Token* Lexer::buildComment() {
     //multi line
     if('`' == currentChar){
         std::string text;
-        text += currentChar;
         for(int i = 0; i < 2; ++i) {
             getNextChar();
-            text += currentChar;
             if('`' != currentChar)
                 return generateError("Beginning of comment: expected a '`'",
                     true);
@@ -78,21 +80,25 @@ Token* Lexer::buildComment() {
         //comment now opened
         getNextChar();
         bool isClosed = false;
+        int backtickCount = 0;
         while(!isClosed) {
             text += currentChar;
+            if(-1 == currentChar)
+                return new Token(INCORRECT);
             if('`' != currentChar) {
+                backtickCount = 0;
                 getNextChar();
                 continue;
             }
-            for(int i = 0; i < 2; ++i) {
-                getNextChar();
-                text += currentChar;
-                if('`' != currentChar)
-                    return generateError(" End of comment: expected a '`'", 
-                        true);
-            }
-            isClosed = true;
+            ++backtickCount;
+            getNextChar();
+            if(3 == backtickCount)
+                isClosed = true;
         }
+
+        //eliminate backtics from comment
+        text = text.substr(0, text.size() - 3);
+
         getNextChar();
         return new Token(COMMENT, text);
     }
@@ -348,28 +354,28 @@ Token* Lexer::getToken() {
     skipWhites();
 
     int tokenLineNumber = lineNumber;
-    int tokencolumnNumber = columnNumber;
+    int tokenColumnNumber = columnNumber;
 
     token = buildEOT();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     token = buildLexerCommand();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     token = buildComment();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     token = buildNumber();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     token = buildStringConstant();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     token = buildIdentifierOrKeyword();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     token = buildOperator();
-    if(token) return token->setPosition(tokenLineNumber, tokencolumnNumber);
+    if(token) return token->setPosition(tokenLineNumber, tokenColumnNumber);
 
     getNextChar();
     return new Token(UNKNOWN);
