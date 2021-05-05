@@ -5,6 +5,8 @@
 #include <memory>
 #include <cmath>
 #include <stack>
+#include <limits>
+
 #include "Token.h"
 
 class Lexer {

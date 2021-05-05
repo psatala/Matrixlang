@@ -149,7 +149,8 @@ Token* Lexer::buildNumber() {
         return generateError("Leading zeros not allowed");
     
     while(isdigit(currentChar)) {
-        if((INT32_MAX - (currentChar - '0')) / 10 < integerPart)
+        if((std::numeric_limits<int>::max() - (currentChar - '0')) / 10 
+            < integerPart)
             return generateError("Number too big");
         integerPart = integerPart * 10 + currentChar - '0';
         getNextChar();
@@ -159,16 +160,25 @@ Token* Lexer::buildNumber() {
         return new Token(INT_NUMBER, integerPart);
     
     //float part
-    float floatingPointPart = 0.0;
-    int decimalPlaces = 1;
+    int floatingPointPart = 0;
+    int decimalPlaces = 0;
+    bool isOverflown = false;
     getNextChar();
     while(isdigit(currentChar)) {
-        floatingPointPart += (currentChar - '0') * pow(10, -decimalPlaces);
-        ++decimalPlaces;
+        
+        if((std::numeric_limits<int>::max() - (currentChar - '0')) / 10 
+            < floatingPointPart)
+            isOverflown = true;
+        
+        if(!isOverflown) {
+            floatingPointPart = floatingPointPart * 10 + currentChar - '0';
+            ++decimalPlaces;
+        }
         getNextChar();
     }
-
-    float fullNumber = static_cast<float>(integerPart) + floatingPointPart;
+    float fullNumber = static_cast<float>(integerPart) 
+        + static_cast<float>(floatingPointPart) 
+        / pow(10, static_cast<float>(decimalPlaces));
     return new Token(FLOAT_NUMBER, fullNumber);
 }
 
