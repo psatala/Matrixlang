@@ -2,13 +2,14 @@
 
 #include <sstream>
 #include <fstream>
+#include <memory>
 #include <cmath>
 #include <stack>
 #include "Token.h"
 
 class Lexer {
-    std::stack<std::stringstream*> inStreamStack;
-    std::stringstream& errStream;
+    std::stack< std::unique_ptr<std::istream> > inStreamStack;
+    std::ostream& errStream;
 
     std::stringstream placeholderStringstream;
     
@@ -37,9 +38,9 @@ public:
     Lexer(): 
         errStream(placeholderStringstream) {}
     
-    Lexer(std::stringstream& inStream, std::stringstream& errStream) : 
+    Lexer(std::unique_ptr<std::istream> inStream, std::ostream& errStream) : 
         errStream(errStream) {
-            inStreamStack.push(new std::stringstream(std::move(inStream)));
+            inStreamStack.push(std::move(inStream));
             getNextChar();
         }
 

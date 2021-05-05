@@ -24,11 +24,13 @@ void assertTokenPosition(Lexer& lexer, int lineNumber, int columnNumber) {
 }
 
 TEST(Lexer, basic) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "int a = 10;";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    *inStream << "int a = 10;";
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     
 
     assertTokenType(interpreter.lexer, INT);
@@ -42,12 +44,14 @@ TEST(Lexer, basic) {
 TEST(Lexer, operators) {
     // This test does not test any real code in Matrixlang, but checks
     // if operators are parsed correctly.
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "+ += ++ - -= -- * *= / /= % %= < <= > >= ! != = == && || \
+    *inStream << "+ += ++ - -= -- * *= / /= % %= < <= > >= ! != = == && || \
     : ; , . { } [ ] ( )";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
 
     assertTokenType(interpreter.lexer, PLUS);
     assertTokenType(interpreter.lexer, PLUS_ASSIGN);
@@ -85,13 +89,15 @@ TEST(Lexer, operators) {
 }
 
 TEST (Lexer, comments) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "# This is a single line comment\n\
+    *inStream << "# This is a single line comment\n\
         ``` This is a multi\nline comment```\n\
         # This is yet another single line comment";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
         "# This is a single line comment");
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
@@ -103,12 +109,14 @@ TEST (Lexer, comments) {
 
 TEST (Lexer, stringConstants) {
     //No real Matrixlang code here either
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "\"String begin$ $string middle$ $string end\"\
+    *inStream << "\"String begin$ $string middle$ $string end\"\
         \"Full string\"";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT_BEGIN, 
         "\"String begin$");
     assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT_MID, 
@@ -122,16 +130,18 @@ TEST (Lexer, stringConstants) {
 
 TEST (Lexer, numbers) {
     //No real Matrixlang code here either
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(1234
         24.
         3.5
         103.23
     )";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 1234);
     assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 24.0f);
     assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 3.5f);
@@ -141,11 +151,13 @@ TEST (Lexer, numbers) {
 
 TEST (Lexer, leadingZeroError) {
     //No real Matrixlang code here either
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "01";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    *inStream << "01";
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     while(!interpreter.lexer.getIsProcessed()) {
         Token* token = interpreter.lexer.getToken();
         delete token;
@@ -157,11 +169,13 @@ TEST (Lexer, leadingZeroError) {
 
 TEST (Lexer, numberTooBigError) {
     //No real Matrixlang code here either
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "999999999999999999999999";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    *inStream << "999999999999999999999999";
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     
     delete interpreter.lexer.getToken();
     
@@ -171,11 +185,13 @@ TEST (Lexer, numberTooBigError) {
 
 TEST (Lexer, andError) {
     //No real Matrixlang code here either
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "\n\nif(1 == 1 & 3 > 2);\nprint(\"OK\");";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    *inStream << "\n\nif(1 == 1 & 3 > 2);\nprint(\"OK\");";
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     while(!interpreter.lexer.getIsProcessed()) {
         Token* token = interpreter.lexer.getToken();
         delete token;
@@ -185,11 +201,13 @@ TEST (Lexer, andError) {
 }
 
 TEST (Lexer, tokenPosition) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << "int a = \n10;";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    *inStream << "int a = \n10;";
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenPosition(interpreter.lexer, 1, 1);
     assertTokenPosition(interpreter.lexer, 1, 5);
     assertTokenPosition(interpreter.lexer, 1, 7);
@@ -200,10 +218,11 @@ TEST (Lexer, tokenPosition) {
 
 
 TEST (Lexer, fibonacciRec) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int fibonacciRec(int n) {
 	    if(n == 0) { return 0; }
 	    if(n == 1) { return 1; }
@@ -214,7 +233,8 @@ TEST (Lexer, fibonacciRec) {
 	    print(string(fibonacciRec(10))); #prints 55
 	    return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "fibonacciRec");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -293,10 +313,11 @@ TEST (Lexer, fibonacciRec) {
 }
 
 TEST (Lexer, fibonacciIter) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int fibonacciIter(int n) {
 	    #special cases
         if(n == 0) { return 0; }
@@ -321,7 +342,8 @@ TEST (Lexer, fibonacciIter) {
 	    print(string(fibonacciIter(10))); #prints 55
 	    return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "fibonacciIter");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -445,10 +467,11 @@ TEST (Lexer, fibonacciIter) {
 }
 
 TEST (Lexer, findMax) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int findMax(Matrix<int>[n_cols, n_rows] matrix) {
     	#n_cols and n_rows always an int
         
@@ -471,7 +494,8 @@ TEST (Lexer, findMax) {
 	    print(string(findMax(matrix))); #prints 14
 	    return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "findMax");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -646,10 +670,11 @@ TEST (Lexer, findMax) {
 }
 
 TEST (Lexer, concatStringMatrix) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(string concatStringMatrix(Matrix<string>[n_cols, n_rows] matrix) {
         string concatString = "";
         for(int i = 0; i < n_cols; ++i) {
@@ -669,7 +694,8 @@ TEST (Lexer, concatStringMatrix) {
 	    print(concatStringMatrix(matrix)); #prints "ala ma kota i psa"
 	    return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, STRING);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, 
         "concatStringMatrix");
@@ -824,10 +850,11 @@ TEST (Lexer, concatStringMatrix) {
 }
 
 TEST (Lexer, average) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(float average(Vector<float>[n] vector) {
     	float sum = 0.0;
     	for(int i = 0; i < n; ++i) {
@@ -843,7 +870,8 @@ TEST (Lexer, average) {
     	print(string(average(vector))); #prints 2.5
     	return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, FLOAT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "average");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -955,10 +983,11 @@ TEST (Lexer, average) {
 }
 
 TEST (Lexer, printAgeDescription) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(void printAgeDescription(int age) {
     	```
     	In this function a switch statement is used to print information about 
@@ -981,7 +1010,8 @@ TEST (Lexer, printAgeDescription) {
     	printAgeDescription(age);
     	return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, VOID);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, 
         "printAgeDescription");
@@ -1087,17 +1117,19 @@ TEST (Lexer, printAgeDescription) {
 }
 
 TEST (Lexer, includeFile) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(@include "../examples/YearInfo.ml"
 
     int main() {
     	printYearInfo(2021);
     	return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, LEXER_COMMAND);
     assertTokenType(interpreter.lexer, VOID);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "printYearInfo");
@@ -1143,10 +1175,11 @@ TEST (Lexer, includeFile) {
 }
 
 TEST (Lexer, copyByValue) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int addOne(int x) {
 	    x++;
     	return x;
@@ -1163,7 +1196,8 @@ TEST (Lexer, copyByValue) {
     
     return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "addOne");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -1237,10 +1271,11 @@ TEST (Lexer, copyByValue) {
 }
 
 TEST (Lexer, copying) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int main() {
     	Vector<int>[2] vector;
     	print("0: $vector[0]$, 1: $vector[1]$\n"); #prints "0: 0, 1: 0"
@@ -1251,7 +1286,8 @@ TEST (Lexer, copying) {
     	print("0: $vectorCopy[0]$, 1: $vectorCopy[1]$\n"); #prints "0: 3, 1: 5"
         return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "main");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -1341,10 +1377,11 @@ TEST (Lexer, copying) {
 }
 
 TEST (Lexer, scope) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int main() {
     	{
     		int a = 10;
@@ -1352,7 +1389,8 @@ TEST (Lexer, scope) {
     	print(string(a));	#error - no such variable "a"
     	return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "main");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -1389,15 +1427,17 @@ TEST (Lexer, scope) {
 }
 
 TEST (Lexer, divideByZero) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int main() {
     	int a = 1 / 0;	#error - cannot divide by 0
     	return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "main");
     assertTokenType(interpreter.lexer, L_PARENT);
@@ -1423,10 +1463,11 @@ TEST (Lexer, divideByZero) {
 }
 
 TEST (Lexer, strongTyping) {
-    std::stringstream inStream("");
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    inStream << 
+    *inStream << 
     R"(int main() {
     	int a = 0;
     	print(string(a)); #ok
@@ -1434,7 +1475,8 @@ TEST (Lexer, strongTyping) {
     	print(a);	#error - value to print must be of type string
     	return 0;
     })";
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
     assertTokenType(interpreter.lexer, INT);
     assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "main");
     assertTokenType(interpreter.lexer, L_PARENT);

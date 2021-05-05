@@ -3,16 +3,15 @@
 #include "Lexer.h"
 
 class Interpreter {
-    std::stringstream& inStream;
-    std::stringstream& errStream;
-    std::stringstream& outStream;
+    std::ostream& errStream;
+    std::ostream& outStream;
     
 
 public:
     Lexer lexer;
 
-    Interpreter(std::stringstream& inStream, std::stringstream& errStream, 
-        std::stringstream& outStream) : 
-        inStream(inStream), errStream(errStream), outStream(outStream),
-        lexer(inStream, errStream) {}
+    Interpreter(std::unique_ptr<std::istream> inStream, std::ostream& errStream, 
+        std::ostream& outStream) : 
+        errStream(errStream), outStream(outStream),
+        lexer(std::move(inStream), errStream) {}
 };

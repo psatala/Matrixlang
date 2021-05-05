@@ -42,9 +42,7 @@ void Lexer::skipWhites() {
 
 Token* Lexer::buildEOT() {
     if(-1 == currentChar) {
-        std::stringstream* inStreamStackTop = inStreamStack.top();
         inStreamStack.pop();
-        delete inStreamStackTop;
         if(inStreamStack.empty())
             isProcessed = true;
         if(!isProcessed)
@@ -313,18 +311,19 @@ Token* Lexer::buildLexerCommand() {
         return generateError("Expected path to file");
     }
     
-    std::ifstream fileStream;
-    std::stringstream* stringStream = new std::stringstream("");
     
     std::string path = std::get<std::string>(pathToken->value);
     path = path.substr(1, path.size() - 2);
     
-    fileStream.open(path, std::ifstream::in);
-    if(fileStream) {
-        *stringStream << fileStream.rdbuf();
-        fileStream.close();
-    }
-    inStreamStack.push(stringStream);
+    std::unique_ptr<std::ifstream> fileStream = 
+        std::make_unique<std::ifstream>();
+    fileStream->open(path, std::ifstream::in);
+
+    if(!fileStream)
+        return new Token(INCORRECT);
+    
+    inStreamStack.push(std::move(fileStream));
+
     delete pathToken;
     return new Token(LEXER_COMMAND);
 }

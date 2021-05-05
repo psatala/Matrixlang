@@ -4,18 +4,15 @@
 #include <fstream>
 int main()
 {
-    std::stringstream inStream("");
-    std::stringstream errStream("");
-    std::stringstream outStream("");
+    std::unique_ptr<std::ifstream> fileStream = 
+        std::make_unique<std::ifstream>();
+
+    fileStream->open("../examples/HelloWorld.ml", std::ifstream::in);
+    if(!*fileStream)
+        return -1;
     
-    std::ifstream fileStream;
-    fileStream.open("../examples/HelloWorld.ml", std::ifstream::in);
-    if(fileStream) {
-        inStream << fileStream.rdbuf();
-        fileStream.close();
-    }
-    
-    Interpreter interpreter = Interpreter(inStream, errStream, outStream);
+    Interpreter interpreter = Interpreter(std::move(fileStream), std::cerr, 
+        std::cout);
 
     while(!interpreter.lexer.getIsProcessed()) {
         Token* token = interpreter.lexer.getToken();
