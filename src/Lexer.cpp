@@ -40,6 +40,25 @@ void Lexer::skipWhites() {
 
 
 
+// converts current char into an escaped character based on previous character
+// used in string parsing
+std::optional<char> Lexer::escapeCharacter(char previousCharacter, 
+    char currentCharacter) {
+    if('\\' != previousCharacter)
+        return std::nullopt;
+    
+    if('\\' == currentCharacter)
+        return '\\';
+    if('n' == currentCharacter)
+        return '\n';
+    if('\"' == currentCharacter)
+        return '\"';
+
+    return std::nullopt;
+}
+
+
+
 Token* Lexer::buildEOT() {
     while(-1 == currentChar) {
         inStreamStack.pop();
@@ -186,14 +205,38 @@ Token* Lexer::buildNumber() {
 
 Token* Lexer::buildStringConstant() {
     std::string text;
-    char startChar = currentChar;
+    
     if('\"' != currentChar)
         return nullptr;
 
     getNextChar();
-    while('\"' != currentChar) {
+
+    // process first char - this is separate from the main loop to simplify
+    // escaping code
+    if(-1 == currentChar)
+        return new Token(INCORRECT);
+    if('\"' == currentChar) {
+        getNextChar();
+        return new Token(STRING_CONSTANT, "");
+    }
+
+    text += currentChar;
+    getNextChar();
+
+    while(true) {
         if(-1 == currentChar)
             return new Token(INCORRECT);
+
+        //if unescaped quote then end of string
+        if('\"' == currentChar && '\\' != text.back())
+            break;
+
+        std::optional<char> tempChar = escapeCharacter(text.back(), 
+            currentChar);
+        if(tempChar) {
+            text.pop_back();
+            currentChar = tempChar.value();
+        }
 
         text += currentChar;
         getNextChar();

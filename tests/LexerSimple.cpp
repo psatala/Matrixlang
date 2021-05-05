@@ -101,7 +101,7 @@ TEST (LexerSimple, stringConstants) {
     assertTokenType(interpreter.lexer, EOT);
 }
 
-TEST (LexerSimple, UnterminatedString)
+TEST (LexerSimple, unterminatedString)
 {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
@@ -114,6 +114,18 @@ TEST (LexerSimple, UnterminatedString)
     assertTokenType(interpreter.lexer, EOT);
 }
 
+TEST (LexerSimple, escapingCharacters)
+{
+    std::unique_ptr<std::stringstream> inStream = 
+        std::make_unique<std::stringstream>("");
+    std::stringstream errStream("");
+    std::stringstream outStream("");
+    *inStream << R"("\" \\ \n")";
+    Interpreter interpreter = Interpreter(std::move(inStream), 
+        errStream, outStream);
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, "\" \\ \n");
+    assertTokenType(interpreter.lexer, EOT);
+}
 
 TEST (LexerSimple, numbers) {
     //No real Matrixlang code here either

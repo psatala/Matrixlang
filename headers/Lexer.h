@@ -6,6 +6,7 @@
 #include <cmath>
 #include <stack>
 #include <limits>
+#include <optional>
 
 #include "Token.h"
 
@@ -23,6 +24,8 @@ class Lexer {
     Token* generateError(std::string errorMessage, bool skipCharacter = false);
     char getNextChar();
     void skipWhites();
+    std::optional<char> escapeCharacter(char previousCharacter, 
+        char currentCharacter);
     
     Token* buildEOT();
     Token* buildComment();

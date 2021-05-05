@@ -1149,7 +1149,7 @@ TEST (LexerComplex, copying) {
     assertTokenType(interpreter.lexer, L_SQUARE_BRACKET);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 1);
     assertTokenType(interpreter.lexer, R_SQUARE_BRACKET);
-    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, "\\n");
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, "\n");
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
@@ -1195,7 +1195,7 @@ TEST (LexerComplex, copying) {
     assertTokenType(interpreter.lexer, L_SQUARE_BRACKET);
     assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 1);
     assertTokenType(interpreter.lexer, R_SQUARE_BRACKET);
-    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, "\\n");
+    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, "\n");
     assertTokenType(interpreter.lexer, R_PARENT);
     assertTokenType(interpreter.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
