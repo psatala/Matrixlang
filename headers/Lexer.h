@@ -13,8 +13,6 @@
 class Lexer {
     std::stack< std::unique_ptr<std::istream> > inStreamStack;
     std::ostream& errStream;
-
-    std::stringstream placeholderStringstream;
     
     int lineNumber = 1;
     int columnNumber = 0;
@@ -41,8 +39,6 @@ class Lexer {
     std::optional<Token> buildLexerCommand();
 
 public:
-    Lexer(): 
-        errStream(placeholderStringstream) {}
     
     Lexer(std::unique_ptr<std::istream> inStream, std::ostream& errStream) : 
         errStream(errStream) {
