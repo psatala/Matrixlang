@@ -7,9 +7,6 @@ enum TokenType {
     INT_NUMBER,
     FLOAT_NUMBER,
     STRING_CONSTANT,
-    STRING_CONSTANT_BEGIN,
-    STRING_CONSTANT_MID,
-    STRING_CONSTANT_END,
     COMMENT,
     EOT,
     UNKNOWN,
@@ -85,9 +82,8 @@ public:
     Token(TokenType type, std::variant<int, float, std::string> value):
         type(type), value(value) {}
 
-    Token* setPosition(int lineNumber, int columnNumber) {
+    void setPosition(const int& lineNumber, const int& columnNumber) {
         this->lineNumber = lineNumber;
         this->columnNumber = columnNumber;
-        return this;
     }
 };

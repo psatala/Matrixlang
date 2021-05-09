@@ -1,3 +1,18 @@
+9.05.2021:
+* Strumienie wejścia przekazywane są teraz za pomocą unique_ptr, a nie zwykłego wskaźnika.
+* Naprawiono błąd, który umożliwiał pojawienie się wielu tokenów EOT dla jednego programu.
+* Komentarze wieloliniowe mogą teraz zawierać znaki "`".
+* Zmieniono sposób parsowania liczb zmiennoprzecinkowych.
+* Usunięto wyróżniki ze stringów.
+* Dodano obsługę niezakończonych stringów i komentarzy.
+* Zmieniono sposób reprezentacji wyrażeń znakowych.
+* Dodano escapowanie znaków w stringach.
+* Lekser działa teraz leniwie.
+* Tokeny przekazywane są teraz za pomocą std::optional, a nie zwykłych wskaźników.
+* Poprawiono czytelność kodu przy zwracaniu tokenów.
+* Usunięto strumień "placeholder".
+* Napisane zostały testy parametryczne, sprawdzające działanie leksera w bardzo prostych przypadkach.
+
 25.04.2021:
 * Napisany został lekser.
 * Przygotowane zostały testy dla leksera.
