@@ -3,6 +3,17 @@
 #include <gtest/gtest.h>
 #include "../headers/Interpreter.h"
 
+
+//class for passing data to parametrised tests
+class SimpleTestData {
+public:
+    std::string input;
+    TokenType firstToken;
+    SimpleTestData(std::string input, TokenType firstToken) :
+        input(input), firstToken(firstToken) {}
+};
+
+
 inline void assertTokenTypeAndValue(Lexer& lexer, TokenType type,
     std::variant<int, float, std::string> value) {
     

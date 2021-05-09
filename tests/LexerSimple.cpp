@@ -18,9 +18,9 @@ TEST (LexerSimple, basic) {
     assertTokenType(interpreter.lexer, EOT);
 }
 
-TEST (LexerSimple, operators) {
+TEST (LexerSimple, operatorSequence) {
     // This test does not test any real code in Matrixlang, but checks
-    // if operators are parsed correctly.
+    // if a sequence of operators is parsed correctly.
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
     std::stringstream errStream("");
