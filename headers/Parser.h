@@ -1,7 +1,14 @@
 #pragma once
 
 #include "Lexer.h"
+
 #include "LanguageObjects.h"
+// #include "LanguageObjects/Expression.h"
+// #include "LanguageObjects/MatrixType.h"
+// #include "LanguageObjects/SimpleType.h"
+// #include "LanguageObjects/StringExpression.h"
+// #include "LanguageObjects/Type.h"
+// #include "LanguageObjects/VectorType.h"
 
 class Parser {
     std::ostream& errStream;

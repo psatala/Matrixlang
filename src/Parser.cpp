@@ -74,8 +74,8 @@ std::optional<VectorType> Parser::parseVectorType() {
         generateError("Parsing Vector, expected \"<\"");
     getNextToken();
 
-    std::optional<SimpleType> simpleType = parseSimpleType();
-    if(!simpleType)
+    std::optional<Type> type = parseType();
+    if(!type)
         generateError("Parsing Vector, expected Type");
     
     if(MORE_THAN != currentToken.type)
@@ -94,7 +94,10 @@ std::optional<VectorType> Parser::parseVectorType() {
         generateError("Parsing Vector, expected \"]\"");
     getNextToken();
 
-    return VectorType(simpleType.value(), expression.value());
+    Type typeEnd = type.value();
+    std::optional<VectorType> vectorType = VectorType(type.value(), expression.value());
+
+    return VectorType(type.value(), expression.value());
 }
 
 std::optional<MatrixType> Parser::parseMatrixType() {
@@ -106,8 +109,8 @@ std::optional<MatrixType> Parser::parseMatrixType() {
         generateError("Parsing Vector, expected \"<\"");
     getNextToken();
 
-    std::optional<SimpleType> simpleType = parseSimpleType();
-    if(!simpleType)
+    std::optional<Type> type = parseType();
+    if(!type)
         generateError("Parsing Vector, expected Type");
     
     if(MORE_THAN != currentToken.type)
@@ -134,16 +137,20 @@ std::optional<MatrixType> Parser::parseMatrixType() {
         generateError("Parsing Vector, expected \"]\"");
     getNextToken();
 
-    return MatrixType(simpleType.value(), firstExpression.value(), 
+    return MatrixType(type.value(), firstExpression.value(), 
         secondExpression.value());
 }
 
 std::optional<Type> Parser::parseType() {
+    std::optional<VectorType> vectorTypeOptional = parseVectorType();
+    if(vectorTypeOptional) {
+        VectorType vectorType = vectorTypeOptional.value();
+        Type type = Type(vectorType);
+        return type;
+    }
+    
     std::optional<SimpleType> simpleType = parseSimpleType();
     if(simpleType) return Type(simpleType.value());
-    
-    std::optional<VectorType> vectorType = parseVectorType();
-    if(vectorType) return Type(vectorType.value());
     
     std::optional<MatrixType> matrixType = parseMatrixType();
     if(matrixType) return Type(matrixType.value());

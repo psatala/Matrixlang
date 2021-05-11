@@ -1,13 +1,24 @@
 #pragma once
 
-#include <variant>
 #include <vector>
+#include <variant>
 #include <string>
+
+#include "Token.h"
+
+class Expression;
+class StringExpression;
+class SimpleType;
+class VectorType;
+class MatrixType;
+class Type;
+
 
 class Expression {
 public:
     Expression() = default;
 };
+
 
 class StringExpression {
 public:
@@ -24,26 +35,30 @@ public:
     SimpleType(TokenType type): type(type) {}
 };
 
+
 class VectorType {
 public:
-    SimpleType type;
+    Type& type;
     Expression expression;
-    VectorType(SimpleType type, Expression expression) : type(type), 
+    VectorType(Type& type, Expression expression) : type(type), 
         expression(expression) {}
 };
 
+
 class MatrixType {
 public:
-    SimpleType type;
+    Type& type;
     Expression firstExpression;
     Expression secondExpression;
-    MatrixType(SimpleType type, Expression firstExpression, 
+    MatrixType(Type& type, Expression firstExpression, 
         Expression secondExpression) : type(type), 
         firstExpression(firstExpression), secondExpression(secondExpression) {}
 };
 
+
 class Type {
 public:
-    std::variant<SimpleType, VectorType, MatrixType> type;
-    Type(std::variant<SimpleType, VectorType, MatrixType> type) : type(type) {}
+    std::variant<SimpleType, VectorType, MatrixType> containedType;
+    Type(std::variant<SimpleType, VectorType, MatrixType> containedType) : 
+        containedType(containedType) {}
 };
