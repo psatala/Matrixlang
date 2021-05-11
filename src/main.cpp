@@ -14,8 +14,8 @@ int main()
     Interpreter interpreter = Interpreter(std::move(fileStream), std::cerr, 
         std::cout);
 
-    while(!interpreter.lexer.getIsProcessed()) {
-        const std::optional<Token> token = interpreter.lexer.getToken();
+    while(!interpreter.parser.lexer.getIsProcessed()) {
+        const std::optional<Token> token = interpreter.parser.lexer.getToken();
         std::cout << token->type << std::endl;
     }
     return 0;

@@ -15,7 +15,7 @@ TEST_P(LexerParametrised, checkFirstTokenType)
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
     
-    assertTokenType(interpreter.lexer, simpleTestData.firstToken);
+    assertTokenType(interpreter.parser.lexer, simpleTestData.firstToken);
 }
 
 

@@ -380,7 +380,7 @@ bool Lexer::getIsProcessed() const {
 
 
 
-std::optional<Token> Lexer::getToken() {
+Token Lexer::getToken() {
     std::optional<Token> token;
 
     skipWhites();
@@ -398,7 +398,7 @@ std::optional<Token> Lexer::getToken() {
         (token = buildOperator())
     ) {
         token->setPosition(tokenLineNumber, tokenColumnNumber);
-        return token;
+        return token.value();
     }
 
     getNextChar();
