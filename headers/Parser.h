@@ -9,14 +9,22 @@ class Parser {
     Token currentToken;
 
     void getNextToken();
+    void generateError(std::string message);
 
-    std::optional<Expression> parseExpression();
-    std::optional<StringExpression> parseStringExpression();
 
 public:
     Lexer lexer;
 
+    std::optional<Expression> parseExpression();
+    std::optional<StringExpression> parseStringExpression();
+    std::optional<SimpleType> parseSimpleType();
+    std::optional<VectorType> parseVectorType();
+    std::optional<MatrixType> parseMatrixType();
+    std::optional<Type> parseType();
+
     Parser(std::unique_ptr<std::istream> inStream, std::ostream& errStream) : 
         errStream(errStream),
-        lexer(std::move(inStream), errStream) {}
+        lexer(std::move(inStream), errStream) {
+            getNextToken();
+        }
 };
