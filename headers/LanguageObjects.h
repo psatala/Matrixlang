@@ -7,6 +7,87 @@
 
 #include "Token.h"
 
+class Expression {
+    
+};
+
+class Operator {
+public:
+    TokenType type;
+    int precedenceLevel;
+    bool isRightAssociative;
+    bool isBinary;
+    Operator(TokenType type) : type(type) { setAttributes(); }
+    void setAttributes() {
+        //TODO: refactor
+        if(type == PLUS) {
+            precedenceLevel = 4;
+            isRightAssociative = false;
+            isBinary = true;
+            return;
+        }
+        if(type == ASSIGN) {
+            precedenceLevel = 0;
+            isRightAssociative = true;
+            isBinary = true;
+        }
+    }
+};
+
+class BinaryExpression : public Expression {
+public:    
+    std::unique_ptr<Expression> lhs;
+    std::unique_ptr<Expression> rhs;
+    std::unique_ptr<Operator> op;
+    BinaryExpression(std::unique_ptr<Expression> lhs, 
+        std::unique_ptr<Expression> rhs, std::unique_ptr<Operator> op) :
+        lhs(std::move(lhs)), rhs(std::move(rhs)), op(std::move(op)) {}
+};
+
+class PrimaryExpression : public Expression {
+public:
+    Token token;
+    PrimaryExpression(Token token) : token(token) {}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // class Expression;
 // class StringExpression;
 // class SimpleType;

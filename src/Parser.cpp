@@ -23,6 +23,45 @@ void Parser::generateError(std::string message) {
 
 }
 
+
+std::unique_ptr<PrimaryExpression> Parser::parsePrimaryExpression() {
+    if( INT         != currentToken.type    && 
+        FLOAT       != currentToken.type    &&
+        IDENTIFIER  != currentToken.type     )
+        return std::unique_ptr<PrimaryExpression>(nullptr);
+
+    PrimaryExpression primaryExpression = PrimaryExpression(currentToken);
+    getNextToken();
+    return std::make_unique<PrimaryExpression>(primaryExpression);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // std::optional<Expression> Parser::parseExpression() {
 //     return Expression();
 // }
