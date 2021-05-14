@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "Lexer.h"
 
 #include "LanguageObjects.h"
@@ -30,8 +32,16 @@ public:
     // std::optional<Type> parseType();
 
     std::unique_ptr<PrimaryExpression> parsePrimaryExpression();
+
+    std::unique_ptr<Operator> parseOperator(std::vector<TokenType> 
+        acceptedOperators);
     std::unique_ptr<Operator> parseAdditionOperator();
     std::unique_ptr<Operator> parseAssignmentOperator();
+    
+    std::unique_ptr<Expression> parseBinaryExpression(
+        std::function<std::unique_ptr<Expression>()> parseLowerExpression,
+        std::function<std::unique_ptr<Operator>()> parseThisOperator,
+        std::string errorMessage, bool isRightAssociative = false);
     std::unique_ptr<Expression> parseAdditionExpression();
     std::unique_ptr<Expression> parseAssignmentExpression();
     std::unique_ptr<Program> parseProgram();

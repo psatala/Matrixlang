@@ -35,28 +35,80 @@ std::unique_ptr<PrimaryExpression> Parser::parsePrimaryExpression() {
     return std::make_unique<PrimaryExpression>(primaryExpression);
 }
 
-std::unique_ptr<Operator> Parser::parseAdditionOperator() {
-    if( PLUS    != currentToken.type    &&
-        MINUS   != currentToken.type    )
+std::unique_ptr<Operator> Parser::parseOperator(std::vector<TokenType> 
+        acceptedOperators) {
+
+        for(int i = 0; i < acceptedOperators.size(); ++i) {
+            if(acceptedOperators[i] == currentToken.type) {
+                Operator additionOperator = Operator(currentToken.type);
+                getNextToken();
+                return std::make_unique<Operator>(additionOperator);            
+            }
+        }
+
         return std::unique_ptr<Operator>(nullptr);
-    
-    Operator additionOperator = Operator(currentToken.type);
-    getNextToken();
-    return std::make_unique<Operator>(additionOperator);
+    }
+
+std::unique_ptr<Operator> Parser::parseAdditionOperator() {
+    return parseOperator(std::vector<TokenType> {PLUS, MINUS});
 }
 
 std::unique_ptr<Operator> Parser::parseAssignmentOperator() {
-    if( ASSIGN          != currentToken.type    &&
-        PLUS_ASSIGN     != currentToken.type    &&
-        MINUS_ASSIGN    != currentToken.type    &&
-        MULTIPLY_ASSIGN != currentToken.type    &&
-        DIVIDE_ASSIGN   != currentToken.type    &&
-        MODULO_ASSIGN   != currentToken.type    )
-        return std::unique_ptr<Operator>(nullptr);
+    return parseOperator(std::vector<TokenType> {ASSIGN, PLUS_ASSIGN, 
+        MINUS_ASSIGN, MULTIPLY_ASSIGN, DIVIDE_ASSIGN, MODULO_ASSIGN});
+}
+
+
+std::unique_ptr<Expression> Parser::parseBinaryExpression(
+    std::function<std::unique_ptr<Expression>()> parseLowerExpression,
+    std::function<std::unique_ptr<Operator>()> parseThisOperator,
+    std::string errorMessage, bool isRightAssociative) {
+
+    std::unique_ptr<Expression> leftExpression = parseLowerExpression();
+    if(!leftExpression)
+        return std::unique_ptr<Expression>(nullptr);
+
+    std::vector<std::unique_ptr<Expression>> expressionVector;
+    expressionVector.push_back(std::move(leftExpression));
+
+    std::vector<std::unique_ptr<Operator>> operatorVector;
     
-    Operator assignmentOperator = Operator(currentToken.type);
-    getNextToken();
-    return std::make_unique<Operator>(assignmentOperator);
+    while(true) {
+        std::unique_ptr<Operator> currentOperator = 
+            parseThisOperator();
+        if(!currentOperator)
+            break;
+        std::unique_ptr<Expression> rightExpression = parseLowerExpression();
+        if(!rightExpression)
+            generateError(errorMessage);
+        operatorVector.push_back(std::move(currentOperator));
+        expressionVector.push_back(std::move(rightExpression));
+    }
+
+    if(isRightAssociative) {
+        std::unique_ptr<BinaryExpression> resultExpression;
+        for(int i = expressionVector.size() - 2; i >= 0; --i) {
+            resultExpression = std::make_unique<BinaryExpression>
+                (BinaryExpression(std::move(expressionVector[i]), 
+                std::move(expressionVector[i + 1]),
+                std::move(operatorVector[i])));
+            expressionVector[i] = std::move(resultExpression);
+        }
+
+        return std::move(expressionVector[0]);
+
+    }
+
+    std::unique_ptr<BinaryExpression> resultExpression;
+    for(int i = 0; i < expressionVector.size() - 1; ++i) {
+        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression(
+            std::move(expressionVector[i]), std::move(expressionVector[i + 1]),
+            std::move(operatorVector[i])));
+        expressionVector[i + 1] = std::move(resultExpression);
+    }
+
+    return std::move(expressionVector[expressionVector.size() - 1]);
+
 }
 
 
@@ -65,35 +117,34 @@ std::unique_ptr<Expression> Parser::parseAdditionExpression() {
     if(!leftExpression)
         return std::unique_ptr<Expression>(nullptr);
 
+    std::vector<std::unique_ptr<Expression>> expressionVector;
+    expressionVector.push_back(std::move(leftExpression));
 
-    std::unique_ptr<Operator> additionOperator = parseAdditionOperator();
-    if(!additionOperator)
-        return leftExpression;
-
-
-    std::unique_ptr<Expression> rightExpression = parsePrimaryExpression();
-    if(!rightExpression)
-        generateError("Parsing addition expression: expected another "
-            "operand");
-    std::unique_ptr<BinaryExpression> resultExpression = 
-        std::make_unique<BinaryExpression>(BinaryExpression
-        (std::move(leftExpression), std::move(rightExpression), 
-        std::move(additionOperator)));
-
-
+    std::vector<std::unique_ptr<Operator>> operatorVector;
+    
     while(true) {
-        std::unique_ptr<Operator> additionOperator = parseAdditionOperator();
+        std::unique_ptr<Operator> additionOperator = 
+            parseAdditionOperator();
         if(!additionOperator)
             break;
         std::unique_ptr<Expression> rightExpression = parsePrimaryExpression();
         if(!rightExpression)
-            generateError("Parsing addition expression: expected another "
+            generateError("Parsing assignment expression: expected another "
                 "operand");
-        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression
-            (std::move(resultExpression), std::move(rightExpression), 
-            std::move(additionOperator)));
+        operatorVector.push_back(std::move(additionOperator));
+        expressionVector.push_back(std::move(rightExpression));
     }
-    return resultExpression;
+
+    std::unique_ptr<BinaryExpression> resultExpression;
+    for(int i = 0; i < expressionVector.size() - 1; ++i) {
+        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression(
+            std::move(expressionVector[i]), std::move(expressionVector[i + 1]),
+            std::move(operatorVector[i])));
+        expressionVector[i + 1] = std::move(resultExpression);
+    }
+
+    return std::move(expressionVector[expressionVector.size() - 1]);
+
 }
 
 
