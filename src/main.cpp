@@ -9,8 +9,8 @@ int main()
     
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(
-            // R"(Vector<float>[ ])"
-            R"(a + b + c)"
+            // R"(a + b + c)"
+            R"(a = b = c)"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
@@ -19,6 +19,20 @@ int main()
     try {
         std::unique_ptr<Program> program = interpreter.parser.parseProgram();
         
+        // a = b = c
+        BinaryExpression* binaryExpression = dynamic_cast<BinaryExpression*>
+            (program->expression.get());
+        BinaryExpression* binaryExpressionRight = 
+            dynamic_cast<BinaryExpression*>(binaryExpression->rhs.get());
+        PrimaryExpression* primaryExpressionA = dynamic_cast<PrimaryExpression*>
+            (binaryExpression->lhs.get());
+        PrimaryExpression* primaryExpressionB = dynamic_cast<PrimaryExpression*>
+            (binaryExpressionRight->lhs.get());
+        PrimaryExpression* primaryExpressionC = dynamic_cast<PrimaryExpression*>
+            (binaryExpressionRight->rhs.get());
+        
+        int a = 0;
+
         // a + b + c
         // BinaryExpression* binaryExpression = dynamic_cast<BinaryExpression*>
         //     (program->expression.get());

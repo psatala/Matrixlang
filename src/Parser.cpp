@@ -102,27 +102,11 @@ std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
     if(!leftExpression)
         return std::unique_ptr<Expression>(nullptr);
 
-    // std::vector<std::unique_ptr<Expression>> expressionVector;
-    // expressionVector.push_back(std::move(leftExpression));
+    std::vector<std::unique_ptr<Expression>> expressionVector;
+    expressionVector.push_back(std::move(leftExpression));
 
-    // std::vector<std::unique_ptr<Operator>> operatorVector;
-
-
-    std::unique_ptr<Operator> assignmentOperator = parseAssignmentOperator();
-    if(!assignmentOperator)
-        return leftExpression;
-
-
-    std::unique_ptr<Expression> rightExpression = parseAdditionExpression();
-    if(!rightExpression)
-        generateError("Parsing addition expression: expected another "
-            "operand");
-    std::unique_ptr<BinaryExpression> resultExpression = 
-        std::make_unique<BinaryExpression>(BinaryExpression
-        (std::move(leftExpression), std::move(rightExpression), 
-        std::move(assignmentOperator)));
-
-
+    std::vector<std::unique_ptr<Operator>> operatorVector;
+    
     while(true) {
         std::unique_ptr<Operator> assignmentOperator = 
             parseAssignmentOperator();
@@ -132,17 +116,59 @@ std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
         if(!rightExpression)
             generateError("Parsing assignment expression: expected another "
                 "operand");
-        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression
-            (std::move(resultExpression), std::move(rightExpression), 
-            std::move(assignmentOperator)));
+        operatorVector.push_back(std::move(assignmentOperator));
+        expressionVector.push_back(std::move(rightExpression));
     }
-    return resultExpression;
+
+    std::unique_ptr<BinaryExpression> resultExpression;
+    for(int i = expressionVector.size() - 2; i >= 0; --i) {
+        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression(
+            std::move(expressionVector[i]), std::move(expressionVector[i + 1]),
+            std::move(operatorVector[i])));
+        expressionVector[i] = std::move(resultExpression);
+    }
+
+    return std::move(expressionVector[0]);
+
+        
+    
+
+
+    // std::unique_ptr<Operator> assignmentOperator = parseAssignmentOperator();
+    // if(!assignmentOperator)
+    //     return leftExpression;
+
+
+    // std::unique_ptr<Expression> rightExpression = parseAdditionExpression();
+    // if(!rightExpression)
+    //     generateError("Parsing addition expression: expected another "
+    //         "operand");
+    // std::unique_ptr<BinaryExpression> resultExpression = 
+    //     std::make_unique<BinaryExpression>(BinaryExpression
+    //     (std::move(leftExpression), std::move(rightExpression), 
+    //     std::move(assignmentOperator)));
+
+
+    // while(true) {
+    //     std::unique_ptr<Operator> assignmentOperator = 
+    //         parseAssignmentOperator();
+    //     if(!assignmentOperator)
+    //         break;
+    //     std::unique_ptr<Expression> rightExpression = parseAdditionExpression();
+    //     if(!rightExpression)
+    //         generateError("Parsing assignment expression: expected another "
+    //             "operand");
+    //     resultExpression = std::make_unique<BinaryExpression>(BinaryExpression
+    //         (std::move(resultExpression), std::move(rightExpression), 
+    //         std::move(assignmentOperator)));
+    // }
+    // return resultExpression;
 }
 
 
 std::unique_ptr<Program> Parser::parseProgram() {
     getNextToken();
-    std::unique_ptr<Expression> expression = parseAdditionExpression();
+    std::unique_ptr<Expression> expression = parseAssignmentExpression();
     if(!expression)
         return std::unique_ptr<Program>(nullptr);
     return std::make_unique<Program>(Program(std::move(expression)));
