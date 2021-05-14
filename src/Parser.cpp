@@ -55,6 +55,12 @@ std::unique_ptr<Operator> Parser::parseOperator(std::vector<TokenType>
 
 
 
+std::unique_ptr<Operator> Parser::parseUnaryOperator() {
+    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT, PLUS, 
+        MINUS, NOT});
+}
+
+
 std::unique_ptr<Operator> Parser::parseMultiplicationOperator() {
     return parseOperator(std::vector<TokenType> {MULTIPLY, DIVIDE, MODULO});
 }
@@ -82,6 +88,32 @@ std::unique_ptr<Operator> Parser::parseAssignmentOperator() {
 }
 
 
+
+
+std::unique_ptr<Expression> Parser::parseUnaryExpression() {
+    std::vector<std::unique_ptr<Operator>> operatorVector;
+    while(std::unique_ptr<Operator> unaryOperator = parseUnaryOperator()) {
+        operatorVector.push_back(std::move(unaryOperator));
+    }
+    
+    std::unique_ptr<Expression> expression = parsePrimaryExpression();
+    if(!expression) {
+        if(operatorVector.empty())
+            return std::unique_ptr<Expression>(nullptr);
+        
+        generateError("Parsing unary expression: got unary operators, but an "
+        "expression did not follow");
+    }
+
+    for(int i = operatorVector.size() - 1; i >= 0; --i) {
+        expression = std::make_unique<UnaryExpression>(UnaryExpression(
+            std::move(operatorVector[i]), 
+            std::move(expression)));
+    }
+
+    return expression;
+
+}
 
 
 std::unique_ptr<Expression> Parser::parseBinaryExpression(
@@ -141,7 +173,7 @@ std::unique_ptr<Expression> Parser::parseBinaryExpression(
 
 std::unique_ptr<Expression> Parser::parseMultiplicationExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parsePrimaryExpression, this),
+        std::bind(&Parser::parseUnaryExpression, this),
         std::bind(&Parser::parseMultiplicationOperator, this),
         "Parsing multiplication expression: expected another operand");
 }

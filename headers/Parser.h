@@ -37,6 +37,7 @@ public:
     std::unique_ptr<Operator> parseOperator(std::vector<TokenType> 
         acceptedOperators);
     
+    std::unique_ptr<Operator> parseUnaryOperator();
     std::unique_ptr<Operator> parseMultiplicationOperator();
     std::unique_ptr<Operator> parseAdditionOperator();
     std::unique_ptr<Operator> parseRelationOperator();
@@ -44,6 +45,8 @@ public:
     std::unique_ptr<Operator> parseOrOperator();
     std::unique_ptr<Operator> parseAssignmentOperator();
     
+
+    std::unique_ptr<Expression> parseUnaryExpression();
 
     std::unique_ptr<Expression> parseBinaryExpression(
         std::function<std::unique_ptr<Expression>()> parseLowerExpression,

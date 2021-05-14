@@ -87,6 +87,27 @@ R"(Program
       Right: Primary expression: identifier: d
       Operator: code 60
     Operator: code 61
+)"),
+
+    ParserInputOutput(R"(++--!a)",
+R"(Program
+  Unary expression
+    Operator: code 151
+    Expression: Unary expression
+      Operator: code 152
+      Expression: Unary expression
+        Operator: code 33
+        Expression: Primary expression: identifier: a
+)"),
+
+    ParserInputOutput(R"(a + ++ b)",
+R"(Program
+  Binary expression
+    Left: Primary expression: identifier: a
+    Right: Unary expression
+      Operator: code 151
+      Expression: Primary expression: identifier: b
+    Operator: code 43
 )")
 
 };

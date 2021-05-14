@@ -9,7 +9,9 @@ int main()
     
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(
-            R"(a = b + c * 2 < d)"
+            // R"(a = b + c * 2 < d)"
+            // R"(++--!a)"
+            R"(a + ++ b)"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
