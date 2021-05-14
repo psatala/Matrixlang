@@ -30,6 +30,11 @@ public:
     // std::optional<Type> parseType();
 
     std::unique_ptr<PrimaryExpression> parsePrimaryExpression();
+    std::unique_ptr<Operator> parseAdditionOperator();
+    std::unique_ptr<Operator> parseAssignmentOperator();
+    std::unique_ptr<Expression> parseAdditionExpression();
+    std::unique_ptr<Expression> parseAssignmentExpression();
+    std::unique_ptr<Program> parseProgram();
 
     Parser(std::unique_ptr<std::istream> inStream, std::ostream& errStream) : 
         errStream(errStream),
