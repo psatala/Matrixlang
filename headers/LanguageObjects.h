@@ -7,10 +7,16 @@
 
 #include "Token.h"
 
+inline std::string ident(int identationLevel) {
+    const int identationMultiplier = 2;
+    return std::string(identationMultiplier * identationLevel, ' ');
+}
 
 class Expression {
 public:
-    virtual int evaluate() { return -1; }
+    virtual std::string print(int identationLevel) {
+        return std::string("Expression") + "\n";
+    }
 };
 
 
@@ -20,6 +26,10 @@ public:
     std::unique_ptr<Expression> expression;
     Program(std::unique_ptr<Expression> expression) : 
         expression(std::move(expression)) {}
+    std::string print() {
+        return std::string("Program") + "\n"
+            + ident(1) + expression->print(2);
+    }
 };
 
 
@@ -27,6 +37,10 @@ class Operator {
 public:
     TokenType type;
     Operator(TokenType type) : type(type) {}
+
+    std::string print(int identationLevel) {
+        return std::string("code ") + std::to_string(type) + "\n";
+    }
 };
 
 class BinaryExpression : public Expression {
@@ -37,14 +51,34 @@ public:
     BinaryExpression(std::unique_ptr<Expression> lhs, 
         std::unique_ptr<Expression> rhs, std::unique_ptr<Operator> op) :
         lhs(std::move(lhs)), rhs(std::move(rhs)), op(std::move(op)) {}
-    int evaluate() override { return 0; }
+    
+    std::string print(int identLevel) override {
+        return std::string("Binary expression")  + "\n" 
+            + ident(identLevel) + "Left: " +        lhs->print(identLevel + 1)
+            + ident(identLevel) + "Right: " +       rhs->print(identLevel + 1)
+            + ident(identLevel) + "Operator: " +     op->print(identLevel + 1);
+    }
 };
 
 class PrimaryExpression : public Expression {
 public:
     Token token;
     PrimaryExpression(Token token) : token(token) {}
-    int evaluate() override { return 0; }
+    
+    std::string print(int identationLevel) override {
+        return std::string("Primary expression: ") + getTokenInfo() + "\n";
+    }
+
+    std::string getTokenInfo() {
+        if(INT_NUMBER == token.type)
+            return "int number: " + std::to_string(std::get<int>(token.value));
+        if(FLOAT_NUMBER == token.type)
+            return "float number: " + 
+                std::to_string(std::get<float>(token.value));
+        if(IDENTIFIER == token.type)
+            return "identifier: " + std::get<std::string>(token.value);
+        return "unexpected token type";
+    }
 };
 
 
