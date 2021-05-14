@@ -23,18 +23,6 @@ void Parser::generateError(std::string message) {
 }
 
 
-std::unique_ptr<PrimaryExpression> Parser::parsePrimaryExpression() {
-    if( INT_NUMBER      != currentToken.type    && 
-        FLOAT_NUMBER    != currentToken.type    &&
-        IDENTIFIER      != currentToken.type     )
-        return std::unique_ptr<PrimaryExpression>(nullptr);
-
-    PrimaryExpression primaryExpression = PrimaryExpression(currentToken);
-    getNextToken();
-    return std::make_unique<PrimaryExpression>(primaryExpression);
-}
-
-
 
 
 
@@ -55,8 +43,8 @@ std::unique_ptr<Operator> Parser::parseOperator(std::vector<TokenType>
 
 
 
-std::unique_ptr<Operator> Parser::parseUnaryOperator() {
-    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT, PLUS, 
+std::unique_ptr<Operator> Parser::parseUnaryLValueOperator() {
+    return parseOperator(std::vector<TokenType> {PLUS, 
         MINUS, NOT});
 }
 
@@ -89,12 +77,89 @@ std::unique_ptr<Operator> Parser::parseAssignmentOperator() {
 
 
 
+std::unique_ptr<Expression> Parser::parseStringExpression() {
+    //parsing first string
+    if(STRING_CONSTANT != currentToken.type)
+        return std::unique_ptr<Expression>(nullptr);
 
-std::unique_ptr<Expression> Parser::parseUnaryExpression() {
-    std::vector<std::unique_ptr<Operator>> operatorVector;
-    while(std::unique_ptr<Operator> unaryOperator = parseUnaryOperator()) {
-        operatorVector.push_back(std::move(unaryOperator));
+    StringExpression stringExpression;
+    stringExpression.stringLiteralsAndExpressions.push_back(
+        std::get<std::string>(currentToken.value));
+    getNextToken();
+    
+    while(true) {
+        //parsing expression
+        bool isExpressionParsed = false;
+        if(std::unique_ptr<Expression> expression = parseExpression()) {
+            stringExpression.stringLiteralsAndExpressions.push_back
+                (std::move(expression));
+            isExpressionParsed = true;
+        }
+    
+        //parsing string
+        if(STRING_CONSTANT != currentToken.type) {
+            if(isExpressionParsed)
+                generateError("String expression should end with string "
+                    "literal, not expression");
+            break;
+        }
+        stringExpression.stringLiteralsAndExpressions.push_back(
+            std::get<std::string>(currentToken.value));
+        getNextToken();
     }
+    
+    return std::make_unique<StringExpression>(std::move(stringExpression));
+}
+
+
+
+
+
+std::unique_ptr<Expression> Parser::parseLiteralExpression() {
+    if( INT_NUMBER      == currentToken.type    ||
+        FLOAT_NUMBER    == currentToken.type    ) {
+            
+        LiteralExpression literalExpression = LiteralExpression(currentToken);
+        getNextToken();
+        return std::make_unique<LiteralExpression>
+            (std::move(literalExpression));
+    }
+    
+    if(std::unique_ptr<Expression> stringExpression = parseStringExpression())
+        return std::move(stringExpression);
+
+    return std::unique_ptr<Expression>(nullptr);
+}
+
+
+std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
+    std::unique_ptr<Expression> expression = parseLiteralExpression();
+    if(expression)
+        return expression;
+
+    if(L_PARENT != currentToken.type)
+        return std::unique_ptr<Expression>(nullptr);
+
+    //parsing expression in parenthesis
+    getNextToken();
+    expression = parseExpression();
+    if(!expression)
+        generateError("Parsing expression in parenthesis: expected an "
+            "expression");
+    if(R_PARENT != currentToken.type)
+        generateError("Parsing expression in parenthesis: missing closing "
+            "parenthesis");
+    getNextToken();
+
+    return expression;
+
+}
+
+
+std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
+    std::vector<std::unique_ptr<Operator>> operatorVector;
+    while(std::unique_ptr<Operator> unaryOperator = parseUnaryLValueOperator())
+        operatorVector.push_back(std::move(unaryOperator));
     
     std::unique_ptr<Expression> expression = parsePrimaryExpression();
     if(!expression) {
@@ -106,13 +171,18 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression() {
     }
 
     for(int i = operatorVector.size() - 1; i >= 0; --i) {
-        expression = std::make_unique<UnaryExpression>(UnaryExpression(
-            std::move(operatorVector[i]), 
+        expression = std::make_unique<UnaryRValueExpression>
+        (UnaryRValueExpression(std::move(operatorVector[i]), 
             std::move(expression)));
     }
 
     return expression;
 
+}
+
+
+std::unique_ptr<Expression> Parser::parseUnaryExpression() {
+    return std::move(parseUnaryRValueExpression());
 }
 
 
@@ -220,11 +290,14 @@ std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseExpression() {
+    return std::move(parseAssignmentExpression());
+}
 
 
 std::unique_ptr<Program> Parser::parseProgram() {
     getNextToken();
-    std::unique_ptr<Expression> expression = parseAssignmentExpression();
+    std::unique_ptr<Expression> expression = parseExpression();
     if(!expression)
         return std::unique_ptr<Program>(nullptr);
     return std::make_unique<Program>(Program(std::move(expression)));
@@ -258,32 +331,7 @@ std::unique_ptr<Program> Parser::parseProgram() {
 //     return Expression();
 // }
 
-// std::optional<StringExpression> Parser::parseStringExpression() {
-//     if(STRING_CONSTANT != currentToken.type)
-//         return std::nullopt;
-//     std::vector<std::variant<std::string, Expression>>
-//         stringLiteralsAndExpressions;
-//     stringLiteralsAndExpressions.push_back(
-//         std::get<std::string>(currentToken.value));
-//     getNextToken();
-//     while(true) {
-//         bool isExpressionParsed = false;
-//         if(std::optional<Expression> expression = parseExpression()) {
-//             stringLiteralsAndExpressions.push_back(expression.value());
-//             isExpressionParsed = true;
-//         }
-//         if(STRING_CONSTANT != currentToken.type) {
-//             if(isExpressionParsed)
-//                 generateError("String expression should end with string "
-//                     "literal, not expression");
-//             break;
-//         }
-//         stringLiteralsAndExpressions.push_back(
-//             std::get<std::string>(currentToken.value));
-//         getNextToken();
-//     }
-//     return StringExpression(stringLiteralsAndExpressions);
-// }
+
 
 // std::optional<SimpleType> Parser::parseSimpleType() {
 //     if( INT     != currentToken.type    &&

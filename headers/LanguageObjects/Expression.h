@@ -1,6 +1,10 @@
-// #pragma once
+#pragma once
 
-// class Expression {
-// public:
-//     Expression() = default;
-// };
+#include <string>
+
+class Expression {
+public:
+    virtual std::string print(int identationLevel) {
+        return std::string("Expression") + "\n";
+    }
+};

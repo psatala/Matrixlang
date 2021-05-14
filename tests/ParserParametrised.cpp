@@ -22,92 +22,114 @@ TEST_P(ParserParametrised, checkParsedTree)
 
 
 const ParserInputOutput basicExpressions[] = {
-    ParserInputOutput(R"(a + b + c)", 
+    ParserInputOutput(R"(1 + 2 + 3)", 
 R"(Program
   Binary expression
     Left: Binary expression
-      Left: Primary expression: identifier: a
-      Right: Primary expression: identifier: b
-      Operator: code 43
-    Right: Primary expression: identifier: c
-    Operator: code 43
+      Left: Literal expression: int number: 1
+      Right: Literal expression: int number: 2
+      Operator: +
+    Right: Literal expression: int number: 3
+    Operator: +
 )"),
 
-    ParserInputOutput(R"(a = b = c)",
-R"(Program
-  Binary expression
-    Left: Primary expression: identifier: a
-    Right: Binary expression
-      Left: Primary expression: identifier: b
-      Right: Primary expression: identifier: c
-      Operator: code 61
-    Operator: code 61
-)"),
+//     ParserInputOutput(R"(a = b = c)",
+// R"(Program
+//   Binary expression
+//     Left: Primary expression: identifier: a
+//     Right: Binary expression
+//       Left: Primary expression: identifier: b
+//       Right: Primary expression: identifier: c
+//       Operator: =
+//     Operator: =
+// )"),
 
     ParserInputOutput(R"(1 + 2 * 3 + 4)", 
 R"(Program
   Binary expression
     Left: Binary expression
-      Left: Primary expression: int number: 1
+      Left: Literal expression: int number: 1
       Right: Binary expression
-        Left: Primary expression: int number: 2
-        Right: Primary expression: int number: 3
-        Operator: code 42
-      Operator: code 43
-    Right: Primary expression: int number: 4
-    Operator: code 43
+        Left: Literal expression: int number: 2
+        Right: Literal expression: int number: 3
+        Operator: *
+      Operator: +
+    Right: Literal expression: int number: 4
+    Operator: +
 )"),
 
     ParserInputOutput(R"(1.0 * 2.0 + 3.0 * 4.0)",
 R"(Program
   Binary expression
     Left: Binary expression
-      Left: Primary expression: float number: 1.000000
-      Right: Primary expression: float number: 2.000000
-      Operator: code 42
+      Left: Literal expression: float number: 1.000000
+      Right: Literal expression: float number: 2.000000
+      Operator: *
     Right: Binary expression
-      Left: Primary expression: float number: 3.000000
-      Right: Primary expression: float number: 4.000000
-      Operator: code 42
-    Operator: code 43
+      Left: Literal expression: float number: 3.000000
+      Right: Literal expression: float number: 4.000000
+      Operator: *
+    Operator: +
 )"), 
 
-    ParserInputOutput(R"(a = b + c * 2 < d)",
+    ParserInputOutput(R"(1 && 2 + 3 * 4 < 5)",
 R"(Program
   Binary expression
-    Left: Primary expression: identifier: a
+    Left: Literal expression: int number: 1
     Right: Binary expression
       Left: Binary expression
-        Left: Primary expression: identifier: b
+        Left: Literal expression: int number: 2
         Right: Binary expression
-          Left: Primary expression: identifier: c
-          Right: Primary expression: int number: 2
-          Operator: code 42
-        Operator: code 43
-      Right: Primary expression: identifier: d
-      Operator: code 60
-    Operator: code 61
+          Left: Literal expression: int number: 3
+          Right: Literal expression: int number: 4
+          Operator: *
+        Operator: +
+      Right: Literal expression: int number: 5
+      Operator: <
+    Operator: &&
 )"),
 
-    ParserInputOutput(R"(++--!a)",
+    ParserInputOutput(R"(+-!1)",
 R"(Program
-  Unary expression
-    Operator: code 151
-    Expression: Unary expression
-      Operator: code 152
-      Expression: Unary expression
-        Operator: code 33
-        Expression: Primary expression: identifier: a
+  Unary rvalue expression
+    Operator: +
+    Expression: Unary rvalue expression
+      Operator: -
+      Expression: Unary rvalue expression
+        Operator: !
+        Expression: Literal expression: int number: 1
 )"),
 
-    ParserInputOutput(R"(a + ++ b)",
+//     ParserInputOutput(R"(a + ++ b)",
+// R"(Program
+//   Binary expression
+//     Left: Primary expression: identifier: a
+//     Right: Unary expression
+//       Operator: ++
+//       Expression: Primary expression: identifier: b
+//     Operator: +
+// )")
+
+    ParserInputOutput(R"(1 * (2 + 3))",
 R"(Program
   Binary expression
-    Left: Primary expression: identifier: a
-    Right: Unary expression
-      Operator: code 151
-      Expression: Primary expression: identifier: b
-    Operator: code 43
+    Left: Literal expression: int number: 1
+    Right: Binary expression
+      Left: Literal expression: int number: 2
+      Right: Literal expression: int number: 3
+      Operator: +
+    Operator: *
+)"),
+
+  ParserInputOutput(R"("abc" 1 + 2 "def")",
+R"(Program
+  String Expression: 
+    Raw String: abc
+    Expression within string: Binary expression
+      Left: Literal expression: int number: 1
+      Right: Literal expression: int number: 2
+      Operator: +
+    Raw String: def
 )")
 
 };

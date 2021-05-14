@@ -5,10 +5,16 @@
 #include "Lexer.h"
 
 #include "LanguageObjects.h"
-// #include "LanguageObjects/Expression.h"
+#include "LanguageObjects/BinaryExpression.h"
+#include "LanguageObjects/Expression.h"
+#include "LanguageObjects/Operator.h"
+#include "LanguageObjects/LiteralExpression.h"
+#include "LanguageObjects/Program.h"
+#include "LanguageObjects/UnaryRValueExpression.h"
+
 // #include "LanguageObjects/MatrixType.h"
 // #include "LanguageObjects/SimpleType.h"
-// #include "LanguageObjects/StringExpression.h"
+#include "LanguageObjects/StringExpression.h"
 // #include "LanguageObjects/Type.h"
 // #include "LanguageObjects/VectorType.h"
 
@@ -32,12 +38,12 @@ public:
     // std::optional<MatrixType> parseMatrixType();
     // std::optional<Type> parseType();
 
-    std::unique_ptr<PrimaryExpression> parsePrimaryExpression();
+
 
     std::unique_ptr<Operator> parseOperator(std::vector<TokenType> 
         acceptedOperators);
     
-    std::unique_ptr<Operator> parseUnaryOperator();
+    std::unique_ptr<Operator> parseUnaryLValueOperator();
     std::unique_ptr<Operator> parseMultiplicationOperator();
     std::unique_ptr<Operator> parseAdditionOperator();
     std::unique_ptr<Operator> parseRelationOperator();
@@ -45,7 +51,11 @@ public:
     std::unique_ptr<Operator> parseOrOperator();
     std::unique_ptr<Operator> parseAssignmentOperator();
     
+    std::unique_ptr<Expression> parseStringExpression();
+    std::unique_ptr<Expression> parseLiteralExpression();
+    std::unique_ptr<Expression> parsePrimaryExpression();
 
+    std::unique_ptr<Expression> parseUnaryRValueExpression();
     std::unique_ptr<Expression> parseUnaryExpression();
 
     std::unique_ptr<Expression> parseBinaryExpression(
@@ -59,6 +69,8 @@ public:
     std::unique_ptr<Expression> parseAndExpression();
     std::unique_ptr<Expression> parseOrExpression();
     std::unique_ptr<Expression> parseAssignmentExpression();
+    
+    std::unique_ptr<Expression> parseExpression();
     
     
     std::unique_ptr<Program> parseProgram();

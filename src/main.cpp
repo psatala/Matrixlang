@@ -11,7 +11,9 @@ int main()
         std::make_unique<std::stringstream>(
             // R"(a = b + c * 2 < d)"
             // R"(++--!a)"
-            R"(a + ++ b)"
+            // R"(a + ++ b)"
+            // R"(1)"
+            R"("abc" 1 + 2 "def")"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
