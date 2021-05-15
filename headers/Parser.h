@@ -15,12 +15,16 @@
 #include "LanguageObjects/VectorIndexExpression.h"
 #include "LanguageObjects/MatrixIndexExpression.h"
 #include "LanguageObjects/PostExpression.h"
-
 #include "LanguageObjects/MatrixType.h"
 #include "LanguageObjects/SimpleType.h"
 #include "LanguageObjects/StringExpression.h"
 #include "LanguageObjects/Type.h"
 #include "LanguageObjects/VectorType.h"
+#include "LanguageObjects/Declaration.h"
+#include "LanguageObjects/ArgumentList.h"
+#include "LanguageObjects/Function.h"
+#include "LanguageObjects/Statement.h"
+
 
 class Parser {
     std::ostream& errStream;
@@ -96,7 +100,17 @@ public:
     std::unique_ptr<Expression> parseExpression();
     std::unique_ptr<ExpressionList> parseExpressionList();
     
-    
+    std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
+        parseDeclarationOrFunction();
+    std::unique_ptr<Declaration> parseDeclarationEnd(std::unique_ptr<Type> type,
+        std::string identifier);
+    std::unique_ptr<Function> parseFunctionEnd(std::unique_ptr<Type> type, 
+        std::string identifier);
+
+    std::unique_ptr<ArgumentList> parseArgumentList();
+
+    std::unique_ptr<Statement> parseStatement();
+
     std::unique_ptr<Program> parseProgram();
 
     Parser(std::unique_ptr<std::istream> inStream, std::ostream& errStream) : 

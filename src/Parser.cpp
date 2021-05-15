@@ -572,6 +572,114 @@ std::unique_ptr<ExpressionList> Parser::parseExpressionList() {
 }
 
 
+std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
+    Parser::parseDeclarationOrFunction() {
+
+    std::unique_ptr<Type> type = parseType();
+    if(!type)
+        return std::unique_ptr<Declaration>(nullptr);
+
+    if(IDENTIFIER != currentToken.type)
+        generateError("Expected an identifier");
+    std::string identifier = std::get<std::string>(currentToken.value);
+    getNextToken();
+    
+    if(L_PARENT == currentToken.type)
+        return parseFunctionEnd(std::move(type), identifier);
+
+    std::unique_ptr<Declaration> declaration = parseDeclarationEnd(
+        std::move(type), identifier);
+    if(declaration)
+        return std::move(declaration);
+
+    generateError("Parsing declaration or function: could not parse neither "
+        "declaration nor function");
+    return std::unique_ptr<Declaration>(nullptr);
+}
+
+
+std::unique_ptr<Declaration> Parser::parseDeclarationEnd(
+    std::unique_ptr<Type> type, std::string identifier) {
+    
+    std::unique_ptr<Expression> expression = std::unique_ptr<Expression>
+        (nullptr);
+    if(ASSIGN == currentToken.type) {
+        getNextToken();
+        expression = parseExpression();
+        if(!expression)
+            generateError("Parsing declaration: parsed \"=\", but an expression"
+            " did not follow");
+    }
+    if(SEMICOLON != currentToken.type)
+        generateError("Parsing declaration: expected \";\" at the end of "
+            "declaration");
+    getNextToken();
+    return std::make_unique<Declaration>(Declaration(std::move(type), 
+        identifier, std::move(expression)));
+}
+
+
+std::unique_ptr<Function> Parser::parseFunctionEnd(std::unique_ptr<Type> type, 
+    std::string identifier) {
+    
+    getNextToken();
+
+    //can be null - then the list is empty
+    std::unique_ptr<ArgumentList> argumentList = parseArgumentList();
+
+    if(R_PARENT != currentToken.type)
+        generateError("Parsing function: expected \")\"");
+    getNextToken();
+    
+    std::unique_ptr<Statement> statement = parseStatement();
+    if(!statement)
+        generateError("Parsing function: function must have a body");
+
+    return std::make_unique<Function>(Function(std::move(type), identifier, 
+        std::move(argumentList), std::move(statement)));
+}
+
+
+std::unique_ptr<ArgumentList> Parser::parseArgumentList() {
+    std::unique_ptr<ArgumentList> argumentList = 
+        std::make_unique<ArgumentList>();
+
+    std::unique_ptr<Type> type = parseType();
+    if(!type)
+        return std::unique_ptr<ArgumentList>(nullptr);
+    argumentList->typeVector.push_back(std::move(type));
+
+    if(IDENTIFIER != currentToken.type)
+        generateError("Parsing argument list: expected an identifier");
+    
+    argumentList->identifierVector.push_back(std::get<std::string>
+        (currentToken.value));
+    getNextToken();
+
+    while(COMMA == currentToken.type) {
+        getNextToken();
+
+        type = parseType();
+        if(!type)
+            generateError("Parsing argument list: expected type after \",\"");
+        argumentList->typeVector.push_back(std::move(type));
+
+        if(IDENTIFIER != currentToken.type)
+            generateError("Parsing argument list: expected an identifier");
+        argumentList->identifierVector.push_back(std::get<std::string>
+            (currentToken.value));
+        getNextToken();
+    }
+
+    return std::move(argumentList);
+}
+
+
+std::unique_ptr<Statement> Parser::parseStatement() {
+    return std::make_unique<Statement>(Statement());
+}
+
+
 std::unique_ptr<Program> Parser::parseProgram() {
     getNextToken();
     std::unique_ptr<Expression> expression = parseExpression();
