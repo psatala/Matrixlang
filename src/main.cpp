@@ -21,8 +21,9 @@ int main()
             // R"(Matrix< Vector<int>[1] >[2, 3])"
             // R"(a = b = c)"
             // R"(int a = 0;)"
-            R"(int a, Vector<float>[2] b)"
+            // R"(int a, Vector<float>[2] b)"
             // R"(int foo(float bar, string variable))"
+            R"(return 0;)"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
@@ -31,9 +32,13 @@ int main()
     try {
         interpreter.parser.getNextToken();
         
-        std::unique_ptr<ArgumentList> argumentList = 
-            interpreter.parser.parseArgumentList();
-        std::cout << argumentList->print(1);
+        std::unique_ptr<Return> returnInstruction = 
+            interpreter.parser.parseReturn();
+        std::cout << returnInstruction->print(1);
+
+        // std::unique_ptr<ArgumentList> argumentList = 
+        //     interpreter.parser.parseArgumentList();
+        // std::cout << argumentList->print(1);
         
         // std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         //     variant = interpreter.parser.parseDeclarationOrFunction();

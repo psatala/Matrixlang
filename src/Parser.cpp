@@ -675,6 +675,22 @@ std::unique_ptr<ArgumentList> Parser::parseArgumentList() {
 }
 
 
+std::unique_ptr<Return> Parser::parseReturn() {
+    if(RETURN != currentToken.type)
+        return std::unique_ptr<Return>(nullptr);
+    getNextToken();
+    
+    //empty expression allowed
+    std::unique_ptr<Expression> expression = parseExpression();
+
+    if(SEMICOLON != currentToken.type)
+        generateError("Parsing return instruction: expected a \";\"");
+    getNextToken();
+
+    return std::make_unique<Return>(Return(std::move(expression)));
+}
+
+
 std::unique_ptr<Statement> Parser::parseStatement() {
     return std::make_unique<Statement>(Statement());
 }

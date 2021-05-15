@@ -24,6 +24,7 @@
 #include "LanguageObjects/ArgumentList.h"
 #include "LanguageObjects/Function.h"
 #include "LanguageObjects/Statement.h"
+#include "LanguageObjects/Return.h"
 
 
 class Parser {
@@ -108,6 +109,7 @@ public:
         std::string identifier);
 
     std::unique_ptr<ArgumentList> parseArgumentList();
+    std::unique_ptr<Return> parseReturn();
 
     std::unique_ptr<Statement> parseStatement();
 
