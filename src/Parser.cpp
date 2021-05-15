@@ -26,6 +26,125 @@ void Parser::generateError(std::string message) {
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   types                                    //
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+std::unique_ptr<SimpleType> Parser::parseSimpleType() {
+    if( INT     != currentToken.type    &&
+        FLOAT   != currentToken.type    &&
+        STRING  != currentToken.type    )
+        return std::unique_ptr<SimpleType>(nullptr);
+
+    TokenType type = currentToken.type;
+    getNextToken();
+    return std::make_unique<SimpleType>(SimpleType(type));
+}
+
+
+std::unique_ptr<VectorType> Parser::parseVectorType() {
+    if(VECTOR != currentToken.type)
+        return std::unique_ptr<VectorType>(nullptr);
+    getNextToken();
+
+    if(LESS_THAN != currentToken.type)
+        generateError("Parsing Vector, expected \"<\"");
+    getNextToken();
+
+    std::unique_ptr<Type> type = parseType();
+    if(!type)
+        generateError("Parsing Vector, expected Type");
+    
+    if(MORE_THAN != currentToken.type)
+        generateError("Parsing Vector, expected \">\"");
+    getNextToken();
+
+    if(L_SQUARE_BRACKET != currentToken.type)
+        generateError("Parsing Vector, expected \"[\"");
+    getNextToken();
+
+    std::unique_ptr<Expression> expression = parseExpression();
+    if(!expression)
+        generateError("Parsing Vector, expected Expression");
+    
+    if(R_SQUARE_BRACKET != currentToken.type)
+        generateError("Parsing Vector, expected \"]\"");
+    getNextToken();
+
+    return std::make_unique<VectorType>(VectorType(std::move(type), 
+        std::move(expression)));
+}
+
+
+
+std::unique_ptr<MatrixType> Parser::parseMatrixType() {
+    if(MATRIX != currentToken.type)
+        return std::unique_ptr<MatrixType>(nullptr);    
+    getNextToken();
+
+    if(LESS_THAN != currentToken.type)
+        generateError("Parsing Matrix, expected \"<\"");
+    getNextToken();
+
+    std::unique_ptr<Type> type = parseType();
+    if(!type)
+        generateError("Parsing Matrix, expected Type");
+    
+    if(MORE_THAN != currentToken.type)
+        generateError("Parsing Matrix, expected \">\"");
+    getNextToken();
+    
+    if(L_SQUARE_BRACKET != currentToken.type)
+        generateError("Parsing Matrix, expected \"[\"");
+    getNextToken();
+    
+    std::unique_ptr<Expression> firstExpression = parseExpression();
+    if(!firstExpression)
+        generateError("Parsing Matrix, expected Expression");
+    
+    if(COMMA != currentToken.type)
+        generateError("Parsing Matrix, expected \",\"");
+    getNextToken();
+
+    std::unique_ptr<Expression> secondExpression = parseExpression();
+    if(!secondExpression)
+        generateError("Parsing Matrix, expected Expression");
+    
+    if(R_SQUARE_BRACKET != currentToken.type)
+        generateError("Parsing Matrix, expected \"]\"");
+    getNextToken();
+
+    return std::make_unique<MatrixType>(MatrixType(std::move(type), 
+        std::move(firstExpression), std::move(secondExpression)));
+}
+
+
+
+
+std::unique_ptr<Type> Parser::parseType() {
+
+    std::unique_ptr<SimpleType> simpleType = parseSimpleType();
+    if(simpleType) return std::move(simpleType);
+
+    std::unique_ptr<VectorType> vectorType = parseVectorType();
+    if(vectorType) return std::move(vectorType);
+
+    std::unique_ptr<MatrixType> matrixType = parseMatrixType();
+    if(matrixType) return std::move(matrixType);
+    
+    return std::unique_ptr<Type>(nullptr);
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//                               operators                                    //
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 std::unique_ptr<Operator> Parser::parseOperator(std::vector<TokenType> 
     acceptedOperators) {
@@ -87,6 +206,14 @@ std::unique_ptr<Operator> Parser::parseAssignmentOperator() {
 
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+//                               expressions                                  //
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 std::unique_ptr<Expression> Parser::parseStringExpression() {
     //parsing first string
     if(STRING_CONSTANT != currentToken.type)
@@ -120,8 +247,6 @@ std::unique_ptr<Expression> Parser::parseStringExpression() {
     
     return std::make_unique<StringExpression>(std::move(stringExpression));
 }
-
-
 
 
 
@@ -427,140 +552,3 @@ std::unique_ptr<Program> Parser::parseProgram() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// std::optional<Expression> Parser::parseExpression() {
-//     return Expression();
-// }
-
-
-
-// std::optional<SimpleType> Parser::parseSimpleType() {
-//     if( INT     != currentToken.type    &&
-//         FLOAT   != currentToken.type    &&
-//         STRING  != currentToken.type    )
-//         return std::nullopt;
-
-//     TokenType type = currentToken.type;
-//     getNextToken();
-//     return SimpleType(type);
-// }
-
-// std::optional<VectorType> Parser::parseVectorType() {
-//     if(VECTOR != currentToken.type)
-//         return std::nullopt;
-//     getNextToken();
-
-//     if(LESS_THAN != currentToken.type)
-//         generateError("Parsing Vector, expected \"<\"");
-//     getNextToken();
-
-//     std::optional<Type> type = parseType();
-//     if(!type)
-//         generateError("Parsing Vector, expected Type");
-    
-//     if(MORE_THAN != currentToken.type)
-//         generateError("Parsing Vector, expected \">\"");
-//     getNextToken();
-
-//     if(L_SQUARE_BRACKET != currentToken.type)
-//         generateError("Parsing Vector, expected \"[\"");
-//     getNextToken();
-
-//     std::optional<Expression> expression = parseExpression();
-//     if(!expression)
-//         generateError("Parsing Vector, expected Expression");
-    
-//     if(R_SQUARE_BRACKET != currentToken.type)
-//         generateError("Parsing Vector, expected \"]\"");
-//     getNextToken();
-
-//     Type typeEnd = type.value();
-//     std::optional<VectorType> vectorType = VectorType(type.value(), expression.value());
-
-//     return VectorType(type.value(), expression.value());
-// }
-
-// std::optional<MatrixType> Parser::parseMatrixType() {
-//     if(MATRIX != currentToken.type)
-//         return std::nullopt;    
-//     getNextToken();
-
-//     if(LESS_THAN != currentToken.type)
-//         generateError("Parsing Vector, expected \"<\"");
-//     getNextToken();
-
-//     std::optional<Type> type = parseType();
-//     if(!type)
-//         generateError("Parsing Vector, expected Type");
-    
-//     if(MORE_THAN != currentToken.type)
-//         generateError("Parsing Vector, expected \">\"");
-//     getNextToken();
-    
-//     if(L_SQUARE_BRACKET != currentToken.type)
-//         generateError("Parsing Vector, expected \"[\"");
-//     getNextToken();
-    
-//     std::optional<Expression> firstExpression = parseExpression();
-//     if(!firstExpression)
-//         generateError("Parsing Vector, expected Expression");
-    
-//     if(COMMA != currentToken.type)
-//         generateError("Parsing Vector, expected \",\"");
-//     getNextToken();
-
-//     std::optional<Expression> secondExpression = parseExpression();
-//     if(!secondExpression)
-//         generateError("Parsing Vector, expected Expression");
-    
-//     if(R_SQUARE_BRACKET != currentToken.type)
-//         generateError("Parsing Vector, expected \"]\"");
-//     getNextToken();
-
-//     return MatrixType(type.value(), firstExpression.value(), 
-//         secondExpression.value());
-// }
-
-// std::optional<Type> Parser::parseType() {
-//     std::optional<VectorType> vectorTypeOptional = parseVectorType();
-//     if(vectorTypeOptional) {
-//         VectorType vectorType = vectorTypeOptional.value();
-//         // std::size_t variantIndex = vectorType.type.containedType.index();
-//         std::get<SimpleType>(vectorType.type.containedType);
-//         // VectorType vt = vectorType;
-//         Type type = Type(vectorType);
-//         // std::size_t variantIndex2 = vectorType.type.containedType.index();
-//         std::get<SimpleType>(vectorType.type.containedType);
-//         return type;
-//     }
-    
-//     std::optional<SimpleType> simpleType = parseSimpleType();
-//     if(simpleType) return Type(simpleType.value());
-    
-//     std::optional<MatrixType> matrixType = parseMatrixType();
-//     if(matrixType) return Type(matrixType.value());
-    
-//     return std::nullopt;
-// }

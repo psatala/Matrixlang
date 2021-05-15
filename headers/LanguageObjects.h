@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "Token.h"
+#include "LanguageObjects/SimpleType.h"
+
 
 inline std::string ident(int identationLevel) {
     const int identationMultiplier = 2;
@@ -24,45 +26,6 @@ inline std::string ident(int identationLevel) {
 
 
 
-
-
-// class Expression;
-// class StringExpression;
-// class SimpleType;
-// class VectorType;
-// class MatrixType;
-// class Type;
-
-
-// class Expression {
-// public:
-//     Expression() = default;
-// };
-
-
-// class StringExpression {
-// public:
-//     std::vector<std::variant<std::string, Expression>>
-//         stringLiteralsAndExpressions;
-//     StringExpression(std::vector<std::variant<std::string, Expression>>
-//         stringLiteralsAndExpressions): 
-//         stringLiteralsAndExpressions(stringLiteralsAndExpressions) {}
-// };
-
-// class SimpleType {
-// public:
-//     TokenType type;
-//     SimpleType(TokenType type): type(type) {}
-// };
-
-
-// class VectorType {
-// public:
-//     std::unique_ptr<Token> type;
-//     Expression expression;
-//     VectorType(std::unique_ptr<Token> type, Expression expression) : type(type), 
-//         expression(expression) {}
-// };
 
 
 // class MatrixType {

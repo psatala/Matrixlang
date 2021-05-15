@@ -16,11 +16,11 @@
 #include "LanguageObjects/MatrixIndexExpression.h"
 #include "LanguageObjects/PostExpression.h"
 
-// #include "LanguageObjects/MatrixType.h"
-// #include "LanguageObjects/SimpleType.h"
+#include "LanguageObjects/MatrixType.h"
+#include "LanguageObjects/SimpleType.h"
 #include "LanguageObjects/StringExpression.h"
-// #include "LanguageObjects/Type.h"
-// #include "LanguageObjects/VectorType.h"
+#include "LanguageObjects/Type.h"
+#include "LanguageObjects/VectorType.h"
 
 class Parser {
     std::ostream& errStream;
@@ -28,19 +28,20 @@ class Parser {
     Token currentToken;
     bool isEOTProcessed = false;
 
-    void getNextToken();
+
     void generateError(std::string message);
 
 
 public:
     Lexer lexer;
 
-    // std::optional<Expression> parseExpression();
-    // std::optional<StringExpression> parseStringExpression();
-    // std::optional<SimpleType> parseSimpleType();
-    // std::optional<VectorType> parseVectorType();
-    // std::optional<MatrixType> parseMatrixType();
-    // std::optional<Type> parseType();
+    void getNextToken();
+    
+    
+    std::unique_ptr<SimpleType> parseSimpleType();
+    std::unique_ptr<VectorType> parseVectorType();
+    std::unique_ptr<MatrixType> parseMatrixType();
+    std::unique_ptr<Type> parseType();
 
 
 
@@ -57,7 +58,6 @@ public:
     std::unique_ptr<Operator> parseOrOperator();
     std::unique_ptr<Operator> parseAssignmentOperator();
     
-
 
 
     std::unique_ptr<Expression> parseStringExpression();

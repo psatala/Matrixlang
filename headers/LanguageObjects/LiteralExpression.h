@@ -6,13 +6,6 @@
 #include "../Token.h"
 
 class LiteralExpression : public Expression {
-public:
-    Token token;
-    LiteralExpression(Token token): token(token) {}
-    
-    std::string print(int identationLevel) override {
-        return std::string("Literal expression: ") + getTokenInfo() + "\n";
-    }
 
     std::string getTokenInfo() {
         if(INT_NUMBER == token.type)
@@ -22,4 +15,13 @@ public:
                 std::to_string(std::get<float>(token.value));
         return "unexpected token type";
     }
+
+public:
+    Token token;
+    LiteralExpression(Token token): token(token) {}
+    
+    std::string print(int identationLevel) override {
+        return std::string("Literal expression: ") + getTokenInfo() + "\n";
+    }
+
 };

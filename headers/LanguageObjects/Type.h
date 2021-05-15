@@ -1,14 +1,11 @@
-// #pragma once
+#pragma once
 
-// #include <variant>
+#include <string>
 
-// #include "SimpleType.h"
-// #include "VectorType.h"
-// #include "MatrixType.h"
-
-
-// class Type {
-// public:
-//     std::variant<SimpleType, VectorType, MatrixType> type;
-//     Type(std::variant<SimpleType, VectorType, MatrixType> type) : type(type) {}
-// };
+class Type {
+public:
+    Type() {}
+    virtual std::string print(int identLevel) {
+        return std::string("Type") + "\n";
+    }
+};
