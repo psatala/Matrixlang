@@ -33,16 +33,19 @@ R"(Program
     Operator: +
 )"),
 
-//     ParserInputOutput(R"(a = b = c)",
-// R"(Program
-//   Binary expression
-//     Left: Primary expression: identifier: a
-//     Right: Binary expression
-//       Left: Primary expression: identifier: b
-//       Right: Primary expression: identifier: c
-//       Operator: =
-//     Operator: =
-// )"),
+    ParserInputOutput(R"(a = b = c)",
+R"(Program
+  Binary expression
+    Left: Funcall expression
+      Identifier: a
+    Right: Binary expression
+      Left: Funcall expression
+        Identifier: b
+      Right: Funcall expression
+        Identifier: c
+      Operator: =
+    Operator: =
+)"),
 
     ParserInputOutput(R"(1 + 2 * 3 + 4)", 
 R"(Program

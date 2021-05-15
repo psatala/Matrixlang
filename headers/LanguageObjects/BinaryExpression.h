@@ -21,4 +21,8 @@ public:
             + ident(identLevel) + "Right: " +       rhs->print(identLevel + 1)
             + ident(identLevel) + "Operator: " +     op->print(identLevel + 1);
     }
+
+    bool isLValue() const override {
+        return false;
+    }
 };

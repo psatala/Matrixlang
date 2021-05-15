@@ -18,18 +18,19 @@ int main()
             // R"(a[1][2, 3])"
             // R"(a++--)"
             // R"(Vector<float>[1])"
-            R"(Matrix< Vector<int>[1] >[2, 3])"
+            // R"(Matrix< Vector<int>[1] >[2, 3])"
+            R"(a = b = c)"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
         std::cout);
 
     try {
-        interpreter.parser.getNextToken();
-        std::unique_ptr<Type> type = interpreter.parser.parseType();
-        std::cout << type->print(1);
-        // std::unique_ptr<Program> program = interpreter.parser.parseProgram();
-        // std::cout << program->print();
+        // interpreter.parser.getNextToken();
+        // std::unique_ptr<Type> type = interpreter.parser.parseType();
+        // std::cout << type->print(1);
+        std::unique_ptr<Program> program = interpreter.parser.parseProgram();
+        std::cout << program->print();
     } catch(std::string exception) {
         std::cout << exception << std::endl;
     }

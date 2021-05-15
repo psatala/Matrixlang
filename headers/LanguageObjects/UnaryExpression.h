@@ -23,4 +23,8 @@ public:
             + ident(identLevel) + "Expression: "
                  + expression->print(identLevel + 1);
     }
+
+    bool isLValue() const override {
+        return expression->isLValue();
+    }
 };

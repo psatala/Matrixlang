@@ -26,4 +26,8 @@ public:
             ident(identLevel) + "Second index expression: " + 
             secondIndexExpression->print(identLevel + 1);
     }
+
+    bool isLValue() const override {
+        return true;
+    }
 };

@@ -34,4 +34,8 @@ public:
         }
         return toPrintString;
     }
+
+    bool isLValue() const override {
+        return false;
+    }
 };

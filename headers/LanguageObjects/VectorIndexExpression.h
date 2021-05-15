@@ -21,4 +21,8 @@ public:
             ident(identLevel) + "Index expression: " + 
             indexExpression->print(identLevel + 1);
     }
+
+    bool isLValue() const override {
+        return true;
+    }
 };

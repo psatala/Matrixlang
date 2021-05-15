@@ -31,6 +31,12 @@ class Parser {
 
     void generateError(std::string message);
 
+    std::unique_ptr<Expression> constructLeftTreeFromExpressionVector(
+        std::vector<std::unique_ptr<Expression>> expressionVector,
+        std::vector<std::unique_ptr<Operator>> operatorVector);
+    std::unique_ptr<Expression> constructRightTreeFromExpressionVector(
+        std::vector<std::unique_ptr<Expression>> expressionVector,
+        std::vector<std::unique_ptr<Operator>> operatorVector);
 
 public:
     Lexer lexer;
@@ -83,6 +89,8 @@ public:
     std::unique_ptr<Expression> parseRelationExpression();
     std::unique_ptr<Expression> parseAndExpression();
     std::unique_ptr<Expression> parseOrExpression();
+    std::unique_ptr<Expression> parseRValueExpression();
+
     std::unique_ptr<Expression> parseAssignmentExpression();
     
     std::unique_ptr<Expression> parseExpression();

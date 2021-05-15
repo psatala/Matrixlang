@@ -23,6 +23,38 @@ void Parser::generateError(std::string message) {
 }
 
 
+std::unique_ptr<Expression> Parser::constructLeftTreeFromExpressionVector(
+    std::vector<std::unique_ptr<Expression>> expressionVector,
+    std::vector<std::unique_ptr<Operator>> operatorVector) {
+    
+    std::unique_ptr<BinaryExpression> resultExpression;
+    for(int i = 0; i < expressionVector.size() - 1; ++i) {
+        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression(
+            std::move(expressionVector[i]), std::move(expressionVector[i + 1]),
+            std::move(operatorVector[i])));
+        expressionVector[i + 1] = std::move(resultExpression);
+    }
+
+    return std::move(expressionVector[expressionVector.size() - 1]);
+}
+
+
+std::unique_ptr<Expression> Parser::constructRightTreeFromExpressionVector(
+    std::vector<std::unique_ptr<Expression>> expressionVector,
+    std::vector<std::unique_ptr<Operator>> operatorVector) {
+
+    std::unique_ptr<BinaryExpression> resultExpression;
+    for(int i = expressionVector.size() - 2; i >= 0; --i) {
+        resultExpression = std::make_unique<BinaryExpression>
+            (BinaryExpression(std::move(expressionVector[i]), 
+            std::move(expressionVector[i + 1]),
+            std::move(operatorVector[i])));
+        expressionVector[i] = std::move(resultExpression);
+    }
+
+    return std::move(expressionVector[0]);
+}
+
 
 
 
@@ -439,30 +471,22 @@ std::unique_ptr<Expression> Parser::parseBinaryExpression(
         expressionVector.push_back(std::move(rightExpression));
     }
 
-    if(isRightAssociative) {
-        std::unique_ptr<BinaryExpression> resultExpression;
-        for(int i = expressionVector.size() - 2; i >= 0; --i) {
-            resultExpression = std::make_unique<BinaryExpression>
-                (BinaryExpression(std::move(expressionVector[i]), 
-                std::move(expressionVector[i + 1]),
-                std::move(operatorVector[i])));
-            expressionVector[i] = std::move(resultExpression);
+    if(isRightAssociative) { // only assignment expression
+        
+        //for every but last expression
+        for(int i = 0; i < expressionVector.size() - 1; ++i) {
+            if(!expressionVector[i]->isLValue()) {
+                generateError("Parsing assignment expression: expected lvalue "
+                "expression, but got rvalue expression");
+            }
         }
 
-        return std::move(expressionVector[0]);
-
+        return constructRightTreeFromExpressionVector(
+            std::move(expressionVector), std::move(operatorVector));
     }
 
-    std::unique_ptr<BinaryExpression> resultExpression;
-    for(int i = 0; i < expressionVector.size() - 1; ++i) {
-        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression(
-            std::move(expressionVector[i]), std::move(expressionVector[i + 1]),
-            std::move(operatorVector[i])));
-        expressionVector[i + 1] = std::move(resultExpression);
-    }
-
-    return std::move(expressionVector[expressionVector.size() - 1]);
-
+    return constructLeftTreeFromExpressionVector(
+            std::move(expressionVector), std::move(operatorVector));
 }
 
 
@@ -508,9 +532,14 @@ std::unique_ptr<Expression> Parser::parseOrExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseRValueExpression() {
+    return std::move(parseOrExpression());
+}
+
+
 std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseOrExpression, this),
+        std::bind(&Parser::parseRValueExpression, this),
         std::bind(&Parser::parseAssignmentOperator, this),
         "Parsing assignment expression: expected another operand",
         true);

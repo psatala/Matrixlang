@@ -23,4 +23,8 @@ public:
             + ident(identLevel) + "Operator: " 
                 + postOperator->print(identLevel + 1);
     }
+
+    bool isLValue() const override {
+        return true;
+    }
 };

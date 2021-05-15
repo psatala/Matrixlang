@@ -24,4 +24,8 @@ public:
         return std::string("Literal expression: ") + getTokenInfo() + "\n";
     }
 
+    bool isLValue() const override {
+        return false;
+    }
+    
 };
