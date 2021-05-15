@@ -3,7 +3,7 @@
 //basic fixture for parametrised tests
 class ParserParametrised : public testing::TestWithParam<ParserInputOutput> {};
 
-//parametrised test checking only type of first token
+//parametrised test checking only parsed tree
 TEST_P(ParserParametrised, checkParsedTree)
 {
     ParserInputOutput parserInputOutput = GetParam();
@@ -91,24 +91,26 @@ R"(Program
 
     ParserInputOutput(R"(+-!1)",
 R"(Program
-  Unary rvalue expression
+  Unary expression
     Operator: +
-    Expression: Unary rvalue expression
+    Expression: Unary expression
       Operator: -
-      Expression: Unary rvalue expression
+      Expression: Unary expression
         Operator: !
         Expression: Literal expression: int number: 1
 )"),
 
-//     ParserInputOutput(R"(a + ++ b)",
-// R"(Program
-//   Binary expression
-//     Left: Primary expression: identifier: a
-//     Right: Unary expression
-//       Operator: ++
-//       Expression: Primary expression: identifier: b
-//     Operator: +
-// )")
+    ParserInputOutput(R"(a + ++ b)",
+R"(Program
+  Binary expression
+    Left: Funcall expression
+      Identifier: a
+    Right: Unary expression
+      Operator: ++
+      Expression: Funcall expression
+        Identifier: b
+    Operator: +
+)"),
 
     ParserInputOutput(R"(1 * (2 + 3))",
 R"(Program
@@ -152,6 +154,28 @@ R"(Program
       Index expression: Literal expression: int number: 1
     First index expression: Literal expression: int number: 2
     Second index expression: Literal expression: int number: 3
+)"),
+
+  ParserInputOutput(R"(a++--)",
+R"(Program
+  Post expression
+    Expression: Post expression
+      Expression: Funcall expression
+        Identifier: a
+      Operator: ++
+    Operator: --
+)"),
+
+  ParserInputOutput(R"(++--!a)",
+R"(Program
+  Unary expression
+    Operator: ++
+    Expression: Unary expression
+      Operator: --
+      Expression: Unary expression
+        Operator: !
+        Expression: Funcall expression
+          Identifier: a
 )")
 
 };

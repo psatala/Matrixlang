@@ -43,8 +43,18 @@ std::unique_ptr<Operator> Parser::parseOperator(std::vector<TokenType>
 
 
 
+std::unique_ptr<Operator> Parser::parsePostOperator() {
+    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT});
+}
+
+
 std::unique_ptr<Operator> Parser::parseUnaryRValueOperator() {
-    return parseOperator(std::vector<TokenType> {PLUS, 
+    return parseOperator(std::vector<TokenType> {PLUS, MINUS, NOT});
+}
+
+
+std::unique_ptr<Operator> Parser::parseUnaryLValueOperator() {
+    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT, PLUS, 
         MINUS, NOT});
 }
 
@@ -224,12 +234,29 @@ std::unique_ptr<Expression> Parser::parseLValueExpression() {
 }
 
 
-std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
+std::unique_ptr<Expression> Parser::parsePostExpression() {
+    std::unique_ptr<Expression> expression = parseLValueExpression();
+    if(!expression)
+        return std::unique_ptr<Expression>(nullptr);
+
+    while(std::unique_ptr<Operator> postOperator = parsePostOperator()) {
+        expression = std::make_unique<PostExpression>(std::move(expression), 
+            std::move(postOperator));
+    }
+    return std::move(expression);
+}
+
+
+
+std::unique_ptr<Expression> Parser::parseUnaryExpression(
+    std::function<std::unique_ptr<Expression>()> parseLowerExpression,
+    std::function<std::unique_ptr<Operator>()> parseThisOperator) {
+
     std::vector<std::unique_ptr<Operator>> operatorVector;
-    while(std::unique_ptr<Operator> unaryOperator = parseUnaryRValueOperator())
+    while(std::unique_ptr<Operator> unaryOperator = parseThisOperator())
         operatorVector.push_back(std::move(unaryOperator));
     
-    std::unique_ptr<Expression> expression = parsePrimaryExpression();
+    std::unique_ptr<Expression> expression = parseLowerExpression();
     if(!expression) {
         if(operatorVector.empty())
             return std::unique_ptr<Expression>(nullptr);
@@ -239,8 +266,8 @@ std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
     }
 
     for(int i = operatorVector.size() - 1; i >= 0; --i) {
-        expression = std::make_unique<UnaryRValueExpression>
-        (UnaryRValueExpression(std::move(operatorVector[i]), 
+        expression = std::make_unique<UnaryExpression>
+        (UnaryExpression(std::move(operatorVector[i]), 
             std::move(expression)));
     }
 
@@ -249,10 +276,15 @@ std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
 }
 
 
-std::unique_ptr<Expression> Parser::parseUnaryExpression() {
-    if(std::unique_ptr<Expression> expression = parseUnaryRValueExpression())
+std::unique_ptr<Expression> Parser::parseAllUnaryExpressions() {
+    if(std::unique_ptr<Expression> expression = parseUnaryExpression(
+        std::bind(&Parser::parsePrimaryExpression, this),
+        std::bind(&Parser::parseUnaryRValueOperator, this)))
         return std::move(expression);
-    return std::move(parseLValueExpression());
+
+    return std::move(parseUnaryExpression(
+        std::bind(&Parser::parsePostExpression, this),
+        std::bind(&Parser::parseUnaryLValueOperator, this)));
 }
 
 
@@ -313,7 +345,7 @@ std::unique_ptr<Expression> Parser::parseBinaryExpression(
 
 std::unique_ptr<Expression> Parser::parseMultiplicationExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseUnaryExpression, this),
+        std::bind(&Parser::parseAllUnaryExpressions, this),
         std::bind(&Parser::parseMultiplicationOperator, this),
         "Parsing multiplication expression: expected another operand");
 }

@@ -10,12 +10,14 @@ int main()
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(
             // R"(a = b + c * 2 < d)"
-            // R"(++--!a)"
+            R"(++--!a)"
             // R"(a + ++ b)"
             // R"(1)"
             // R"("abc" 1 + 2 "def")"
             // R"(abc(1, 2 + 3))"
-            R"(a[1][2, 3])"
+            // R"(a[1][2, 3])"
+            // R"(a++--)"
+
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 

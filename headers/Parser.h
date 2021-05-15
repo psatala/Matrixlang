@@ -10,10 +10,11 @@
 #include "LanguageObjects/Operator.h"
 #include "LanguageObjects/LiteralExpression.h"
 #include "LanguageObjects/Program.h"
-#include "LanguageObjects/UnaryRValueExpression.h"
+#include "LanguageObjects/UnaryExpression.h"
 #include "LanguageObjects/FuncallExpression.h"
 #include "LanguageObjects/VectorIndexExpression.h"
 #include "LanguageObjects/MatrixIndexExpression.h"
+#include "LanguageObjects/PostExpression.h"
 
 // #include "LanguageObjects/MatrixType.h"
 // #include "LanguageObjects/SimpleType.h"
@@ -46,7 +47,9 @@ public:
     std::unique_ptr<Operator> parseOperator(std::vector<TokenType> 
         acceptedOperators);
     
+    std::unique_ptr<Operator> parsePostOperator();
     std::unique_ptr<Operator> parseUnaryRValueOperator();
+    std::unique_ptr<Operator> parseUnaryLValueOperator();
     std::unique_ptr<Operator> parseMultiplicationOperator();
     std::unique_ptr<Operator> parseAdditionOperator();
     std::unique_ptr<Operator> parseRelationOperator();
@@ -54,15 +57,21 @@ public:
     std::unique_ptr<Operator> parseOrOperator();
     std::unique_ptr<Operator> parseAssignmentOperator();
     
+
+
+
     std::unique_ptr<Expression> parseStringExpression();
     std::unique_ptr<Expression> parseLiteralExpression();
     std::unique_ptr<Expression> parsePrimaryExpression();
 
     std::unique_ptr<Expression> parseFuncallExpression();
     std::unique_ptr<Expression> parseLValueExpression();
+    std::unique_ptr<Expression> parsePostExpression();
 
-    std::unique_ptr<Expression> parseUnaryRValueExpression();
-    std::unique_ptr<Expression> parseUnaryExpression();
+    std::unique_ptr<Expression> parseUnaryExpression(
+        std::function<std::unique_ptr<Expression>()> parseLowerExpression,
+        std::function<std::unique_ptr<Operator>()> parseThisOperator);
+    std::unique_ptr<Expression> parseAllUnaryExpressions();
 
     std::unique_ptr<Expression> parseBinaryExpression(
         std::function<std::unique_ptr<Expression>()> parseLowerExpression,
