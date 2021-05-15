@@ -43,7 +43,7 @@ std::unique_ptr<Operator> Parser::parseOperator(std::vector<TokenType>
 
 
 
-std::unique_ptr<Operator> Parser::parseUnaryLValueOperator() {
+std::unique_ptr<Operator> Parser::parseUnaryRValueOperator() {
     return parseOperator(std::vector<TokenType> {PLUS, 
         MINUS, NOT});
 }
@@ -156,9 +156,31 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseFuncallExpression() {
+    if(IDENTIFIER != currentToken.type)
+        return std::unique_ptr<Expression>(nullptr);
+
+    std::string identifier = std::get<std::string>(currentToken.value);
+    getNextToken();
+    
+    if(L_PARENT != currentToken.type)
+        return std::make_unique<FuncallExpression>(identifier);
+    getNextToken();
+
+    std::unique_ptr<ExpressionList> expressionList = parseExpressionList();
+
+    if(R_PARENT != currentToken.type)
+        generateError("End of function call: expected \")\"");
+    getNextToken();
+
+    return std::make_unique<FuncallExpression>(identifier, 
+        std::move(expressionList));
+}
+
+
 std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
     std::vector<std::unique_ptr<Operator>> operatorVector;
-    while(std::unique_ptr<Operator> unaryOperator = parseUnaryLValueOperator())
+    while(std::unique_ptr<Operator> unaryOperator = parseUnaryRValueOperator())
         operatorVector.push_back(std::move(unaryOperator));
     
     std::unique_ptr<Expression> expression = parsePrimaryExpression();
@@ -292,6 +314,25 @@ std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
 
 std::unique_ptr<Expression> Parser::parseExpression() {
     return std::move(parseAssignmentExpression());
+}
+
+
+std::unique_ptr<ExpressionList> Parser::parseExpressionList() {
+    std::unique_ptr<ExpressionList> expressionList;
+    std::unique_ptr<Expression> expression = parseExpression();
+    if(!expression)
+        return std::move(expressionList);
+    expressionList->push_back(std::move(expression));
+
+    while(true) {
+        if(COMMA != currentToken.type)
+            break;
+        expression = parseExpression();
+        if(!expression)
+            generateError("Another expression after \",\" should follow");
+        expressionList->push_back(std::move(expression));
+    }
+    return std::move(expressionList);
 }
 
 

@@ -4,7 +4,7 @@
 
 class Expression {
 public:
-    virtual std::string print(int identationLevel) {
+    virtual std::string print(int identLevel) {
         return std::string("Expression") + "\n";
     }
 };
