@@ -20,9 +20,13 @@ public:
 
     std::string print(int identLevel) override {
         std::string toPrintString = std::string("Funcall expression") + "\n";
+        toPrintString += ident(identLevel) + "Identifier: " + identifier + "\n";
+        if(!expressionList)
+            return toPrintString;
+            
         for(int i = 0; i < expressionList->size(); ++i) {
             toPrintString += ident(identLevel) + "Expression no. " + 
-                std::to_string(i) + 
+                std::to_string(i) + ": " + 
                 expressionList->at(i)->print(identLevel + 1);
         }
         return toPrintString;

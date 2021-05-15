@@ -12,6 +12,8 @@
 #include "LanguageObjects/Program.h"
 #include "LanguageObjects/UnaryRValueExpression.h"
 #include "LanguageObjects/FuncallExpression.h"
+#include "LanguageObjects/VectorIndexExpression.h"
+#include "LanguageObjects/MatrixIndexExpression.h"
 
 // #include "LanguageObjects/MatrixType.h"
 // #include "LanguageObjects/SimpleType.h"
@@ -57,6 +59,7 @@ public:
     std::unique_ptr<Expression> parsePrimaryExpression();
 
     std::unique_ptr<Expression> parseFuncallExpression();
+    std::unique_ptr<Expression> parseLValueExpression();
 
     std::unique_ptr<Expression> parseUnaryRValueExpression();
     std::unique_ptr<Expression> parseUnaryExpression();

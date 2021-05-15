@@ -130,6 +130,28 @@ R"(Program
       Right: Literal expression: int number: 2
       Operator: +
     Raw String: def
+)"),
+
+  ParserInputOutput(R"(abc(1, 2 + 3))",
+R"(Program
+  Funcall expression
+    Identifier: abc
+    Expression no. 0: Literal expression: int number: 1
+    Expression no. 1: Binary expression
+      Left: Literal expression: int number: 2
+      Right: Literal expression: int number: 3
+      Operator: +
+)"),
+
+  ParserInputOutput(R"(a[1][2, 3])",
+R"(Program
+  Matrix index expression
+    Inner expression: Vector index expression
+      Inner expression: Funcall expression
+        Identifier: a
+      Index expression: Literal expression: int number: 1
+    First index expression: Literal expression: int number: 2
+    Second index expression: Literal expression: int number: 3
 )")
 
 };

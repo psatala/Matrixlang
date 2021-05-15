@@ -178,6 +178,52 @@ std::unique_ptr<Expression> Parser::parseFuncallExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseLValueExpression() {
+    std::unique_ptr<Expression> expression = parseFuncallExpression();
+    if(!expression)
+        return std::unique_ptr<Expression>(nullptr);
+    
+    while(true) {
+        if(L_SQUARE_BRACKET != currentToken.type)
+            break;
+        getNextToken();
+
+        std::unique_ptr<Expression> firstIndexExpression = parseExpression();
+        if(!firstIndexExpression)
+            generateError("Parsing Vector/Matrix index access: no expression "
+            "after \"[\"");
+        
+        if(COMMA != currentToken.type) {
+            
+            if(R_SQUARE_BRACKET != currentToken.type)
+                generateError("Parsing Vector index access: expected \"]\"");
+            getNextToken();
+
+            expression = std::make_unique<VectorIndexExpression>
+                (VectorIndexExpression(std::move(expression), 
+                std::move(firstIndexExpression)));    
+            continue;
+        }
+        getNextToken();
+
+        std::unique_ptr<Expression> secondIndexExpression = parseExpression();
+        if(!secondIndexExpression)
+            generateError("Parsing Matrix index access: expected another "
+            "expression after \",\"");
+        
+        if(R_SQUARE_BRACKET != currentToken.type)
+            generateError("Parsing Matrix index access: expected \"]\"");
+        getNextToken();
+
+        expression = std::make_unique<MatrixIndexExpression>
+                (MatrixIndexExpression(std::move(expression), 
+                std::move(firstIndexExpression), 
+                std::move(secondIndexExpression)));
+    }
+    return std::move(expression);
+}
+
+
 std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
     std::vector<std::unique_ptr<Operator>> operatorVector;
     while(std::unique_ptr<Operator> unaryOperator = parseUnaryRValueOperator())
@@ -204,7 +250,9 @@ std::unique_ptr<Expression> Parser::parseUnaryRValueExpression() {
 
 
 std::unique_ptr<Expression> Parser::parseUnaryExpression() {
-    return std::move(parseUnaryRValueExpression());
+    if(std::unique_ptr<Expression> expression = parseUnaryRValueExpression())
+        return std::move(expression);
+    return std::move(parseLValueExpression());
 }
 
 
@@ -318,21 +366,23 @@ std::unique_ptr<Expression> Parser::parseExpression() {
 
 
 std::unique_ptr<ExpressionList> Parser::parseExpressionList() {
-    std::unique_ptr<ExpressionList> expressionList;
+    ExpressionList expressionList;
     std::unique_ptr<Expression> expression = parseExpression();
     if(!expression)
-        return std::move(expressionList);
-    expressionList->push_back(std::move(expression));
+        return std::make_unique<ExpressionList>(std::move(expressionList));
+    
+    expressionList.push_back(std::move(expression));
 
     while(true) {
         if(COMMA != currentToken.type)
             break;
+        getNextToken();
         expression = parseExpression();
         if(!expression)
             generateError("Another expression after \",\" should follow");
-        expressionList->push_back(std::move(expression));
+        expressionList.push_back(std::move(expression));
     }
-    return std::move(expressionList);
+    return std::make_unique<ExpressionList>(std::move(expressionList));
 }
 
 
