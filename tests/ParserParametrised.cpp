@@ -22,163 +22,293 @@ TEST_P(ParserParametrised, checkParsedTree)
 
 
 const ParserInputOutput basicExpressions[] = {
-    ParserInputOutput(R"(1 + 2 + 3)", 
+    ParserInputOutput(R"(
+                int main()
+                    1 + 2 + 3;
+                )", 
 R"(Program
-  Binary expression
-    Left: Binary expression
-      Left: Literal expression: int number: 1
-      Right: Literal expression: int number: 2
-      Operator: +
-    Right: Literal expression: int number: 3
-    Operator: +
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Binary expression
+              Left: Literal expression: int number: 1
+              Right: Literal expression: int number: 2
+              Operator: +
+            Right: Literal expression: int number: 3
+            Operator: +
 )"),
 
-    ParserInputOutput(R"(a = b = c)",
+    ParserInputOutput(R"(
+                int main()
+                    a = b = c;
+                )",
 R"(Program
-  Binary expression
-    Left: Funcall expression
-      Identifier: a
-    Right: Binary expression
-      Left: Funcall expression
-        Identifier: b
-      Right: Funcall expression
-        Identifier: c
-      Operator: =
-    Operator: =
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Funcall expression
+              Identifier: a
+            Right: Binary expression
+              Left: Funcall expression
+                Identifier: b
+              Right: Funcall expression
+                Identifier: c
+              Operator: =
+            Operator: =
 )"),
 
-    ParserInputOutput(R"(1 + 2 * 3 + 4)", 
+    ParserInputOutput(R"(
+                int main()
+                    1 + 2 * 3 + 4;
+                )",
 R"(Program
-  Binary expression
-    Left: Binary expression
-      Left: Literal expression: int number: 1
-      Right: Binary expression
-        Left: Literal expression: int number: 2
-        Right: Literal expression: int number: 3
-        Operator: *
-      Operator: +
-    Right: Literal expression: int number: 4
-    Operator: +
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Binary expression
+              Left: Literal expression: int number: 1
+              Right: Binary expression
+                Left: Literal expression: int number: 2
+                Right: Literal expression: int number: 3
+                Operator: *
+              Operator: +
+            Right: Literal expression: int number: 4
+            Operator: +
 )"),
 
-    ParserInputOutput(R"(1.0 * 2.0 + 3.0 * 4.0)",
+    ParserInputOutput(R"(
+                int main()
+                    1.0 * 2.0 + 3.0 * 4.0;
+                )",
 R"(Program
-  Binary expression
-    Left: Binary expression
-      Left: Literal expression: float number: 1.000000
-      Right: Literal expression: float number: 2.000000
-      Operator: *
-    Right: Binary expression
-      Left: Literal expression: float number: 3.000000
-      Right: Literal expression: float number: 4.000000
-      Operator: *
-    Operator: +
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Binary expression
+              Left: Literal expression: float number: 1.000000
+              Right: Literal expression: float number: 2.000000
+              Operator: *
+            Right: Binary expression
+              Left: Literal expression: float number: 3.000000
+              Right: Literal expression: float number: 4.000000
+              Operator: *
+            Operator: +
 )"), 
 
-    ParserInputOutput(R"(1 && 2 + 3 * 4 < 5)",
+    ParserInputOutput(R"(
+                int main()
+                    1 && 2 + 3 * 4 < 5;
+                )",
 R"(Program
-  Binary expression
-    Left: Literal expression: int number: 1
-    Right: Binary expression
-      Left: Binary expression
-        Left: Literal expression: int number: 2
-        Right: Binary expression
-          Left: Literal expression: int number: 3
-          Right: Literal expression: int number: 4
-          Operator: *
-        Operator: +
-      Right: Literal expression: int number: 5
-      Operator: <
-    Operator: &&
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Literal expression: int number: 1
+            Right: Binary expression
+              Left: Binary expression
+                Left: Literal expression: int number: 2
+                Right: Binary expression
+                  Left: Literal expression: int number: 3
+                  Right: Literal expression: int number: 4
+                  Operator: *
+                Operator: +
+              Right: Literal expression: int number: 5
+              Operator: <
+            Operator: &&
 )"),
 
-    ParserInputOutput(R"(+-!1)",
+    ParserInputOutput(R"(
+                int main()
+                    +-!1;
+                )",
 R"(Program
-  Unary expression
-    Operator: +
-    Expression: Unary expression
-      Operator: -
-      Expression: Unary expression
-        Operator: !
-        Expression: Literal expression: int number: 1
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Unary expression
+            Operator: +
+            Expression: Unary expression
+              Operator: -
+              Expression: Unary expression
+                Operator: !
+                Expression: Literal expression: int number: 1
 )"),
 
-    ParserInputOutput(R"(a + ++ b)",
+    ParserInputOutput(R"(
+                int main()
+                    a + ++ b;
+                )",
 R"(Program
-  Binary expression
-    Left: Funcall expression
-      Identifier: a
-    Right: Unary expression
-      Operator: ++
-      Expression: Funcall expression
-        Identifier: b
-    Operator: +
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Funcall expression
+              Identifier: a
+            Right: Unary expression
+              Operator: ++
+              Expression: Funcall expression
+                Identifier: b
+            Operator: +
 )"),
 
-    ParserInputOutput(R"(1 * (2 + 3))",
+    ParserInputOutput(R"(
+                int main()
+                    1 * (2 + 3);
+                )",
 R"(Program
-  Binary expression
-    Left: Literal expression: int number: 1
-    Right: Binary expression
-      Left: Literal expression: int number: 2
-      Right: Literal expression: int number: 3
-      Operator: +
-    Operator: *
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Binary expression
+            Left: Literal expression: int number: 1
+            Right: Binary expression
+              Left: Literal expression: int number: 2
+              Right: Literal expression: int number: 3
+              Operator: +
+            Operator: *
 )"),
 
-  ParserInputOutput(R"("abc" 1 + 2 "def")",
+  ParserInputOutput(R"(
+                int main()
+                    "abc" 1 + 2 "def";
+                )",
 R"(Program
-  String Expression: 
-    Raw String: abc
-    Expression within string: Binary expression
-      Left: Literal expression: int number: 1
-      Right: Literal expression: int number: 2
-      Operator: +
-    Raw String: def
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: String Expression: 
+            Raw String: abc
+            Expression within string: Binary expression
+              Left: Literal expression: int number: 1
+              Right: Literal expression: int number: 2
+              Operator: +
+            Raw String: def
 )"),
 
-  ParserInputOutput(R"(abc(1, 2 + 3))",
+  ParserInputOutput(R"(
+                int main()
+                    abc(1, 2 + 3);
+                )",
 R"(Program
-  Funcall expression
-    Identifier: abc
-    Expression no. 0: Literal expression: int number: 1
-    Expression no. 1: Binary expression
-      Left: Literal expression: int number: 2
-      Right: Literal expression: int number: 3
-      Operator: +
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Funcall expression
+            Identifier: abc
+            Expression no. 0: Literal expression: int number: 1
+            Expression no. 1: Binary expression
+              Left: Literal expression: int number: 2
+              Right: Literal expression: int number: 3
+              Operator: +
 )"),
 
-  ParserInputOutput(R"(a[1][2, 3])",
+  ParserInputOutput(R"(
+                int main()
+                    a[1][2, 3];
+                )",
 R"(Program
-  Matrix index expression
-    Inner expression: Vector index expression
-      Inner expression: Funcall expression
-        Identifier: a
-      Index expression: Literal expression: int number: 1
-    First index expression: Literal expression: int number: 2
-    Second index expression: Literal expression: int number: 3
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Matrix index expression
+            Inner expression: Vector index expression
+              Inner expression: Funcall expression
+                Identifier: a
+              Index expression: Literal expression: int number: 1
+            First index expression: Literal expression: int number: 2
+            Second index expression: Literal expression: int number: 3
 )"),
 
-  ParserInputOutput(R"(a++--)",
+  ParserInputOutput(R"(
+                int main()
+                    a++--;
+                )",
 R"(Program
-  Post expression
-    Expression: Post expression
-      Expression: Funcall expression
-        Identifier: a
-      Operator: ++
-    Operator: --
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Post expression
+            Expression: Post expression
+              Expression: Funcall expression
+                Identifier: a
+              Operator: ++
+            Operator: --
 )"),
 
-  ParserInputOutput(R"(++--!a)",
+  ParserInputOutput(R"(
+                int main()
+                    ++--!a;
+                )",
 R"(Program
-  Unary expression
-    Operator: ++
-    Expression: Unary expression
-      Operator: --
-      Expression: Unary expression
-        Operator: !
-        Expression: Funcall expression
-          Identifier: a
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Unary expression
+            Operator: ++
+            Expression: Unary expression
+              Operator: --
+              Expression: Unary expression
+                Operator: !
+                Expression: Funcall expression
+                  Identifier: a
 )")
 
 };

@@ -61,25 +61,30 @@ int main()
             //     }
             // )"
 
-            R"(
-                switch(a) {
-                case 1:
-                    b = 2;
-                case 3:
-                    b = 4;
-                default:
-                    b = 5;
-                }
-            )"
+            // R"(
+            //     switch(a) {
+            //     case 1:
+            //         b = 2;
+            //     case 3:
+            //         b = 4;
+            //     default:
+            //         b = 5;
+            //     }
+            // )"
 
             // R"(a = 3;)"
+
+            R"(
+                int main()
+                    ++--!a;
+                )"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
         std::cout);
 
     try {
-        interpreter.parser.getNextToken();
+        // interpreter.parser.getNextToken();
 
         // std::unique_ptr<Instruction> instruction = 
         //     interpreter.parser.parseInstruction();
@@ -88,9 +93,9 @@ int main()
         // std::unique_ptr<Switch> switchC = interpreter.parser.parseSwitch();
         // std::cout << switchC->print(1);
 
-        std::unique_ptr<Instruction> instruction = 
-            interpreter.parser.parseInstruction();
-        std::cout << instruction->print(1);
+        // std::unique_ptr<Instruction> instruction = 
+        //     interpreter.parser.parseInstruction();
+        // std::cout << instruction->print(1);
 
         // std::unique_ptr<CaseC> instructionList = 
         //     interpreter.parser.parseCaseC();
@@ -132,8 +137,8 @@ int main()
         // std::unique_ptr<Type> type = interpreter.parser.parseType();
         // std::cout << type->print(1);
         
-        // std::unique_ptr<Program> program = interpreter.parser.parseProgram();
-        // std::cout << program->print();
+        std::unique_ptr<Program> program = interpreter.parser.parseProgram();
+        std::cout << program->print();
 
 
     } catch(std::string exception) {
