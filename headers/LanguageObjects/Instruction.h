@@ -6,6 +6,7 @@
 #include "../LanguageObjects.h"
 #include "Expression.h"
 #include "If.h"
+#include "Switch.h"
 #include "For.h"
 #include "Return.h"
 #include "Declaration.h"
@@ -15,6 +16,7 @@ public:
     std::variant<
         std::unique_ptr<Expression>, 
         std::unique_ptr<If>, 
+        std::unique_ptr<Switch>, 
         std::unique_ptr<For>,
         std::unique_ptr<Return>,
         std::unique_ptr<Declaration>>
@@ -23,6 +25,7 @@ public:
     Instruction(std::variant<
         std::unique_ptr<Expression>, 
         std::unique_ptr<If>, 
+        std::unique_ptr<Switch>, 
         std::unique_ptr<For>,
         std::unique_ptr<Return>,
         std::unique_ptr<Declaration>>
@@ -49,18 +52,24 @@ public:
             break;
             
         case 2:
+            toPrintString += ident(identLevel) + "Switch: " + 
+                std::get<std::unique_ptr<Switch>>(instructionVariant)->
+                print(identLevel + 1);
+            break;
+        
+        case 3:
             toPrintString += ident(identLevel) + "For: " + 
                 std::get<std::unique_ptr<For>>(instructionVariant)->
                 print(identLevel + 1);
             break;
             
-        case 3:
+        case 4:
             toPrintString += ident(identLevel) + "Return: " + 
                 std::get<std::unique_ptr<Return>>(instructionVariant)->
                 print(identLevel + 1);
             break;
             
-        case 4:
+        case 5:
             toPrintString += ident(identLevel) + "Declaration: " + 
                 std::get<std::unique_ptr<Declaration>>(instructionVariant)->
                 print(identLevel + 1);

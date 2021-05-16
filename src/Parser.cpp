@@ -731,6 +731,11 @@ std::unique_ptr<Instruction> Parser::parseInstruction() {
         return std::make_unique<Instruction>
             (Instruction(std::move(ifInstruction)));
     
+    std::unique_ptr<Switch> switchInstruction = parseSwitch();
+    if(switchInstruction)
+        return std::make_unique<Instruction>
+            (Instruction(std::move(switchInstruction)));
+
     std::unique_ptr<For> forInstruction = parseFor();
     if(forInstruction)
         return std::make_unique<Instruction>
@@ -942,6 +947,84 @@ std::unique_ptr<Default> Parser::parseDefault() {
     getNextToken();
 
     return std::make_unique<Default>(Default(parseInstructionList()));
+}
+
+
+
+std::unique_ptr<Switch> Parser::parseSwitch() {
+    if(SWITCH != currentToken.type)
+        return std::unique_ptr<Switch>(nullptr);
+    getNextToken();
+
+    if(std::unique_ptr<SwitchGo> switchGo = parseSwitchGoEnd())
+        return std::move(switchGo);
+
+    if(std::unique_ptr<SwitchC> switchC = parseSwitchCEnd())
+        return std::move(switchC);
+
+    generateError("Parsing switch: could not parse switch go nor switch c");
+    return std::unique_ptr<Switch>(nullptr);
+}
+
+
+
+std::unique_ptr<SwitchGo> Parser::parseSwitchGoEnd() {
+    if(L_BRACKET != currentToken.type)
+        return std::unique_ptr<SwitchGo>(nullptr);
+    getNextToken();
+
+    std::unique_ptr<SwitchGo> switchGo = std::make_unique<SwitchGo>(SwitchGo());
+    
+    std::unique_ptr<CaseGo> caseGo = parseCaseGo();
+    while (caseGo) {
+        switchGo->caseGoInstructions.push_back(std::move(caseGo));
+        caseGo = parseCaseGo();
+    }
+    
+    switchGo->defaultInstruction = parseDefault();
+
+    if(R_BRACKET != currentToken.type)
+        generateError("Parsing switch go: expected \"}\"");
+    getNextToken();
+
+    return std::move(switchGo);
+}
+
+
+
+std::unique_ptr<SwitchC> Parser::parseSwitchCEnd() {
+    if(L_PARENT != currentToken.type)
+        return std::unique_ptr<SwitchC>(nullptr);
+    getNextToken();
+
+    std::unique_ptr<SwitchC> switchC = std::make_unique<SwitchC>(SwitchC());
+    
+    switchC->postExpression = parsePostExpression();
+    if(!switchC->postExpression)
+        generateError("Parsing switch c: expected expression");
+    
+    if(R_PARENT != currentToken.type)
+        generateError("Parsing switch c: expected \")\"");
+    getNextToken();
+
+    if(L_BRACKET != currentToken.type)
+        generateError("Parsing switch c: expected \"{\"");
+    getNextToken();
+
+    std::unique_ptr<CaseC> caseC = parseCaseC();
+    while (caseC) {
+        switchC->caseCInstructions.push_back(std::move(caseC));
+        caseC = parseCaseC();
+    }
+    
+    switchC->defaultInstruction = parseDefault();
+
+    if(R_BRACKET != currentToken.type)
+        generateError("Parsing switch c: expected \"}\"");
+    getNextToken();
+
+    return std::move(switchC);
+
 }
 
 

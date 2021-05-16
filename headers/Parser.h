@@ -32,6 +32,9 @@
 #include "LanguageObjects/Default.h"
 #include "LanguageObjects/CaseGo.h"
 #include "LanguageObjects/CaseC.h"
+#include "LanguageObjects/Switch.h"
+#include "LanguageObjects/SwitchGo.h"
+#include "LanguageObjects/SwitchC.h"
 
 
 class Parser {
@@ -131,6 +134,10 @@ public:
     std::unique_ptr<CaseGo> parseCaseGo();
     std::unique_ptr<CaseC> parseCaseC();
     std::unique_ptr<Default> parseDefault();
+
+    std::unique_ptr<Switch> parseSwitch();
+    std::unique_ptr<SwitchGo> parseSwitchGoEnd();
+    std::unique_ptr<SwitchC> parseSwitchCEnd();
 
     std::unique_ptr<Program> parseProgram();
 
