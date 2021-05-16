@@ -725,6 +725,37 @@ std::unique_ptr<Return> Parser::parseReturn() {
 }
 
 
+std::unique_ptr<Instruction> Parser::parseInstruction() {
+    std::unique_ptr<If> ifInstruction = parseIf();
+    if(ifInstruction)
+        return std::make_unique<Instruction>
+            (Instruction(std::move(ifInstruction)));
+    
+    std::unique_ptr<For> forInstruction = parseFor();
+    if(forInstruction)
+        return std::make_unique<Instruction>
+            (Instruction(std::move(forInstruction)));
+
+    std::unique_ptr<Return> returnInstruction = parseReturn();
+    if(returnInstruction)
+        return std::make_unique<Instruction>
+            (Instruction(std::move(returnInstruction)));
+
+    std::unique_ptr<Declaration> declarationInstruction = 
+        parseDeclarationInstruction();
+    if(declarationInstruction)
+        return std::make_unique<Instruction>
+            (Instruction(std::move(declarationInstruction)));
+    
+    std::unique_ptr<Expression> expressionInstruction = parseExpression();
+    if(SEMICOLON != currentToken.type)
+        generateError("Parsing instruction: expected \";\"");
+    getNextToken();
+    return std::make_unique<Instruction>
+        (Instruction(std::move(expressionInstruction)));
+}
+
+
 std::unique_ptr<If> Parser::parseIf() {
     if(IF != currentToken.type)
         return std::unique_ptr<If>(nullptr);
