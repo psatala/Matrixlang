@@ -610,10 +610,10 @@ std::unique_ptr<Declaration> Parser::parseDeclarationEnd(
             generateError("Parsing declaration: parsed \"=\", but an expression"
             " did not follow");
     }
-    if(SEMICOLON != currentToken.type)
-        generateError("Parsing declaration: expected \";\" at the end of "
-            "declaration");
-    getNextToken();
+    // if(SEMICOLON != currentToken.type)
+    //     generateError("Parsing declaration: expected \";\" at the end of "
+    //         "declaration");
+    // getNextToken();
     return std::make_unique<Declaration>(Declaration(std::move(type), 
         identifier, std::move(expression)));
 }
@@ -637,6 +637,25 @@ std::unique_ptr<Function> Parser::parseFunctionEnd(std::unique_ptr<Type> type,
 
     return std::make_unique<Function>(Function(std::move(type), identifier, 
         std::move(argumentList), std::move(statement)));
+}
+
+
+std::unique_ptr<Declaration> Parser::parseDeclarationInstruction() {
+    std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
+        declarationVariant = parseDeclarationOrFunction();
+    if(0 != declarationVariant.index())
+        return std::unique_ptr<Declaration>(nullptr);
+    
+    std::unique_ptr<Declaration> declaration = 
+        std::move(std::get<std::unique_ptr<Declaration>>(declarationVariant));
+    if(!declaration)
+        return std::unique_ptr<Declaration>(nullptr);
+
+    if(SEMICOLON != currentToken.type)
+        generateError("Parsing declaration instruction: expected \";\"");
+    getNextToken();
+
+    return std::move(declaration);
 }
 
 
@@ -688,6 +707,87 @@ std::unique_ptr<Return> Parser::parseReturn() {
     getNextToken();
 
     return std::make_unique<Return>(Return(std::move(expression)));
+}
+
+
+std::unique_ptr<If> Parser::parseIf() {
+    if(IF != currentToken.type)
+        return std::unique_ptr<If>(nullptr);
+    getNextToken();
+
+    if(L_PARENT != currentToken.type)
+        generateError("Parsing if instruction: expected \"(\"");
+    getNextToken();
+
+    std::unique_ptr<Expression> conditionalExpression = parseExpression();
+    if(!conditionalExpression)
+        generateError("Parsing if instruction: expected expression");
+
+    if(R_PARENT != currentToken.type)
+        generateError("Parsing if instruction: expected \")\"");
+    getNextToken();
+
+    std::unique_ptr<Statement> trueStatement = parseStatement();
+    if(!trueStatement)
+        generateError("Parsing if instruction: expected statement");
+
+    std::unique_ptr<Statement> falseStatement = 
+        std::unique_ptr<Statement>(nullptr);
+    
+    if(ELSE == currentToken.type) {
+        getNextToken();
+        falseStatement = parseStatement();
+        if(!falseStatement)
+            generateError("Parsing if instruction: expected statement");
+    }
+    return std::make_unique<If>(If(std::move(conditionalExpression), 
+            std::move(trueStatement), std::move(falseStatement)));
+}
+
+
+std::unique_ptr<For> Parser::parseFor() {
+    if(FOR != currentToken.type)
+        return std::unique_ptr<For>(nullptr);
+    getNextToken();
+
+    if(L_PARENT != currentToken.type)
+        generateError("Parsing for instruction: expected \"(\"");
+    getNextToken();
+
+    std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
+        declarationVariant = parseDeclarationOrFunction();
+    if(0 != declarationVariant.index())
+        generateError("Parsing for instruction: got function instead of "
+            "declaration");
+    // may be null
+    std::unique_ptr<Declaration> declaration = 
+        std::move(std::get<std::unique_ptr<Declaration>>(declarationVariant));
+    
+    if(SEMICOLON != currentToken.type)
+        generateError("Parsing for instruction: expected \";\"");
+    getNextToken();
+
+    // may be null
+    std::unique_ptr<Expression> conditionalExpression = parseExpression();
+    
+    if(SEMICOLON != currentToken.type)
+        generateError("Parsing for instruction: expected \";\"");
+    getNextToken();
+
+    // may be null
+    std::unique_ptr<Expression> incrementalExpression = parseExpression();
+    
+    if(R_PARENT != currentToken.type)
+        generateError("Parsing for instruction: expected \")\"");
+    getNextToken();
+
+    std::unique_ptr<Statement> statement = parseStatement();
+    if(!statement)
+        generateError("Parsing for instruction: expected a statement");
+
+    return std::make_unique<For>(For(std::move(declaration), 
+        std::move(conditionalExpression), std::move(incrementalExpression),
+        std::move(statement)));
 }
 
 

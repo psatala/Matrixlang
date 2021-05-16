@@ -25,6 +25,8 @@
 #include "LanguageObjects/Function.h"
 #include "LanguageObjects/Statement.h"
 #include "LanguageObjects/Return.h"
+#include "LanguageObjects/If.h"
+#include "LanguageObjects/For.h"
 
 
 class Parser {
@@ -107,9 +109,13 @@ public:
         std::string identifier);
     std::unique_ptr<Function> parseFunctionEnd(std::unique_ptr<Type> type, 
         std::string identifier);
+    std::unique_ptr<Declaration> parseDeclarationInstruction();
 
     std::unique_ptr<ArgumentList> parseArgumentList();
     std::unique_ptr<Return> parseReturn();
+    std::unique_ptr<If> parseIf();
+    std::unique_ptr<For> parseFor();
+
 
     std::unique_ptr<Statement> parseStatement();
 

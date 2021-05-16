@@ -20,10 +20,12 @@ int main()
             // R"(Vector<float>[1])"
             // R"(Matrix< Vector<int>[1] >[2, 3])"
             // R"(a = b = c)"
-            // R"(int a = 0;)"
+            R"(int a = 0;)"
             // R"(int a, Vector<float>[2] b)"
             // R"(int foo(float bar, string variable))"
-            R"(return 0;)"
+            // R"(return 0;)"
+            // R"(if(1))"
+            // R"(for(int i = 0; i < n; ++i))"
             );
 
     Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
@@ -32,14 +34,25 @@ int main()
     try {
         interpreter.parser.getNextToken();
         
-        std::unique_ptr<Return> returnInstruction = 
-            interpreter.parser.parseReturn();
-        std::cout << returnInstruction->print(1);
+        // std::unique_ptr<For> forInstruction = interpreter.parser.parseFor();
+        // std::cout << forInstruction->print(1);
+
+
+        // std::unique_ptr<If> ifInstruction = interpreter.parser.parseIf();
+        // std::cout << ifInstruction->print(1);
+
+        // std::unique_ptr<Return> returnInstruction = 
+        //     interpreter.parser.parseReturn();
+        // std::cout << returnInstruction->print(1);
 
         // std::unique_ptr<ArgumentList> argumentList = 
         //     interpreter.parser.parseArgumentList();
         // std::cout << argumentList->print(1);
         
+        std::unique_ptr<Declaration> declaration = 
+            interpreter.parser.parseDeclarationInstruction();
+        std::cout << declaration->print(1);
+
         // std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         //     variant = interpreter.parser.parseDeclarationOrFunction();
         // std::unique_ptr<Function> function = std::move
