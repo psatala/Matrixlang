@@ -110,6 +110,7 @@ public:
     std::unique_ptr<Function> parseFunctionEnd(std::unique_ptr<Type> type, 
         std::string identifier);
     std::unique_ptr<Declaration> parseDeclarationInstruction();
+    std::unique_ptr<Function> parseFunction();
 
     std::unique_ptr<ArgumentList> parseArgumentList();
     std::unique_ptr<Return> parseReturn();

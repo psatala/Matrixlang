@@ -659,6 +659,21 @@ std::unique_ptr<Declaration> Parser::parseDeclarationInstruction() {
 }
 
 
+std::unique_ptr<Function> Parser::parseFunction() {
+    std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
+        functionVariant = parseDeclarationOrFunction();
+    if(1 != functionVariant.index())
+        return std::unique_ptr<Function>(nullptr);
+    
+    std::unique_ptr<Function> function = 
+        std::move(std::get<std::unique_ptr<Function>>(functionVariant));
+    if(!function)
+        return std::unique_ptr<Function>(nullptr);
+
+    return std::move(function);
+}
+
+
 std::unique_ptr<ArgumentList> Parser::parseArgumentList() {
     std::unique_ptr<ArgumentList> argumentList = 
         std::make_unique<ArgumentList>();
@@ -798,10 +813,62 @@ std::unique_ptr<Statement> Parser::parseStatement() {
 
 std::unique_ptr<Program> Parser::parseProgram() {
     getNextToken();
-    std::unique_ptr<Expression> expression = parseExpression();
-    if(!expression)
-        return std::unique_ptr<Program>(nullptr);
-    return std::make_unique<Program>(Program(std::move(expression)));
+
+    std::unique_ptr<Program> program = std::make_unique<Program>(Program());
+    while(EOT != currentToken.type) {
+        std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
+            variant = parseDeclarationOrFunction();
+
+        // declaration
+        if(0 == variant.index()) {
+            std::unique_ptr<Declaration> declaration = 
+                std::move(std::get<std::unique_ptr<Declaration>>(variant));
+            if(!declaration)
+                generateError("Parsing program: expected a declaration");
+            program->declarationFunctionVector.push_back
+                (std::move(declaration));
+            if(SEMICOLON != currentToken.type)
+                generateError("Parsing global declaration: expected a \";\"");
+            getNextToken();
+            continue;
+        }
+
+        // function
+        std::unique_ptr<Function> function = 
+            std::move(std::get<std::unique_ptr<Function>>(variant));
+        if(!function)
+            generateError("Parsing program: expected a function");
+        program->declarationFunctionVector.push_back(std::move(function));
+        continue;        
+
+        // // declaration
+        // std::unique_ptr<Declaration> declaration = 
+        //     parseDeclarationInstruction();
+        // if(declaration) {
+        //     program->declarationFunctionVector.push_back
+        //         (std::move(declaration));
+        //     continue;
+        // }
+        
+        // // function
+        // std::unique_ptr<Function> function = 
+        //     parseFunction();
+        // if(function) {
+        //     program->declarationFunctionVector.push_back
+        //         (std::move(function));
+        //     continue;
+        // }
+
+        
+        // generateError("Parsing program: expected declaration or function");
+    }
+
+    return std::move(program);
+    // getNextToken();
+    // std::unique_ptr<Expression> expression = parseExpression();
+    // if(!expression)
+    //     return std::unique_ptr<Program>(nullptr);
+    // return std::make_unique<Program>(Program(std::move(expression)));
 }
 
 

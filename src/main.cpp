@@ -20,7 +20,9 @@ int main()
             // R"(Vector<float>[1])"
             // R"(Matrix< Vector<int>[1] >[2, 3])"
             // R"(a = b = c)"
-            R"(int a = 0;)"
+            // R"(int a = 0;)"
+            R"(int global = 0;
+                int main())"
             // R"(int a, Vector<float>[2] b)"
             // R"(int foo(float bar, string variable))"
             // R"(return 0;)"
@@ -32,7 +34,7 @@ int main()
         std::cout);
 
     try {
-        interpreter.parser.getNextToken();
+        // interpreter.parser.getNextToken();
         
         // std::unique_ptr<For> forInstruction = interpreter.parser.parseFor();
         // std::cout << forInstruction->print(1);
@@ -49,9 +51,9 @@ int main()
         //     interpreter.parser.parseArgumentList();
         // std::cout << argumentList->print(1);
         
-        std::unique_ptr<Declaration> declaration = 
-            interpreter.parser.parseDeclarationInstruction();
-        std::cout << declaration->print(1);
+        // std::unique_ptr<Declaration> declaration = 
+        //     interpreter.parser.parseDeclarationInstruction();
+        // std::cout << declaration->print(1);
 
         // std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         //     variant = interpreter.parser.parseDeclarationOrFunction();
@@ -66,8 +68,10 @@ int main()
         // std::unique_ptr<Type> type = interpreter.parser.parseType();
         // std::cout << type->print(1);
         
-        // std::unique_ptr<Program> program = interpreter.parser.parseProgram();
-        // std::cout << program->print();
+        std::unique_ptr<Program> program = interpreter.parser.parseProgram();
+        std::cout << program->print();
+
+        
     } catch(std::string exception) {
         std::cout << exception << std::endl;
     }
