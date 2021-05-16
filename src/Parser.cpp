@@ -888,6 +888,62 @@ std::unique_ptr<For> Parser::parseFor() {
 }
 
 
+std::unique_ptr<CaseGo> Parser::parseCaseGo() {
+    if(CASE != currentToken.type)
+        return std::unique_ptr<CaseGo>(nullptr);
+    getNextToken();
+
+    std::unique_ptr<Expression> expression = parseExpression();
+    if(!expression)
+        generateError("Parsing case go: expected expression");
+
+    if(COLON != currentToken.type)
+        generateError("Parsing case go: expected \":\"");
+    getNextToken();
+
+    std::unique_ptr<InstructionList> instructionList = parseInstructionList();
+
+    return std::make_unique<CaseGo>(CaseGo(std::move(expression), 
+        std::move(instructionList)));
+}
+
+
+std::unique_ptr<CaseC> Parser::parseCaseC() { 
+    if(CASE != currentToken.type)
+        return std::unique_ptr<CaseC>(nullptr);
+    getNextToken();
+
+    if( INT_NUMBER      != currentToken.type &&
+        FLOAT_NUMBER    != currentToken.type &&
+        STRING_CONSTANT != currentToken.type )
+        generateError("Parsing case c: expected a literal");
+
+    Token token = currentToken;
+    getNextToken();
+
+    if(COLON != currentToken.type)
+        generateError("Parsing case c: expected \":\"");
+    getNextToken();
+
+    std::unique_ptr<InstructionList> instructionList = parseInstructionList();
+
+    return std::make_unique<CaseC>(CaseC(token, std::move(instructionList)));
+}
+
+
+
+std::unique_ptr<Default> Parser::parseDefault() {
+    if(DEFAULT != currentToken.type)
+        return std::unique_ptr<Default>(nullptr);
+    getNextToken();
+
+    if(COLON != currentToken.type)
+        generateError("Parsing default: expected \":\"");
+    getNextToken();
+
+    return std::make_unique<Default>(Default(parseInstructionList()));
+}
+
 
 
 std::unique_ptr<Program> Parser::parseProgram() {
@@ -919,35 +975,9 @@ std::unique_ptr<Program> Parser::parseProgram() {
             generateError("Parsing program: expected a function");
         program->declarationFunctionVector.push_back(std::move(function));
         continue;        
-
-        // // declaration
-        // std::unique_ptr<Declaration> declaration = 
-        //     parseDeclarationInstruction();
-        // if(declaration) {
-        //     program->declarationFunctionVector.push_back
-        //         (std::move(declaration));
-        //     continue;
-        // }
-        
-        // // function
-        // std::unique_ptr<Function> function = 
-        //     parseFunction();
-        // if(function) {
-        //     program->declarationFunctionVector.push_back
-        //         (std::move(function));
-        //     continue;
-        // }
-
-        
-        // generateError("Parsing program: expected declaration or function");
     }
 
     return std::move(program);
-    // getNextToken();
-    // std::unique_ptr<Expression> expression = parseExpression();
-    // if(!expression)
-    //     return std::unique_ptr<Program>(nullptr);
-    // return std::make_unique<Program>(Program(std::move(expression)));
 }
 
 

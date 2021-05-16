@@ -29,6 +29,9 @@
 #include "LanguageObjects/For.h"
 #include "LanguageObjects/Instruction.h"
 #include "LanguageObjects/InstructionList.h"
+#include "LanguageObjects/Default.h"
+#include "LanguageObjects/CaseGo.h"
+#include "LanguageObjects/CaseC.h"
 
 
 class Parser {
@@ -125,6 +128,9 @@ public:
     std::unique_ptr<If> parseIf();
     std::unique_ptr<For> parseFor();
 
+    std::unique_ptr<CaseGo> parseCaseGo();
+    std::unique_ptr<CaseC> parseCaseC();
+    std::unique_ptr<Default> parseDefault();
 
     std::unique_ptr<Program> parseProgram();
 

@@ -33,18 +33,22 @@ int main()
 
             // R"(for(int i = 0; i < n; ++i))"
 
-            R"({
-                if(1)
-                    a = 0;
-                int b = 1;
-                return c;
-            })"
+            // R"({
+            //     if(1)
+            //         a = 0;
+            //     int b = 1;
+            //     return c;
+            // })"
 
 //             R"(
 // int main() {
 //     print("Hello world");
 //     return 0;
 // })"
+
+            R"(case 2:
+                int a = 1;
+                a = 3;)"
 
             // R"(a = 3;)"
             );
@@ -59,14 +63,13 @@ int main()
         //     interpreter.parser.parseInstruction();
         // std::cout << instruction->print(1);
 
-        // std::unique_ptr<InstructionList> instructionList = 
-        //     interpreter.parser.parseBlock();
-        // std::cout << instructionList->print(1);
+        std::unique_ptr<CaseC> instructionList = 
+            interpreter.parser.parseCaseC();
+        std::cout << instructionList->print(1);
 
-        std::unique_ptr<Statement> statement = 
-            interpreter.parser.parseStatement();
-        std::cout << statement->print(1);
-
+        // std::unique_ptr<Statement> statement = 
+        //     interpreter.parser.parseStatement();
+        // std::cout << statement->print(1);
 
         // std::unique_ptr<For> forInstruction = interpreter.parser.parseFor();
         // std::cout << forInstruction->print(1);
