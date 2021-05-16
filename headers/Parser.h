@@ -28,6 +28,7 @@
 #include "LanguageObjects/If.h"
 #include "LanguageObjects/For.h"
 #include "LanguageObjects/Instruction.h"
+#include "LanguageObjects/InstructionList.h"
 
 
 class Parser {
@@ -117,13 +118,13 @@ public:
     std::unique_ptr<Return> parseReturn();
 
     std::unique_ptr<Instruction> parseInstruction();
+    std::unique_ptr<InstructionList> parseInstructionList();
+    std::unique_ptr<InstructionList> parseBlock();
+    std::unique_ptr<Statement> parseStatement();
 
     std::unique_ptr<If> parseIf();
     std::unique_ptr<For> parseFor();
 
-
-
-    std::unique_ptr<Statement> parseStatement();
 
     std::unique_ptr<Program> parseProgram();
 

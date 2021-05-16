@@ -748,12 +748,63 @@ std::unique_ptr<Instruction> Parser::parseInstruction() {
             (Instruction(std::move(declarationInstruction)));
     
     std::unique_ptr<Expression> expressionInstruction = parseExpression();
-    if(SEMICOLON != currentToken.type)
-        generateError("Parsing instruction: expected \";\"");
-    getNextToken();
-    return std::make_unique<Instruction>
-        (Instruction(std::move(expressionInstruction)));
+    if(expressionInstruction) {
+        if(SEMICOLON != currentToken.type)
+            generateError("Parsing instruction: expected \";\"");
+        getNextToken();
+        return std::make_unique<Instruction>
+            (Instruction(std::move(expressionInstruction)));
+    }
+    
+    return std::unique_ptr<Instruction>(nullptr);
 }
+
+
+std::unique_ptr<InstructionList> Parser::parseInstructionList() {
+    std::unique_ptr<Instruction> instruction = parseInstruction();
+    std::unique_ptr<InstructionList> instructionList = 
+        std::make_unique<InstructionList>(InstructionList());
+    while(instruction) {
+        instructionList->instructions.push_back(std::move(instruction));
+        instruction = parseInstruction();
+    }
+    return std::move(instructionList);
+}
+
+
+std::unique_ptr<InstructionList> Parser::parseBlock() {
+    if(L_BRACKET != currentToken.type)
+        return std::unique_ptr<InstructionList>(nullptr);
+    getNextToken();
+
+    // cannot be null, but may be empty
+    std::unique_ptr<InstructionList> instructionList = parseInstructionList();
+
+    if(R_BRACKET != currentToken.type)
+        generateError("Parsing block: expected \"}\"");
+    getNextToken();
+
+    return std::move(instructionList);
+}
+
+
+std::unique_ptr<Statement> Parser::parseStatement() {
+    std::unique_ptr<InstructionList> instructionList = 
+        std::make_unique<InstructionList>(InstructionList());
+    if(std::unique_ptr<Instruction> instruction = parseInstruction()) {
+        instructionList->instructions.push_back(std::move(instruction));
+        return std::make_unique<Statement>(
+            Statement(std::move(instructionList)));
+    }
+        
+    if(instructionList = parseBlock())
+        return std::make_unique<Statement>(
+            Statement(std::move(instructionList)));
+
+    generateError("Parsing statement: expected instruction or block");
+    return std::unique_ptr<Statement>(nullptr);
+}
+
 
 
 std::unique_ptr<If> Parser::parseIf() {
@@ -837,9 +888,6 @@ std::unique_ptr<For> Parser::parseFor() {
 }
 
 
-std::unique_ptr<Statement> Parser::parseStatement() {
-    return std::make_unique<Statement>(Statement());
-}
 
 
 std::unique_ptr<Program> Parser::parseProgram() {

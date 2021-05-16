@@ -2,12 +2,16 @@
 
 #include <memory>
 
+class Statement;
+
 #include "../LanguageObjects.h"
 #include "Declaration.h"
 #include "Expression.h"
-#include "Statement.h"
 
 class For {
+
+    std::string getStatementInfo(int identLevel);
+
 public:
     std::unique_ptr<Declaration> declaration;
     std::unique_ptr<Expression> conditionalExpression;
@@ -23,16 +27,5 @@ public:
             incrementalExpression(std::move(incrementalExpression)),
             statement(std::move(statement)) {}
 
-    std::string print(int identLevel) { 
-        return std::string("For") + "\n" + 
-            ident(identLevel) + "Declaration: " + 
-                declaration->print(identLevel + 1) + 
-            ident(identLevel) + "Conditional expression: " + 
-                conditionalExpression->print(identLevel + 1) + 
-            ident(identLevel) + "Incremental expression: " + 
-                incrementalExpression->print(identLevel + 1) + 
-            ident(identLevel) + "Statement: " + 
-                statement->print(identLevel + 1);
-    }
-
+    std::string print(int identLevel);
 };

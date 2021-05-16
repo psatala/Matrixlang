@@ -10,12 +10,14 @@ include_directories(googletest/include)
 # all source files
 file(GLOB SOURCES
     src/*.cpp
+    src/LanguageObjects/*.cpp
 )
 
 # all test files
 file(GLOB TESTS
     tests/*.cpp
     src/*.cpp
+    src/LanguageObjects/*.cpp
 )
 
 list(FILTER TESTS EXCLUDE REGEX ".*src/main.cpp")
