@@ -761,6 +761,13 @@ std::unique_ptr<Instruction> Parser::parseInstruction() {
             (Instruction(std::move(expressionInstruction)));
     }
     
+    // empty expresion, only semicolon
+    if(SEMICOLON == currentToken.type) {
+        getNextToken();
+        return std::make_unique<Instruction>
+            (Instruction(std::move(expressionInstruction)));
+    }
+
     return std::unique_ptr<Instruction>(nullptr);
 }
 

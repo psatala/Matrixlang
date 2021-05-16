@@ -39,8 +39,10 @@ public:
         case 0:
             toPrintString += ident(identLevel) + "Expression: ";
             // warning - expression can be null
-            if(!std::get<std::unique_ptr<Expression>>(instructionVariant))
+            if(!std::get<std::unique_ptr<Expression>>(instructionVariant)) {
+                toPrintString += "\n";
                 break;
+            }
             toPrintString +=std::get<std::unique_ptr<Expression>>
                 (instructionVariant)->print(identLevel + 1);
             break;

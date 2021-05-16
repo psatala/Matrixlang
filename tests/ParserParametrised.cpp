@@ -315,3 +315,305 @@ R"(Program
 
 INSTANTIATE_TEST_SUITE_P(ParserParametrisedExpressions, ParserParametrised, 
     testing::ValuesIn(basicExpressions));
+
+
+const ParserInputOutput otherLanguageObjects[] = {
+  ParserInputOutput(R"(Vector<float>[1] a;)", 
+    R"(Program
+  Declaration
+    Type: Vector type
+      Contained type: Simple type: float
+      Expression: Literal expression: int number: 1
+    Identifier: a
+)"),
+
+  ParserInputOutput(R"(Matrix< Vector<int>[1] >[2, 3] a;)", 
+    R"(Program
+  Declaration
+    Type: Matrix type
+      Contained type: Vector type
+        Contained type: Simple type: int
+        Expression: Literal expression: int number: 1
+      First expression: Literal expression: int number: 2
+      Second expressionLiteral expression: int number: 3
+    Identifier: a
+)"),
+
+  ParserInputOutput(R"(int a = 0;)",
+    R"(Program
+  Declaration
+    Type: Simple type: int
+    Identifier: a
+    Expression: Literal expression: int number: 0
+)"),
+
+  ParserInputOutput(R"(int foo(float bar, string variable);)",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: foo
+    Argument list: Argument list
+      Type no. 0: Simple type: float
+      Identifier no. 0: bar
+      Type no. 1: Simple type: string
+      Identifier no. 1: variable
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: 
+)"),
+
+  ParserInputOutput(R"(int main() return 0;)",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Return: Return
+            Expression: Literal expression: int number: 0
+)"),
+
+  ParserInputOutput(R"(int main() if(1);)",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          If: If
+            Conditional expression: Literal expression: int number: 1
+            True statement: Statement
+              Instruction List: Instruction list
+                Instruction: Instruction
+                  Expression: 
+            False statement: 
+)"),
+
+  ParserInputOutput(R"(int main() if(1); else;)",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          If: If
+            Conditional expression: Literal expression: int number: 1
+            True statement: Statement
+              Instruction List: Instruction list
+                Instruction: Instruction
+                  Expression: 
+            False statement: Statement
+              Instruction List: Instruction list
+                Instruction: Instruction
+                  Expression: 
+)"),
+
+  ParserInputOutput(R"(int main() for(int i = 0; i < n; ++i);)",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          For: For
+            Declaration: Declaration
+              Type: Simple type: int
+              Identifier: i
+              Expression: Literal expression: int number: 0
+            Conditional expression: Binary expression
+              Left: Funcall expression
+                Identifier: i
+              Right: Funcall expression
+                Identifier: n
+              Operator: <
+            Incremental expression: Unary expression
+              Operator: ++
+              Expression: Funcall expression
+                Identifier: i
+            Statement: Statement
+              Instruction List: Instruction list
+                Instruction: Instruction
+                  Expression: 
+)"),
+
+  ParserInputOutput(R"(int main() {
+                if(1)
+                    a = 0;
+                int b = 1;
+                return c;
+            })",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          If: If
+            Conditional expression: Literal expression: int number: 1
+            True statement: Statement
+              Instruction List: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: a
+                    Right: Literal expression: int number: 0
+                    Operator: =
+            False statement: 
+        Instruction: Instruction
+          Declaration: Declaration
+            Type: Simple type: int
+            Identifier: b
+            Expression: Literal expression: int number: 1
+        Instruction: Instruction
+          Return: Return
+            Expression: Funcall expression
+              Identifier: c
+)"),
+
+  ParserInputOutput(R"(int main() {
+                    switch {
+                    case a < 1:
+                        b = 2;
+                    case a > 3:
+                        b = 4;
+                    default:
+                        b = 5;
+                    }
+                }
+            )",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Switch: Switch Go
+            Case Go no. 0: Case Go
+              Expression: Binary expression
+                Left: Funcall expression
+                  Identifier: a
+                Right: Literal expression: int number: 1
+                Operator: <
+              Instruction list: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: b
+                    Right: Literal expression: int number: 2
+                    Operator: =
+            Case Go no. 1: Case Go
+              Expression: Binary expression
+                Left: Funcall expression
+                  Identifier: a
+                Right: Literal expression: int number: 3
+                Operator: >
+              Instruction list: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: b
+                    Right: Literal expression: int number: 4
+                    Operator: =
+            Default: Default
+              Instruction list: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: b
+                    Right: Literal expression: int number: 5
+                    Operator: =
+)"),
+
+  ParserInputOutput(R"(
+                int main() {
+                    switch(a) {
+                    case 1:
+                        b = 2;
+                    case 3:
+                        b = 4;
+                    default:
+                        b = 5;
+                    }
+                }
+            )",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Switch: Switch C
+            Expression: Funcall expression
+              Identifier: a
+            Case C no. 0: Case C
+              Token: int number: 1
+              Instruction list: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: b
+                    Right: Literal expression: int number: 2
+                    Operator: =
+            Case C no. 1: Case C
+              Token: int number: 3
+              Instruction list: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: b
+                    Right: Literal expression: int number: 4
+                    Operator: =
+            Default: Default
+              Instruction list: Instruction list
+                Instruction: Instruction
+                  Expression: Binary expression
+                    Left: Funcall expression
+                      Identifier: b
+                    Right: Literal expression: int number: 5
+                    Operator: =
+)"),
+
+  ParserInputOutput(R"(
+    int main() {
+        print("Hello world");
+        return 0;
+    }
+)",
+    R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: 
+    Statement: Statement
+      Instruction List: Instruction list
+        Instruction: Instruction
+          Expression: Funcall expression
+            Identifier: print
+            Expression no. 0: String Expression: 
+              Raw String: Hello world
+        Instruction: Instruction
+          Return: Return
+            Expression: Literal expression: int number: 0
+)")
+
+
+};
+
+
+INSTANTIATE_TEST_SUITE_P(ParserParametrisedOtherLanguageObjects, 
+  ParserParametrised, testing::ValuesIn(otherLanguageObjects));
