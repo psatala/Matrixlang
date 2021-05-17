@@ -13,6 +13,8 @@ class SimpleType : public Type {
                 return "float";
             case STRING:
                 return "string";
+            case VOID:
+                return "void";
             default:
                 return "unknown type";
         }   

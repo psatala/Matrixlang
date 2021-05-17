@@ -1,3 +1,3 @@
 void printYearInfo(int currentYear) {
-	print("Hello from year " + string(currentYear));
+	print("Hello from year " currentYear "");
 }

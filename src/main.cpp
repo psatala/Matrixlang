@@ -3,6 +3,7 @@
 #include "../headers/Interpreter.h"
 #include <fstream>
 
+#include "../tests/TestPrograms.h"
 
 int main()
 {
@@ -12,7 +13,6 @@ int main()
     fileStream->open("../examples/HelloWorld.ml", std::ifstream::in);
     if(!*fileStream)
         return -1;
-
 
     Interpreter interpreter = Interpreter(std::move(fileStream), std::cerr, 
         std::cout);

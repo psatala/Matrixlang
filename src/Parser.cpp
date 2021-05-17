@@ -6,7 +6,7 @@ void Parser::getNextToken() {
 
     do {
         currentToken = lexer.getToken();
-    } while(COMMENT == currentToken.type);
+    } while(COMMENT == currentToken.type || LEXER_COMMAND == currentToken.type);
     if(EOT == currentToken.type)
         isEOTProcessed = true;
 }
@@ -67,7 +67,8 @@ std::unique_ptr<Expression> Parser::constructRightTreeFromExpressionVector(
 std::unique_ptr<SimpleType> Parser::parseSimpleType() {
     if( INT     != currentToken.type    &&
         FLOAT   != currentToken.type    &&
-        STRING  != currentToken.type    )
+        STRING  != currentToken.type    &&
+        VOID    != currentToken.type    )
         return std::unique_ptr<SimpleType>(nullptr);
 
     TokenType type = currentToken.type;
