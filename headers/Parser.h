@@ -43,22 +43,20 @@ class Parser {
     Token currentToken;
     bool isEOTProcessed = false;
 
-
+    void getNextToken();
     void generateError(std::string message);
+
 
     std::unique_ptr<Expression> constructLeftTreeFromExpressionVector(
         std::vector<std::unique_ptr<Expression>> expressionVector,
         std::vector<std::unique_ptr<Operator>> operatorVector);
     std::unique_ptr<Expression> constructRightTreeFromExpressionVector(
         std::vector<std::unique_ptr<Expression>> expressionVector,
-        std::vector<std::unique_ptr<Operator>> operatorVector);
-
-public:
-    Lexer lexer;
-
-    void getNextToken();
+        std::vector<std::unique_ptr<Operator>> operatorVector);    
     
-    
+
+
+
     std::unique_ptr<SimpleType> parseSimpleType();
     std::unique_ptr<VectorType> parseVectorType();
     std::unique_ptr<MatrixType> parseMatrixType();
@@ -138,6 +136,11 @@ public:
     std::unique_ptr<Switch> parseSwitch();
     std::unique_ptr<SwitchGo> parseSwitchGoEnd();
     std::unique_ptr<SwitchC> parseSwitchCEnd();
+
+
+public:
+    Lexer lexer;
+
 
     std::unique_ptr<Program> parseProgram();
 

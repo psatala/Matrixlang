@@ -5,7 +5,6 @@
 class Type {
 public:
     Type() {}
-    virtual std::string print(int identLevel) {
-        return std::string("Type") + "\n";
-    }
+    virtual std::string print(int identLevel) = 0;
+    virtual ~Type() {}
 };

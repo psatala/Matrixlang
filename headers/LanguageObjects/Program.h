@@ -14,37 +14,24 @@ public:
 
     Program() {}
 
-
-    // std::unique_ptr<Expression> expression;
-    // Program(std::unique_ptr<Expression> expression) : 
-        // expression(std::move(expression)) {}
-
     std::string print() {
         std::string toPrintString = std::string("Program") + "\n";
-            // + ident(1) + expression->print(2);
+        
         for(int i = 0; i < declarationFunctionVector.size(); ++i) {
             
-            if(0 == declarationFunctionVector[i].index()) {
-                // declaration
-                std::unique_ptr<Declaration> declaration = std::move(std::get
-                    <std::unique_ptr<Declaration>>
-                    (declarationFunctionVector[i]));
-                toPrintString += ident(1) + declaration->print(2);
+            // declaration
+            if(std::unique_ptr<Declaration>* declaration = 
+                std::get_if<std::unique_ptr<Declaration>>
+                (&declarationFunctionVector[i])) {
 
-                // move back ownership to vector
-                declarationFunctionVector[i] = std::move(declaration);
-
+                toPrintString += ident(1) + (*declaration)->print(2);
                 continue;
             }
 
             // function
-            std::unique_ptr<Function> function = std::move(std::get
-                    <std::unique_ptr<Function>>
-                    (declarationFunctionVector[i]));
-                toPrintString += ident(1) + function->print(2);
+            toPrintString += ident(1) + std::get<std::unique_ptr<Function>>
+                (declarationFunctionVector[i])->print(2);
 
-                // move back ownership to vector
-                declarationFunctionVector[i] = std::move(function);
         }
 
         return toPrintString;

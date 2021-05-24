@@ -1,6 +1,5 @@
 #pragma once
 
-#include <variant>
 #include <memory>
 
 #include "Expression.h"

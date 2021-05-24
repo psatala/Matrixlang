@@ -644,7 +644,7 @@ std::unique_ptr<Function> Parser::parseFunctionEnd(std::unique_ptr<Type> type,
 std::unique_ptr<Declaration> Parser::parseDeclarationInstruction() {
     std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         declarationVariant = parseDeclarationOrFunction();
-    if(0 != declarationVariant.index())
+    if(!std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
         return std::unique_ptr<Declaration>(nullptr);
     
     std::unique_ptr<Declaration> declaration = 
@@ -663,7 +663,7 @@ std::unique_ptr<Declaration> Parser::parseDeclarationInstruction() {
 std::unique_ptr<Function> Parser::parseFunction() {
     std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         functionVariant = parseDeclarationOrFunction();
-    if(1 != functionVariant.index())
+    if(!std::get_if<std::unique_ptr<Function>>(&functionVariant))
         return std::unique_ptr<Function>(nullptr);
     
     std::unique_ptr<Function> function = 
@@ -866,7 +866,7 @@ std::unique_ptr<For> Parser::parseFor() {
 
     std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         declarationVariant = parseDeclarationOrFunction();
-    if(0 != declarationVariant.index())
+    if(!std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
         generateError("Parsing for instruction: got function instead of "
             "declaration");
     // may be null
@@ -1046,13 +1046,12 @@ std::unique_ptr<Program> Parser::parseProgram() {
             variant = parseDeclarationOrFunction();
 
         // declaration
-        if(0 == variant.index()) {
-            std::unique_ptr<Declaration> declaration = 
-                std::move(std::get<std::unique_ptr<Declaration>>(variant));
+        if(std::unique_ptr<Declaration>* declaration = 
+            std::get_if<std::unique_ptr<Declaration>>(&variant)) {
             if(!declaration)
                 generateError("Parsing program: expected a declaration");
             program->declarationFunctionVector.push_back
-                (std::move(declaration));
+                (std::move(*declaration));
             if(SEMICOLON != currentToken.type)
                 generateError("Parsing global declaration: expected a \";\"");
             getNextToken();

@@ -34,54 +34,61 @@ public:
 
     std::string print(int identLevel) {
         std::string toPrintString = std::string("Instruction") + "\n";
-        switch (instructionVariant.index()) {
+
+        // expression
+        if(std::unique_ptr<Expression>* expressionInstruction = 
+            std::get_if<std::unique_ptr<Expression>>(&instructionVariant)) {
             
-        case 0:
             toPrintString += ident(identLevel) + "Expression: ";
             // warning - expression can be null
-            if(!std::get<std::unique_ptr<Expression>>(instructionVariant)) {
-                toPrintString += "\n";
-                break;
-            }
-            toPrintString +=std::get<std::unique_ptr<Expression>>
-                (instructionVariant)->print(identLevel + 1);
-            break;
-            
-        case 1:
-            toPrintString += ident(identLevel) + "If: " + 
-                std::get<std::unique_ptr<If>>(instructionVariant)->
-                print(identLevel + 1);
-            break;
-            
-        case 2:
-            toPrintString += ident(identLevel) + "Switch: " + 
-                std::get<std::unique_ptr<Switch>>(instructionVariant)->
-                print(identLevel + 1);
-            break;
-        
-        case 3:
-            toPrintString += ident(identLevel) + "For: " + 
-                std::get<std::unique_ptr<For>>(instructionVariant)->
-                print(identLevel + 1);
-            break;
-            
-        case 4:
-            toPrintString += ident(identLevel) + "Return: " + 
-                std::get<std::unique_ptr<Return>>(instructionVariant)->
-                print(identLevel + 1);
-            break;
-            
-        case 5:
-            toPrintString += ident(identLevel) + "Declaration: " + 
-                std::get<std::unique_ptr<Declaration>>(instructionVariant)->
-                print(identLevel + 1);
-            break;
-            
-        default:
-            toPrintString += ident(identLevel) + "Unknown content";
-            break;
+            if(!*expressionInstruction)
+                return toPrintString + "\n";
+                
+            return toPrintString + 
+                (*expressionInstruction)->print(identLevel + 1);
         }
 
-        return toPrintString;
+        // if
+        if(std::unique_ptr<If>* ifInstruction = 
+            std::get_if<std::unique_ptr<If>>(&instructionVariant)) {
+            
+            return toPrintString + ident(identLevel) + "If: " + 
+                (*ifInstruction)->print(identLevel + 1);
+        }
+
+        // switch
+        if(std::unique_ptr<Switch>* switchInstruction = 
+            std::get_if<std::unique_ptr<Switch>>(&instructionVariant)) {
+            
+            return toPrintString + ident(identLevel) + "Switch: " + 
+                (*switchInstruction)->print(identLevel + 1);
+        }
+
+        // for
+        if(std::unique_ptr<For>* forInstruction = 
+            std::get_if<std::unique_ptr<For>>(&instructionVariant)) {
+            
+            return toPrintString + ident(identLevel) + "For: " + 
+                (*forInstruction)->print(identLevel + 1);
+        }
+
+        // return
+        if(std::unique_ptr<Return>* returnInstruction = 
+            std::get_if<std::unique_ptr<Return>>(&instructionVariant)) {
+            
+            return toPrintString + ident(identLevel) + "Return: " + 
+                (*returnInstruction)->print(identLevel + 1);
+        }
+
+        // declaration
+        if(std::unique_ptr<Declaration>* declarationInstruction = 
+            std::get_if<std::unique_ptr<Declaration>>(&instructionVariant)) {
+            
+            return toPrintString + ident(identLevel) + "Declaration: " + 
+                (*declarationInstruction)->print(identLevel + 1);
+        }
+
+        // unknown
+        return toPrintString + ident(identLevel) + "Unknown content";
     }
 };

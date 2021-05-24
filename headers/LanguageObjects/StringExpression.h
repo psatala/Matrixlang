@@ -19,10 +19,11 @@ public:
         for(int i = 0; i < stringLiteralsAndExpressions.size(); ++i) {
             
             //string
-            if(0 == stringLiteralsAndExpressions[i].index()) {
+            if(std::string* stringLiteral = std::get_if<std::string> 
+                (&stringLiteralsAndExpressions[i])) {
+
                 toPrintString += ident(identLevel) + "Raw String: " + 
-                    std::get<std::string>(stringLiteralsAndExpressions[i]) + 
-                    "\n";
+                    *stringLiteral + "\n";
                 continue;
             }
 

@@ -9,11 +9,7 @@ public:
     std::unique_ptr<InstructionList> instructionList;
     Statement(std::unique_ptr<InstructionList> instructionList) : 
         instructionList(std::move(instructionList)) {}
-    // Statement(std::unique_ptr<Instruction> instruction) {
-    //     instructionList->instructions.size();
-    //     instructionList->instructions.push_back(std::move(instruction));
-    // }
-    
+ 
     std::string print(int identLevel) {
         std::string toPrintString = std::string("Statement") + "\n";
         if(instructionList)
