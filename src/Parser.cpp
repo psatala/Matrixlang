@@ -418,13 +418,13 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(
 
 std::unique_ptr<Expression> Parser::parseAllUnaryExpressions() {
     if(std::unique_ptr<Expression> expression = parseUnaryExpression(
-        std::bind(&Parser::parsePrimaryExpression, this),
-        std::bind(&Parser::parseUnaryRValueOperator, this)))
+        std::bind_front(&Parser::parsePrimaryExpression, this),
+        std::bind_front(&Parser::parseUnaryRValueOperator, this)))
         return std::move(expression);
 
     return std::move(parseUnaryExpression(
-        std::bind(&Parser::parsePostExpression, this),
-        std::bind(&Parser::parseUnaryLValueOperator, this)));
+        std::bind_front(&Parser::parsePostExpression, this),
+        std::bind_front(&Parser::parseUnaryLValueOperator, this)));
 }
 
 
@@ -477,40 +477,40 @@ std::unique_ptr<Expression> Parser::parseBinaryExpression(
 
 std::unique_ptr<Expression> Parser::parseMultiplicationExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseAllUnaryExpressions, this),
-        std::bind(&Parser::parseMultiplicationOperator, this),
+        std::bind_front(&Parser::parseAllUnaryExpressions, this),
+        std::bind_front(&Parser::parseMultiplicationOperator, this),
         "Parsing multiplication expression: expected another operand");
 }
 
 
 std::unique_ptr<Expression> Parser::parseAdditionExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseMultiplicationExpression, this),
-        std::bind(&Parser::parseAdditionOperator, this),
+        std::bind_front(&Parser::parseMultiplicationExpression, this),
+        std::bind_front(&Parser::parseAdditionOperator, this),
         "Parsing addition expression: expected another operand");
 }
 
 
 std::unique_ptr<Expression> Parser::parseRelationExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseAdditionExpression, this),
-        std::bind(&Parser::parseRelationOperator, this),
+        std::bind_front(&Parser::parseAdditionExpression, this),
+        std::bind_front(&Parser::parseRelationOperator, this),
         "Parsing relation expression: expected another operand");
 }
 
 
 std::unique_ptr<Expression> Parser::parseAndExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseRelationExpression, this),
-        std::bind(&Parser::parseAndOperator, this),
+        std::bind_front(&Parser::parseRelationExpression, this),
+        std::bind_front(&Parser::parseAndOperator, this),
         "Parsing and expression: expected another operand");
 }
 
 
 std::unique_ptr<Expression> Parser::parseOrExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseAndExpression, this),
-        std::bind(&Parser::parseOrOperator, this),
+        std::bind_front(&Parser::parseAndExpression, this),
+        std::bind_front(&Parser::parseOrOperator, this),
         "Parsing or expression: expected another operand");
 }
 
@@ -522,8 +522,8 @@ std::unique_ptr<Expression> Parser::parseRValueExpression() {
 
 std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
     return parseBinaryExpression(
-        std::bind(&Parser::parseRValueExpression, this),
-        std::bind(&Parser::parseAssignmentOperator, this),
+        std::bind_front(&Parser::parseRValueExpression, this),
+        std::bind_front(&Parser::parseAssignmentOperator, this),
         "Parsing assignment expression: expected another operand",
         true);
 }
