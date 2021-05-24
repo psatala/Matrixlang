@@ -48,15 +48,6 @@ class Parser {
     void expectToken(TokenType type, std::string errorMessage);
 
 
-    std::unique_ptr<Expression> constructLeftTreeFromExpressionVector(
-        std::vector<std::unique_ptr<Expression>> expressionVector,
-        std::vector<std::unique_ptr<Operator>> operatorVector);
-    std::unique_ptr<Expression> constructRightTreeFromExpressionVector(
-        std::vector<std::unique_ptr<Expression>> expressionVector,
-        std::vector<std::unique_ptr<Operator>> operatorVector);    
-    
-
-
 
     std::unique_ptr<SimpleType> parseSimpleType();
     std::unique_ptr<VectorType> parseVectorType();
@@ -96,7 +87,7 @@ class Parser {
     std::unique_ptr<Expression> parseBinaryExpression(
         std::function<std::unique_ptr<Expression>()> parseLowerExpression,
         std::function<std::unique_ptr<Operator>()> parseThisOperator,
-        std::string errorMessage, bool isRightAssociative = false);
+        std::string errorMessage);
     
     std::unique_ptr<Expression> parseMultiplicationExpression();
     std::unique_ptr<Expression> parseAdditionExpression();

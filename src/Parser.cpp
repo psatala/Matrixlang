@@ -30,40 +30,6 @@ void Parser::expectToken(TokenType type, std::string errorMessage) {
 }
 
 
-std::unique_ptr<Expression> Parser::constructLeftTreeFromExpressionVector(
-    std::vector<std::unique_ptr<Expression>> expressionVector,
-    std::vector<std::unique_ptr<Operator>> operatorVector) {
-    
-    std::unique_ptr<BinaryExpression> resultExpression;
-    for(int i = 0; i < expressionVector.size() - 1; ++i) {
-        resultExpression = std::make_unique<BinaryExpression>(BinaryExpression(
-            std::move(expressionVector[i]), std::move(expressionVector[i + 1]),
-            std::move(operatorVector[i])));
-        expressionVector[i + 1] = std::move(resultExpression);
-    }
-
-    return std::move(expressionVector[expressionVector.size() - 1]);
-}
-
-
-std::unique_ptr<Expression> Parser::constructRightTreeFromExpressionVector(
-    std::vector<std::unique_ptr<Expression>> expressionVector,
-    std::vector<std::unique_ptr<Operator>> operatorVector) {
-
-    std::unique_ptr<BinaryExpression> resultExpression;
-    for(int i = expressionVector.size() - 2; i >= 0; --i) {
-        resultExpression = std::make_unique<BinaryExpression>
-            (BinaryExpression(std::move(expressionVector[i]), 
-            std::move(expressionVector[i + 1]),
-            std::move(operatorVector[i])));
-        expressionVector[i] = std::move(resultExpression);
-    }
-
-    return std::move(expressionVector[0]);
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   types                                    //
@@ -392,27 +358,19 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(
     std::function<std::unique_ptr<Expression>()> parseLowerExpression,
     std::function<std::unique_ptr<Operator>()> parseThisOperator) {
 
-    std::vector<std::unique_ptr<Operator>> operatorVector;
-    while(std::unique_ptr<Operator> unaryOperator = parseThisOperator())
-        operatorVector.push_back(std::move(unaryOperator));
-    
-    std::unique_ptr<Expression> expression = parseLowerExpression();
-    if(!expression) {
-        if(operatorVector.empty())
-            return std::unique_ptr<Expression>(nullptr);
+    std::unique_ptr<Operator> unaryOperator = parseThisOperator();
+    if(!unaryOperator)
+        return parseLowerExpression();
+
+    std::unique_ptr<Expression> expression = 
+        parseUnaryExpression(parseLowerExpression, parseThisOperator);
         
-        generateError("Parsing unary expression: got unary operators, but an "
-        "expression did not follow");
-    }
-
-    for(int i = operatorVector.size() - 1; i >= 0; --i) {
-        expression = std::make_unique<UnaryExpression>
-        (UnaryExpression(std::move(operatorVector[i]), 
-            std::move(expression)));
-    }
-
-    return expression;
-
+    if(!expression)
+        generateError("Parsing unary expression: got unary operators, "
+            "but an expression did not follow");
+    
+    return std::make_unique<UnaryExpression>(UnaryExpression(
+        std::move(unaryOperator), std::move(expression)));        
 }
 
 
@@ -431,45 +389,26 @@ std::unique_ptr<Expression> Parser::parseAllUnaryExpressions() {
 std::unique_ptr<Expression> Parser::parseBinaryExpression(
     std::function<std::unique_ptr<Expression>()> parseLowerExpression,
     std::function<std::unique_ptr<Operator>()> parseThisOperator,
-    std::string errorMessage, bool isRightAssociative) {
+    std::string errorMessage) {
 
     std::unique_ptr<Expression> leftExpression = parseLowerExpression();
     if(!leftExpression)
         return std::unique_ptr<Expression>(nullptr);
 
-    std::vector<std::unique_ptr<Expression>> expressionVector;
-    expressionVector.push_back(std::move(leftExpression));
-
-    std::vector<std::unique_ptr<Operator>> operatorVector;
-    
     while(true) {
-        std::unique_ptr<Operator> currentOperator = 
-            parseThisOperator();
+        std::unique_ptr<Operator> currentOperator = parseThisOperator();
         if(!currentOperator)
             break;
         std::unique_ptr<Expression> rightExpression = parseLowerExpression();
         if(!rightExpression)
             generateError(errorMessage);
-        operatorVector.push_back(std::move(currentOperator));
-        expressionVector.push_back(std::move(rightExpression));
+
+        leftExpression = std::make_unique<BinaryExpression>(BinaryExpression(
+            std::move(leftExpression), std::move(rightExpression), 
+            std::move(currentOperator)));
     }
 
-    if(isRightAssociative) { // only assignment expression
-        
-        //for every but last expression
-        for(int i = 0; i < expressionVector.size() - 1; ++i) {
-            if(!expressionVector[i]->isLValue()) {
-                generateError("Parsing assignment expression: expected lvalue "
-                "expression, but got rvalue expression");
-            }
-        }
-
-        return constructRightTreeFromExpressionVector(
-            std::move(expressionVector), std::move(operatorVector));
-    }
-
-    return constructLeftTreeFromExpressionVector(
-            std::move(expressionVector), std::move(operatorVector));
+    return std::move(leftExpression);
 }
 
 
@@ -516,21 +455,38 @@ std::unique_ptr<Expression> Parser::parseOrExpression() {
 
 
 std::unique_ptr<Expression> Parser::parseRValueExpression() {
-    return std::move(parseOrExpression());
+    return parseOrExpression();
 }
 
 
 std::unique_ptr<Expression> Parser::parseAssignmentExpression() {
-    return parseBinaryExpression(
-        std::bind_front(&Parser::parseRValueExpression, this),
-        std::bind_front(&Parser::parseAssignmentOperator, this),
-        "Parsing assignment expression: expected another operand",
-        true);
+    
+    std::unique_ptr<Expression> leftExpression = parseRValueExpression();
+    if(!leftExpression)
+        return std::unique_ptr<Expression>(nullptr);
+
+    std::unique_ptr<Operator> assignmentOperator = parseAssignmentOperator();
+    if(!assignmentOperator)
+        return leftExpression;
+
+    if(!leftExpression->isLValue())
+        generateError("Parsing assignment expression: expected lvalue operand "
+            "before assignment operator");
+
+    std::unique_ptr<Expression> rightExpression = parseAssignmentExpression();
+
+    if(!rightExpression)
+        generateError("Parsing assignment expression: expected another "
+            "operand");
+        
+    return std::make_unique<BinaryExpression>(BinaryExpression(
+        std::move(leftExpression), std::move(rightExpression), 
+        std::move(assignmentOperator)));
 }
 
 
 std::unique_ptr<Expression> Parser::parseExpression() {
-    return std::move(parseAssignmentExpression());
+    return parseAssignmentExpression();
 }
 
 
