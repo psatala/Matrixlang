@@ -23,6 +23,13 @@ void Parser::generateError(std::string message) {
 }
 
 
+void Parser::expectToken(TokenType type, std::string errorMessage) {
+    if(type != currentToken.type)
+        generateError(errorMessage);
+    getNextToken();
+}
+
+
 std::unique_ptr<Expression> Parser::constructLeftTreeFromExpressionVector(
     std::vector<std::unique_ptr<Expression>> expressionVector,
     std::vector<std::unique_ptr<Operator>> operatorVector) {
@@ -82,29 +89,20 @@ std::unique_ptr<VectorType> Parser::parseVectorType() {
         return std::unique_ptr<VectorType>(nullptr);
     getNextToken();
 
-    if(LESS_THAN != currentToken.type)
-        generateError("Parsing Vector, expected \"<\"");
-    getNextToken();
+    expectToken(LESS_THAN, "Parsing Vector, expected \"<\"");
 
     std::unique_ptr<Type> type = parseType();
     if(!type)
         generateError("Parsing Vector, expected Type");
     
-    if(MORE_THAN != currentToken.type)
-        generateError("Parsing Vector, expected \">\"");
-    getNextToken();
-
-    if(L_SQUARE_BRACKET != currentToken.type)
-        generateError("Parsing Vector, expected \"[\"");
-    getNextToken();
-
+    expectToken(MORE_THAN, "Parsing Vector, expected \">\"");
+    expectToken(L_SQUARE_BRACKET, "Parsing Vector, expected \"[\"");
+    
     std::unique_ptr<Expression> expression = parseExpression();
     if(!expression)
         generateError("Parsing Vector, expected Expression");
     
-    if(R_SQUARE_BRACKET != currentToken.type)
-        generateError("Parsing Vector, expected \"]\"");
-    getNextToken();
+    expectToken(R_SQUARE_BRACKET, "Parsing Vector, expected \"]\"");
 
     return std::make_unique<VectorType>(VectorType(std::move(type), 
         std::move(expression)));
@@ -117,38 +115,27 @@ std::unique_ptr<MatrixType> Parser::parseMatrixType() {
         return std::unique_ptr<MatrixType>(nullptr);    
     getNextToken();
 
-    if(LESS_THAN != currentToken.type)
-        generateError("Parsing Matrix, expected \"<\"");
-    getNextToken();
-
+    expectToken(LESS_THAN, "Parsing Matrix, expected \"<\"");
+    
     std::unique_ptr<Type> type = parseType();
     if(!type)
         generateError("Parsing Matrix, expected Type");
     
-    if(MORE_THAN != currentToken.type)
-        generateError("Parsing Matrix, expected \">\"");
-    getNextToken();
-    
-    if(L_SQUARE_BRACKET != currentToken.type)
-        generateError("Parsing Matrix, expected \"[\"");
-    getNextToken();
+    expectToken(MORE_THAN, "Parsing Matrix, expected \">\"");
+    expectToken(L_SQUARE_BRACKET, "Parsing Matrix, expected \"[\"");
     
     std::unique_ptr<Expression> firstExpression = parseExpression();
     if(!firstExpression)
         generateError("Parsing Matrix, expected Expression");
     
-    if(COMMA != currentToken.type)
-        generateError("Parsing Matrix, expected \",\"");
-    getNextToken();
-
+    expectToken(COMMA, "Parsing Matrix, expected \",\"");
+    
     std::unique_ptr<Expression> secondExpression = parseExpression();
     if(!secondExpression)
         generateError("Parsing Matrix, expected Expression");
     
-    if(R_SQUARE_BRACKET != currentToken.type)
-        generateError("Parsing Matrix, expected \"]\"");
-    getNextToken();
-
+    expectToken(R_SQUARE_BRACKET, "Parsing Matrix, expected \"]\"");
+    
     return std::make_unique<MatrixType>(MatrixType(std::move(type), 
         std::move(firstExpression), std::move(secondExpression)));
 }
@@ -307,18 +294,17 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 
     if(L_PARENT != currentToken.type)
         return std::unique_ptr<Expression>(nullptr);
+    getNextToken();
 
     //parsing expression in parenthesis
-    getNextToken();
     expression = parseExpression();
     if(!expression)
         generateError("Parsing expression in parenthesis: expected an "
             "expression");
-    if(R_PARENT != currentToken.type)
-        generateError("Parsing expression in parenthesis: missing closing "
+    
+    expectToken(R_PARENT, "Parsing expression in parenthesis: missing closing "
             "parenthesis");
-    getNextToken();
-
+    
     return expression;
 
 }
@@ -337,10 +323,8 @@ std::unique_ptr<Expression> Parser::parseFuncallExpression() {
 
     std::unique_ptr<ExpressionList> expressionList = parseExpressionList();
 
-    if(R_PARENT != currentToken.type)
-        generateError("End of function call: expected \")\"");
-    getNextToken();
-
+    expectToken(R_PARENT, "End of function call: expected \")\"");
+    
     return std::make_unique<FuncallExpression>(identifier, 
         std::move(expressionList));
 }
@@ -363,10 +347,9 @@ std::unique_ptr<Expression> Parser::parseLValueExpression() {
         
         if(COMMA != currentToken.type) {
             
-            if(R_SQUARE_BRACKET != currentToken.type)
-                generateError("Parsing Vector index access: expected \"]\"");
-            getNextToken();
-
+            expectToken(R_SQUARE_BRACKET, 
+                "Parsing Vector index access: expected \"]\"");
+            
             expression = std::make_unique<VectorIndexExpression>
                 (VectorIndexExpression(std::move(expression), 
                 std::move(firstIndexExpression)));    
@@ -379,10 +362,9 @@ std::unique_ptr<Expression> Parser::parseLValueExpression() {
             generateError("Parsing Matrix index access: expected another "
             "expression after \",\"");
         
-        if(R_SQUARE_BRACKET != currentToken.type)
-            generateError("Parsing Matrix index access: expected \"]\"");
-        getNextToken();
-
+        expectToken(R_SQUARE_BRACKET, 
+            "Parsing Matrix index access: expected \"]\"");
+        
         expression = std::make_unique<MatrixIndexExpression>
                 (MatrixIndexExpression(std::move(expression), 
                 std::move(firstIndexExpression), 
@@ -611,10 +593,6 @@ std::unique_ptr<Declaration> Parser::parseDeclarationEnd(
             generateError("Parsing declaration: parsed \"=\", but an expression"
             " did not follow");
     }
-    // if(SEMICOLON != currentToken.type)
-    //     generateError("Parsing declaration: expected \";\" at the end of "
-    //         "declaration");
-    // getNextToken();
     return std::make_unique<Declaration>(Declaration(std::move(type), 
         identifier, std::move(expression)));
 }
@@ -628,9 +606,7 @@ std::unique_ptr<Function> Parser::parseFunctionEnd(std::unique_ptr<Type> type,
     //can be null - then the list is empty
     std::unique_ptr<ArgumentList> argumentList = parseArgumentList();
 
-    if(R_PARENT != currentToken.type)
-        generateError("Parsing function: expected \")\"");
-    getNextToken();
+    expectToken(R_PARENT, "Parsing function: expected \")\"");
     
     std::unique_ptr<Statement> statement = parseStatement();
     if(!statement)
@@ -652,10 +628,8 @@ std::unique_ptr<Declaration> Parser::parseDeclarationInstruction() {
     if(!declaration)
         return std::unique_ptr<Declaration>(nullptr);
 
-    if(SEMICOLON != currentToken.type)
-        generateError("Parsing declaration instruction: expected \";\"");
-    getNextToken();
-
+    expectToken(SEMICOLON, "Parsing declaration instruction: expected \";\"");
+    
     return std::move(declaration);
 }
 
@@ -718,10 +692,8 @@ std::unique_ptr<Return> Parser::parseReturn() {
     //empty expression allowed
     std::unique_ptr<Expression> expression = parseExpression();
 
-    if(SEMICOLON != currentToken.type)
-        generateError("Parsing return instruction: expected a \";\"");
-    getNextToken();
-
+    expectToken(SEMICOLON, "Parsing return instruction: expected a \";\"");
+    
     return std::make_unique<Return>(Return(std::move(expression)));
 }
 
@@ -755,9 +727,7 @@ std::unique_ptr<Instruction> Parser::parseInstruction() {
     
     std::unique_ptr<Expression> expressionInstruction = parseExpression();
     if(expressionInstruction) {
-        if(SEMICOLON != currentToken.type)
-            generateError("Parsing instruction: expected \";\"");
-        getNextToken();
+        expectToken(SEMICOLON, "Parsing instruction: expected \";\"");
         return std::make_unique<Instruction>
             (Instruction(std::move(expressionInstruction)));
     }
@@ -793,10 +763,8 @@ std::unique_ptr<InstructionList> Parser::parseBlock() {
     // cannot be null, but may be empty
     std::unique_ptr<InstructionList> instructionList = parseInstructionList();
 
-    if(R_BRACKET != currentToken.type)
-        generateError("Parsing block: expected \"}\"");
-    getNextToken();
-
+    expectToken(R_BRACKET, "Parsing block: expected \"}\"");
+    
     return std::move(instructionList);
 }
 
@@ -825,17 +793,13 @@ std::unique_ptr<If> Parser::parseIf() {
         return std::unique_ptr<If>(nullptr);
     getNextToken();
 
-    if(L_PARENT != currentToken.type)
-        generateError("Parsing if instruction: expected \"(\"");
-    getNextToken();
-
+    expectToken(L_PARENT, "Parsing if instruction: expected \"(\"");
+    
     std::unique_ptr<Expression> conditionalExpression = parseExpression();
     if(!conditionalExpression)
         generateError("Parsing if instruction: expected expression");
 
-    if(R_PARENT != currentToken.type)
-        generateError("Parsing if instruction: expected \")\"");
-    getNextToken();
+    expectToken(R_PARENT, "Parsing if instruction: expected \")\"");
 
     std::unique_ptr<Statement> trueStatement = parseStatement();
     if(!trueStatement)
@@ -860,10 +824,8 @@ std::unique_ptr<For> Parser::parseFor() {
         return std::unique_ptr<For>(nullptr);
     getNextToken();
 
-    if(L_PARENT != currentToken.type)
-        generateError("Parsing for instruction: expected \"(\"");
-    getNextToken();
-
+    expectToken(L_PARENT, "Parsing for instruction: expected \"(\"");
+    
     std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
         declarationVariant = parseDeclarationOrFunction();
     if(!std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
@@ -873,23 +835,17 @@ std::unique_ptr<For> Parser::parseFor() {
     std::unique_ptr<Declaration> declaration = 
         std::move(std::get<std::unique_ptr<Declaration>>(declarationVariant));
     
-    if(SEMICOLON != currentToken.type)
-        generateError("Parsing for instruction: expected \";\"");
-    getNextToken();
+    expectToken(SEMICOLON, "Parsing for instruction: expected \";\"");
 
     // may be null
     std::unique_ptr<Expression> conditionalExpression = parseExpression();
     
-    if(SEMICOLON != currentToken.type)
-        generateError("Parsing for instruction: expected \";\"");
-    getNextToken();
+    expectToken(SEMICOLON, "Parsing for instruction: expected \";\"");
 
     // may be null
     std::unique_ptr<Expression> incrementalExpression = parseExpression();
     
-    if(R_PARENT != currentToken.type)
-        generateError("Parsing for instruction: expected \")\"");
-    getNextToken();
+    expectToken(R_PARENT, "Parsing for instruction: expected \")\"");
 
     std::unique_ptr<Statement> statement = parseStatement();
     if(!statement)
@@ -910,10 +866,8 @@ std::unique_ptr<CaseGo> Parser::parseCaseGo() {
     if(!expression)
         generateError("Parsing case go: expected expression");
 
-    if(COLON != currentToken.type)
-        generateError("Parsing case go: expected \":\"");
-    getNextToken();
-
+    expectToken(COLON, "Parsing case go: expected \":\"");
+    
     std::unique_ptr<InstructionList> instructionList = parseInstructionList();
 
     return std::make_unique<CaseGo>(CaseGo(std::move(expression), 
@@ -934,10 +888,8 @@ std::unique_ptr<CaseC> Parser::parseCaseC() {
     Token token = currentToken;
     getNextToken();
 
-    if(COLON != currentToken.type)
-        generateError("Parsing case c: expected \":\"");
-    getNextToken();
-
+    expectToken(COLON, "Parsing case c: expected \":\"");
+    
     std::unique_ptr<InstructionList> instructionList = parseInstructionList();
 
     return std::make_unique<CaseC>(CaseC(token, std::move(instructionList)));
@@ -950,9 +902,7 @@ std::unique_ptr<Default> Parser::parseDefault() {
         return std::unique_ptr<Default>(nullptr);
     getNextToken();
 
-    if(COLON != currentToken.type)
-        generateError("Parsing default: expected \":\"");
-    getNextToken();
+    expectToken(COLON, "Parsing default: expected \":\"");
 
     return std::make_unique<Default>(Default(parseInstructionList()));
 }
@@ -991,10 +941,8 @@ std::unique_ptr<SwitchGo> Parser::parseSwitchGoEnd() {
     
     switchGo->defaultInstruction = parseDefault();
 
-    if(R_BRACKET != currentToken.type)
-        generateError("Parsing switch go: expected \"}\"");
-    getNextToken();
-
+    expectToken(R_BRACKET, "Parsing switch go: expected \"}\"");
+    
     return std::move(switchGo);
 }
 
@@ -1011,14 +959,9 @@ std::unique_ptr<SwitchC> Parser::parseSwitchCEnd() {
     if(!switchC->postExpression)
         generateError("Parsing switch c: expected expression");
     
-    if(R_PARENT != currentToken.type)
-        generateError("Parsing switch c: expected \")\"");
-    getNextToken();
-
-    if(L_BRACKET != currentToken.type)
-        generateError("Parsing switch c: expected \"{\"");
-    getNextToken();
-
+    expectToken(R_PARENT, "Parsing switch c: expected \")\"");
+    expectToken(L_BRACKET, "Parsing switch c: expected \"{\"");
+    
     std::unique_ptr<CaseC> caseC = parseCaseC();
     while (caseC) {
         switchC->caseCInstructions.push_back(std::move(caseC));
@@ -1027,12 +970,9 @@ std::unique_ptr<SwitchC> Parser::parseSwitchCEnd() {
     
     switchC->defaultInstruction = parseDefault();
 
-    if(R_BRACKET != currentToken.type)
-        generateError("Parsing switch c: expected \"}\"");
-    getNextToken();
+    expectToken(R_BRACKET, "Parsing switch c: expected \"}\"");
 
     return std::move(switchC);
-
 }
 
 
@@ -1052,9 +992,8 @@ std::unique_ptr<Program> Parser::parseProgram() {
                 generateError("Parsing program: expected a declaration");
             program->declarationFunctionVector.push_back
                 (std::move(*declaration));
-            if(SEMICOLON != currentToken.type)
-                generateError("Parsing global declaration: expected a \";\"");
-            getNextToken();
+            expectToken(SEMICOLON, 
+                "Parsing global declaration: expected a \";\"");
             continue;
         }
 

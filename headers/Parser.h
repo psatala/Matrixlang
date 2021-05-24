@@ -45,6 +45,7 @@ class Parser {
 
     void getNextToken();
     void generateError(std::string message);
+    void expectToken(TokenType type, std::string errorMessage);
 
 
     std::unique_ptr<Expression> constructLeftTreeFromExpressionVector(
