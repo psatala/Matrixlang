@@ -110,8 +110,8 @@ class Parser {
     std::unique_ptr<Expression> parseExpression();
     std::unique_ptr<ExpressionList> parseExpressionList();
     
-    std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>> 
-        parseDeclarationOrFunction();
+    std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>, 
+        std::monostate> parseDeclarationOrFunction();
     std::unique_ptr<Declaration> parseDeclarationEnd(std::unique_ptr<Type> type,
         std::string identifier);
     std::unique_ptr<Function> parseFunctionEnd(std::unique_ptr<Type> type, 
