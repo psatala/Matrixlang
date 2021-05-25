@@ -35,15 +35,18 @@
 #include "LanguageObjects/Switch.h"
 #include "LanguageObjects/SwitchGo.h"
 #include "LanguageObjects/SwitchC.h"
+#include "LanguageObjects/VariableExpression.h"
 
 
 class Parser {
     std::ostream& errStream;
 
     Token currentToken;
+    Token peekedToken;
     bool isEOTProcessed = false;
 
     void getNextToken();
+    void setUpPeekedToken();
     void generateError(std::string message);
     void expectToken(TokenType type, std::string errorMessage);
 
@@ -75,7 +78,11 @@ class Parser {
     std::unique_ptr<Expression> parseLiteralExpression();
     std::unique_ptr<Expression> parsePrimaryExpression();
 
+    std::variant<std::unique_ptr<VariableExpression>, std::unique_ptr
+        <FuncallExpression>, std::monostate> parseVariableOrFuncallExpression();
+    std::unique_ptr<Expression> parseVariableExpression();
     std::unique_ptr<Expression> parseFuncallExpression();
+
     std::unique_ptr<Expression> parseLValueExpression();
     std::unique_ptr<Expression> parsePostExpression();
 
@@ -138,5 +145,8 @@ public:
 
     Parser(std::unique_ptr<std::istream> inStream, std::ostream& errStream) : 
         errStream(errStream),
-        lexer(std::move(inStream), errStream) {}
+        lexer(std::move(inStream), errStream) {
+        
+        peekedToken.type = UNKNOWN;
+    }
 };

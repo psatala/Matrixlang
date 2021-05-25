@@ -1,15 +1,29 @@
 #include "../headers/Parser.h"
 
 void Parser::getNextToken() {
+    // special case
+    if(EOT == peekedToken.type && EOT != currentToken.type) {
+        currentToken = peekedToken;
+        return;
+    }
+
+    currentToken = peekedToken;
+
     if(isEOTProcessed)
         generateError("EOT already processed");
 
     do {
-        currentToken = lexer.getToken();
-    } while(COMMENT == currentToken.type || LEXER_COMMAND == currentToken.type);
-    if(EOT == currentToken.type)
+        peekedToken = lexer.getToken();
+    } while(COMMENT == peekedToken.type || LEXER_COMMAND == peekedToken.type);
+    if(EOT == peekedToken.type)
         isEOTProcessed = true;
 }
+
+
+void Parser::setUpPeekedToken() {
+    getNextToken();
+}
+
 
 void Parser::generateError(std::string message) {
     std::string completeMessage = "Line: "
@@ -258,6 +272,10 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
     if(expression)
         return expression;
 
+    expression = parseFuncallExpression();
+    if(expression)
+        return std::move(expression);
+
     if(L_PARENT != currentToken.type)
         return std::unique_ptr<Expression>(nullptr);
     getNextToken();
@@ -276,15 +294,18 @@ std::unique_ptr<Expression> Parser::parsePrimaryExpression() {
 }
 
 
-std::unique_ptr<Expression> Parser::parseFuncallExpression() {
+std::variant<std::unique_ptr<VariableExpression>, 
+    std::unique_ptr<FuncallExpression>, std::monostate> 
+    Parser::parseVariableOrFuncallExpression(){
+    
     if(IDENTIFIER != currentToken.type)
-        return std::unique_ptr<Expression>(nullptr);
+        return std::monostate();
 
     std::string identifier = std::get<std::string>(currentToken.value);
     getNextToken();
     
     if(L_PARENT != currentToken.type)
-        return std::make_unique<FuncallExpression>(identifier);
+        return std::make_unique<VariableExpression>(identifier);
     getNextToken();
 
     std::unique_ptr<ExpressionList> expressionList = parseExpressionList();
@@ -296,8 +317,36 @@ std::unique_ptr<Expression> Parser::parseFuncallExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseVariableExpression() {
+    if(IDENTIFIER != currentToken.type || L_PARENT == peekedToken.type)
+        return std::unique_ptr<Expression>(nullptr);
+
+    std::variant<std::unique_ptr<VariableExpression>, 
+        std::unique_ptr<FuncallExpression>, std::monostate> variant = 
+        parseVariableOrFuncallExpression();
+    
+    std::unique_ptr<VariableExpression> expression = 
+        std::move(std::get<std::unique_ptr<VariableExpression>>(variant));
+    return std::move(expression);
+}
+
+
+std::unique_ptr<Expression> Parser::parseFuncallExpression() {
+    if(IDENTIFIER != currentToken.type || L_PARENT != peekedToken.type)
+        return std::unique_ptr<Expression>(nullptr);
+
+    std::variant<std::unique_ptr<VariableExpression>, 
+        std::unique_ptr<FuncallExpression>, std::monostate> variant = 
+        parseVariableOrFuncallExpression();
+    
+    std::unique_ptr<FuncallExpression> expression = 
+        std::move(std::get<std::unique_ptr<FuncallExpression>>(variant));
+    return std::move(expression);
+}
+
+
 std::unique_ptr<Expression> Parser::parseLValueExpression() {
-    std::unique_ptr<Expression> expression = parseFuncallExpression();
+    std::unique_ptr<Expression> expression = parseVariableExpression();
     if(!expression)
         return std::unique_ptr<Expression>(nullptr);
     
@@ -916,6 +965,7 @@ std::unique_ptr<SwitchC> Parser::parseSwitchCEnd() {
 
 
 std::unique_ptr<Program> Parser::parseProgram() {
+    setUpPeekedToken();
     getNextToken();
 
     std::unique_ptr<Program> program = std::make_unique<Program>(Program());

@@ -12,7 +12,7 @@ public:
     std::string identifier;
     std::unique_ptr<ExpressionList> expressionList;
 
-    FuncallExpression(std::string identifier): identifier(identifier) {}
+    FuncallExpression(std::string identifier) : identifier(identifier) {}
 
     FuncallExpression(std::string identifier, std::unique_ptr<ExpressionList> 
         expressionList) : identifier(identifier), 
@@ -33,7 +33,7 @@ public:
     }
 
     bool isLValue() const override {
-        return true;
+        return false;
     }
 
 };

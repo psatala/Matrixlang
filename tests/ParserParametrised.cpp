@@ -56,12 +56,12 @@ R"(Program
       Instruction List: Instruction list
         Instruction: Instruction
           Expression: Binary expression
-            Left: Funcall expression
+            Left: Variable expression
               Identifier: a
             Right: Binary expression
-              Left: Funcall expression
+              Left: Variable expression
                 Identifier: b
-              Right: Funcall expression
+              Right: Variable expression
                 Identifier: c
               Operator: =
             Operator: =
@@ -176,11 +176,11 @@ R"(Program
       Instruction List: Instruction list
         Instruction: Instruction
           Expression: Binary expression
-            Left: Funcall expression
+            Left: Variable expression
               Identifier: a
             Right: Unary expression
               Operator: ++
-              Expression: Funcall expression
+              Expression: Variable expression
                 Identifier: b
             Operator: +
 )"),
@@ -262,7 +262,7 @@ R"(Program
         Instruction: Instruction
           Expression: Matrix index expression
             Inner expression: Vector index expression
-              Inner expression: Funcall expression
+              Inner expression: Variable expression
                 Identifier: a
               Index expression: Literal expression: int number: 1
             First index expression: Literal expression: int number: 2
@@ -283,7 +283,7 @@ R"(Program
         Instruction: Instruction
           Expression: Post expression
             Expression: Post expression
-              Expression: Funcall expression
+              Expression: Variable expression
                 Identifier: a
               Operator: ++
             Operator: --
@@ -307,7 +307,7 @@ R"(Program
               Operator: --
               Expression: Unary expression
                 Operator: !
-                Expression: Funcall expression
+                Expression: Variable expression
                   Identifier: a
 )")
 
@@ -430,14 +430,14 @@ const ParserInputOutput otherLanguageObjects[] = {
               Identifier: i
               Expression: Literal expression: int number: 0
             Conditional expression: Binary expression
-              Left: Funcall expression
+              Left: Variable expression
                 Identifier: i
-              Right: Funcall expression
+              Right: Variable expression
                 Identifier: n
               Operator: <
             Incremental expression: Unary expression
               Operator: ++
-              Expression: Funcall expression
+              Expression: Variable expression
                 Identifier: i
             Statement: Statement
               Instruction List: Instruction list
@@ -465,7 +465,7 @@ const ParserInputOutput otherLanguageObjects[] = {
               Instruction List: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: a
                     Right: Literal expression: int number: 0
                     Operator: =
@@ -477,7 +477,7 @@ const ParserInputOutput otherLanguageObjects[] = {
             Expression: Literal expression: int number: 1
         Instruction: Instruction
           Return: Return
-            Expression: Funcall expression
+            Expression: Variable expression
               Identifier: c
 )"),
 
@@ -503,27 +503,27 @@ const ParserInputOutput otherLanguageObjects[] = {
           Switch: Switch Go
             Case Go no. 0: Case Go
               Expression: Binary expression
-                Left: Funcall expression
+                Left: Variable expression
                   Identifier: a
                 Right: Literal expression: int number: 1
                 Operator: <
               Instruction list: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: b
                     Right: Literal expression: int number: 2
                     Operator: =
             Case Go no. 1: Case Go
               Expression: Binary expression
-                Left: Funcall expression
+                Left: Variable expression
                   Identifier: a
                 Right: Literal expression: int number: 3
                 Operator: >
               Instruction list: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: b
                     Right: Literal expression: int number: 4
                     Operator: =
@@ -531,7 +531,7 @@ const ParserInputOutput otherLanguageObjects[] = {
               Instruction list: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: b
                     Right: Literal expression: int number: 5
                     Operator: =
@@ -558,14 +558,14 @@ const ParserInputOutput otherLanguageObjects[] = {
       Instruction List: Instruction list
         Instruction: Instruction
           Switch: Switch C
-            Expression: Funcall expression
+            Expression: Variable expression
               Identifier: a
             Case C no. 0: Case C
               Token: int number: 1
               Instruction list: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: b
                     Right: Literal expression: int number: 2
                     Operator: =
@@ -574,7 +574,7 @@ const ParserInputOutput otherLanguageObjects[] = {
               Instruction list: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: b
                     Right: Literal expression: int number: 4
                     Operator: =
@@ -582,7 +582,7 @@ const ParserInputOutput otherLanguageObjects[] = {
               Instruction list: Instruction list
                 Instruction: Instruction
                   Expression: Binary expression
-                    Left: Funcall expression
+                    Left: Variable expression
                       Identifier: b
                     Right: Literal expression: int number: 5
                     Operator: =
