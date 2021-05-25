@@ -22,6 +22,7 @@ TEST_P(ParserParametrised, checkParsedTree)
 
 
 const ParserInputOutput basicExpressions[] = {
+    // simple additive expression
     ParserInputOutput(R"(
                 int main()
                     1 + 2 + 3;
@@ -43,6 +44,7 @@ R"(Program
             Operator: +
 )"),
 
+    // simple assignment expression
     ParserInputOutput(R"(
                 int main()
                     a = b = c;
@@ -67,6 +69,7 @@ R"(Program
             Operator: =
 )"),
 
+    // combining mulitplication with addition
     ParserInputOutput(R"(
                 int main()
                     1 + 2 * 3 + 4;
@@ -91,6 +94,7 @@ R"(Program
             Operator: +
 )"),
 
+    // another compilation of multiplication and addition
     ParserInputOutput(R"(
                 int main()
                     1.0 * 2.0 + 3.0 * 4.0;
@@ -115,6 +119,7 @@ R"(Program
             Operator: +
 )"), 
 
+    // multiple operators of different precedence levels
     ParserInputOutput(R"(
                 int main()
                     1 && 2 + 3 * 4 < 5;
@@ -142,6 +147,7 @@ R"(Program
             Operator: &&
 )"),
 
+    // unary rvalue operators
     ParserInputOutput(R"(
                 int main()
                     +-!1;
@@ -163,6 +169,7 @@ R"(Program
                 Expression: Literal expression: int number: 1
 )"),
 
+    // mix of unary and binary
     ParserInputOutput(R"(
                 int main()
                     a + ++ b;
@@ -185,6 +192,7 @@ R"(Program
             Operator: +
 )"),
 
+    // parenthesis
     ParserInputOutput(R"(
                 int main()
                     1 * (2 + 3);
@@ -206,7 +214,8 @@ R"(Program
             Operator: *
 )"),
 
-  ParserInputOutput(R"(
+    // string expression
+    ParserInputOutput(R"(
                 int main()
                     "abc" 1 + 2 "def";
                 )",
@@ -227,6 +236,7 @@ R"(Program
             Raw String: def
 )"),
 
+  // funcall
   ParserInputOutput(R"(
                 int main()
                     abc(1, 2 + 3);
@@ -248,6 +258,7 @@ R"(Program
               Operator: +
 )"),
 
+  // vector and matrix index access
   ParserInputOutput(R"(
                 int main()
                     a[1][2, 3];
@@ -269,6 +280,7 @@ R"(Program
             Second index expression: Literal expression: int number: 3
 )"),
 
+  // post expression
   ParserInputOutput(R"(
                 int main()
                     a++--;
@@ -289,6 +301,7 @@ R"(Program
             Operator: --
 )"),
 
+  // unary lvalue expression
   ParserInputOutput(R"(
                 int main()
                     ++--!a;
@@ -318,6 +331,7 @@ INSTANTIATE_TEST_SUITE_P(ParserParametrisedExpressions, ParserParametrised,
 
 
 const ParserInputOutput otherLanguageObjects[] = {
+  // declaration
   ParserInputOutput(R"(Vector<float>[1] a;)", 
     R"(Program
   Declaration
@@ -327,6 +341,7 @@ const ParserInputOutput otherLanguageObjects[] = {
     Identifier: a
 )"),
 
+  // nested declaration
   ParserInputOutput(R"(Matrix< Vector<int>[1] >[2, 3] a;)", 
     R"(Program
   Declaration
@@ -339,6 +354,7 @@ const ParserInputOutput otherLanguageObjects[] = {
     Identifier: a
 )"),
 
+  // simple declaration
   ParserInputOutput(R"(int a = 0;)",
     R"(Program
   Declaration
@@ -347,6 +363,7 @@ const ParserInputOutput otherLanguageObjects[] = {
     Expression: Literal expression: int number: 0
 )"),
 
+  // function
   ParserInputOutput(R"(int foo(float bar, string variable);)",
     R"(Program
   Function
@@ -363,6 +380,7 @@ const ParserInputOutput otherLanguageObjects[] = {
           Expression: 
 )"),
 
+  // return
   ParserInputOutput(R"(int main() return 0;)",
     R"(Program
   Function
@@ -376,6 +394,7 @@ const ParserInputOutput otherLanguageObjects[] = {
             Expression: Literal expression: int number: 0
 )"),
 
+  // if
   ParserInputOutput(R"(int main() if(1);)",
     R"(Program
   Function
@@ -394,6 +413,7 @@ const ParserInputOutput otherLanguageObjects[] = {
             False statement: 
 )"),
 
+  // if else
   ParserInputOutput(R"(int main() if(1); else;)",
     R"(Program
   Function
@@ -415,6 +435,7 @@ const ParserInputOutput otherLanguageObjects[] = {
                   Expression: 
 )"),
 
+  // for
   ParserInputOutput(R"(int main() for(int i = 0; i < n; ++i);)",
     R"(Program
   Function
@@ -445,6 +466,7 @@ const ParserInputOutput otherLanguageObjects[] = {
                   Expression: 
 )"),
 
+  // instruction list
   ParserInputOutput(R"(int main() {
                 if(1)
                     a = 0;
@@ -481,6 +503,7 @@ const ParserInputOutput otherLanguageObjects[] = {
               Identifier: c
 )"),
 
+  // switch go
   ParserInputOutput(R"(int main() {
                     switch {
                     case a < 1:
@@ -537,6 +560,7 @@ const ParserInputOutput otherLanguageObjects[] = {
                     Operator: =
 )"),
 
+  // switch c
   ParserInputOutput(R"(
                 int main() {
                     switch(a) {
@@ -588,6 +612,7 @@ const ParserInputOutput otherLanguageObjects[] = {
                     Operator: =
 )"),
 
+  // hello world
   ParserInputOutput(R"(
     int main() {
         print("Hello world");

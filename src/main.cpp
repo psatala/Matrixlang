@@ -7,11 +7,6 @@
 
 int main()
 {
-    std::unique_ptr<std::stringstream> inStream = std::make_unique
-        <std::stringstream>(R"(
-                int main()
-                    a + b = c;
-                )");
     std::unique_ptr<std::ifstream> fileStream = 
         std::make_unique<std::ifstream>();
 
@@ -19,7 +14,7 @@ int main()
     if(!*fileStream)
         return -1;
 
-    Interpreter interpreter = Interpreter(std::move(inStream), std::cerr, 
+    Interpreter interpreter = Interpreter(std::move(fileStream), std::cerr, 
         std::cout);
 
     try {
