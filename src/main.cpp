@@ -2,6 +2,9 @@
 
 #include "../headers/Interpreter.h"
 #include <fstream>
+
+#include "../tests/TestPrograms.h"
+
 int main()
 {
     std::unique_ptr<std::ifstream> fileStream = 
@@ -10,13 +13,17 @@ int main()
     fileStream->open("../examples/HelloWorld.ml", std::ifstream::in);
     if(!*fileStream)
         return -1;
-    
+
     Interpreter interpreter = Interpreter(std::move(fileStream), std::cerr, 
         std::cout);
 
-    while(!interpreter.lexer.getIsProcessed()) {
-        const std::optional<Token> token = interpreter.lexer.getToken();
-        std::cout << token->type << std::endl;
+    try {
+        std::unique_ptr<Program> program = interpreter.parser.parseProgram();
+        std::cout << program->print();
+
+
+    } catch(std::string exception) {
+        std::cout << exception << std::endl;
     }
     return 0;
 }

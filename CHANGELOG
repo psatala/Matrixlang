@@ -1,3 +1,19 @@
+25.05.2021:
+* Napisano testy pokazujące błędy w parsowaniu.
+* Zmieniono dostępność funkcji parsera z publicznych na prywatne.
+* Wirtualny destruktor dla expression, klasa ta jest teraz w pełni abstract.
+* getif variant zamiast variant.index().
+* Expect token.
+* variant monostate przy declarationOrFunction.
+* std::bindfront zamiast std::bind.
+* Rekursja lewostronna w assign expression.
+* Rekurencja zamiast iteracji w parsowaniu binary i unary expression.
+* Funkcja zwraca rvalue, nie lvalue.
+
+16.05.2021:
+* Napisany został parser.
+* Parser potrafi wyświetlić drzewo przetworzonego programu.
+
 9.05.2021:
 * Strumienie wejścia przekazywane są teraz za pomocą unique_ptr, a nie zwykłego wskaźnika.
 * Naprawiono błąd, który umożliwiał pojawienie się wielu tokenów EOT dla jednego programu.

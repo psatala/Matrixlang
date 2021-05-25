@@ -1,8 +1,36 @@
+#pragma once
+
 #include <variant>
 #include <string>
 
 enum TokenType {
-    //basic
+    // one character operators
+    PLUS = '+',
+    MINUS = '-',
+    MULTIPLY = '*',
+    DIVIDE = '/',
+    MODULO = '%',
+    LESS_THAN = '<',
+    MORE_THAN = '>',
+    NOT = '!',
+    ASSIGN = '=',
+
+    // special
+    COLON = ':',
+    SEMICOLON = ';',
+    COMMA = ',',
+    DOT = '.',
+    L_SQUARE_BRACKET = '[',
+    R_SQUARE_BRACKET = ']',
+    L_PARENT = '(',
+    R_PARENT = ')',
+    L_BRACKET = '{',
+    R_BRACKET = '}',
+
+    // make the rest non printable
+    UNUSED = 128,
+
+    // basic
     IDENTIFIER,
     INT_NUMBER,
     FLOAT_NUMBER,
@@ -13,7 +41,7 @@ enum TokenType {
     INCORRECT,
     LEXER_COMMAND,
 
-    //keywords
+    // keywords
     IF,
     ELSE,
     SWITCH,
@@ -28,40 +56,18 @@ enum TokenType {
     MATRIX,
     VOID,
 
-    //special
-    COLON = ':',
-    SEMICOLON = ';',
-    COMMA = ',',
-    DOT = '.',
-    L_BRACKET = '{',
-    R_BRACKET = '}',
-    L_SQUARE_BRACKET = '[',
-    R_SQUARE_BRACKET = ']',
-    L_PARENT = '(',
-    R_PARENT = ')',
-    
-    //operators
-    PLUS = '+',
-    MINUS = '-',
-    MULTIPLY = '*',
-    DIVIDE = '/',
-    MODULO = '%',
-
+    // other operators
     INCREMENT,
     DECREMENT,
     
-    LESS_THAN = '<',
     LESS_EQUAL,
-    MORE_THAN = '>',
     MORE_EQUAL,
     EQUAL,
     NOT_EQUAL,
 
     AND,
     OR,
-    NOT = '!',
-
-    ASSIGN = '=',
+    
     PLUS_ASSIGN,
     MINUS_ASSIGN,
     MULTIPLY_ASSIGN,

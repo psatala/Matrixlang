@@ -47,5 +47,5 @@ public:
         }
 
     bool getIsProcessed() const;
-    std::optional<Token> getToken();
+    Token getToken();
 };

@@ -13,7 +13,6 @@ public:
         input(input), firstToken(firstToken) {}
 };
 
-
 inline void assertTokenTypeAndValue(Lexer& lexer, TokenType type,
     std::variant<int, float, std::string> value) {
     

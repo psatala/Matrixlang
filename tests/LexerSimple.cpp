@@ -10,12 +10,12 @@ TEST (LexerSimple, basic) {
         errStream, outStream);
     
 
-    assertTokenType(interpreter.lexer, INT);
-    assertTokenTypeAndValue(interpreter.lexer, IDENTIFIER, "a");
-    assertTokenType(interpreter.lexer, ASSIGN);
-    assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 10);
-    assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenType(interpreter.parser.lexer, INT);
+    assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "a");
+    assertTokenType(interpreter.parser.lexer, ASSIGN);
+    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 10);
+    assertTokenType(interpreter.parser.lexer, SEMICOLON);
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, operatorSequence) {
@@ -30,39 +30,39 @@ TEST (LexerSimple, operatorSequence) {
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
 
-    assertTokenType(interpreter.lexer, PLUS);
-    assertTokenType(interpreter.lexer, PLUS_ASSIGN);
-    assertTokenType(interpreter.lexer, INCREMENT);
-    assertTokenType(interpreter.lexer, MINUS);
-    assertTokenType(interpreter.lexer, MINUS_ASSIGN);
-    assertTokenType(interpreter.lexer, DECREMENT);
-    assertTokenType(interpreter.lexer, MULTIPLY);
-    assertTokenType(interpreter.lexer, MULTIPLY_ASSIGN);
-    assertTokenType(interpreter.lexer, DIVIDE);
-    assertTokenType(interpreter.lexer, DIVIDE_ASSIGN);
-    assertTokenType(interpreter.lexer, MODULO);
-    assertTokenType(interpreter.lexer, MODULO_ASSIGN);
-    assertTokenType(interpreter.lexer, LESS_THAN);
-    assertTokenType(interpreter.lexer, LESS_EQUAL);
-    assertTokenType(interpreter.lexer, MORE_THAN);
-    assertTokenType(interpreter.lexer, MORE_EQUAL);
-    assertTokenType(interpreter.lexer, NOT);
-    assertTokenType(interpreter.lexer, NOT_EQUAL);
-    assertTokenType(interpreter.lexer, ASSIGN);
-    assertTokenType(interpreter.lexer, EQUAL);
-    assertTokenType(interpreter.lexer, AND);
-    assertTokenType(interpreter.lexer, OR);
-    assertTokenType(interpreter.lexer, COLON);
-    assertTokenType(interpreter.lexer, SEMICOLON);
-    assertTokenType(interpreter.lexer, COMMA);
-    assertTokenType(interpreter.lexer, DOT);
-    assertTokenType(interpreter.lexer, L_BRACKET);
-    assertTokenType(interpreter.lexer, R_BRACKET);
-    assertTokenType(interpreter.lexer, L_SQUARE_BRACKET);
-    assertTokenType(interpreter.lexer, R_SQUARE_BRACKET);
-    assertTokenType(interpreter.lexer, L_PARENT);
-    assertTokenType(interpreter.lexer, R_PARENT);
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenType(interpreter.parser.lexer, PLUS);
+    assertTokenType(interpreter.parser.lexer, PLUS_ASSIGN);
+    assertTokenType(interpreter.parser.lexer, INCREMENT);
+    assertTokenType(interpreter.parser.lexer, MINUS);
+    assertTokenType(interpreter.parser.lexer, MINUS_ASSIGN);
+    assertTokenType(interpreter.parser.lexer, DECREMENT);
+    assertTokenType(interpreter.parser.lexer, MULTIPLY);
+    assertTokenType(interpreter.parser.lexer, MULTIPLY_ASSIGN);
+    assertTokenType(interpreter.parser.lexer, DIVIDE);
+    assertTokenType(interpreter.parser.lexer, DIVIDE_ASSIGN);
+    assertTokenType(interpreter.parser.lexer, MODULO);
+    assertTokenType(interpreter.parser.lexer, MODULO_ASSIGN);
+    assertTokenType(interpreter.parser.lexer, LESS_THAN);
+    assertTokenType(interpreter.parser.lexer, LESS_EQUAL);
+    assertTokenType(interpreter.parser.lexer, MORE_THAN);
+    assertTokenType(interpreter.parser.lexer, MORE_EQUAL);
+    assertTokenType(interpreter.parser.lexer, NOT);
+    assertTokenType(interpreter.parser.lexer, NOT_EQUAL);
+    assertTokenType(interpreter.parser.lexer, ASSIGN);
+    assertTokenType(interpreter.parser.lexer, EQUAL);
+    assertTokenType(interpreter.parser.lexer, AND);
+    assertTokenType(interpreter.parser.lexer, OR);
+    assertTokenType(interpreter.parser.lexer, COLON);
+    assertTokenType(interpreter.parser.lexer, SEMICOLON);
+    assertTokenType(interpreter.parser.lexer, COMMA);
+    assertTokenType(interpreter.parser.lexer, DOT);
+    assertTokenType(interpreter.parser.lexer, L_BRACKET);
+    assertTokenType(interpreter.parser.lexer, R_BRACKET);
+    assertTokenType(interpreter.parser.lexer, L_SQUARE_BRACKET);
+    assertTokenType(interpreter.parser.lexer, R_SQUARE_BRACKET);
+    assertTokenType(interpreter.parser.lexer, L_PARENT);
+    assertTokenType(interpreter.parser.lexer, R_PARENT);
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, comments) {
@@ -76,15 +76,15 @@ TEST (LexerSimple, comments) {
         # This is yet another single line comment";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
+    assertTokenTypeAndValue(interpreter.parser.lexer, COMMENT, 
         " This is a single line comment");
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
+    assertTokenTypeAndValue(interpreter.parser.lexer, COMMENT, 
         " This is a multi\nline comment");
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT,
+    assertTokenTypeAndValue(interpreter.parser.lexer, COMMENT,
         " Multiline with `` in the middle");
-    assertTokenTypeAndValue(interpreter.lexer, COMMENT, 
+    assertTokenTypeAndValue(interpreter.parser.lexer, COMMENT, 
         " This is yet another single line comment");
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, stringConstants) {
@@ -96,9 +96,9 @@ TEST (LexerSimple, stringConstants) {
     *inStream << "\"My string literal\"";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, 
+    assertTokenTypeAndValue(interpreter.parser.lexer, STRING_CONSTANT, 
         "My string literal");
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, unterminatedString)
@@ -110,8 +110,8 @@ TEST (LexerSimple, unterminatedString)
     *inStream << "\"abc";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    assertTokenType(interpreter.lexer, INCORRECT);
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenType(interpreter.parser.lexer, INCORRECT);
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, escapingCharacters)
@@ -123,8 +123,9 @@ TEST (LexerSimple, escapingCharacters)
     *inStream << R"("\" \\ \n")";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    assertTokenTypeAndValue(interpreter.lexer, STRING_CONSTANT, "\" \\ \n");
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenTypeAndValue(interpreter.parser.lexer, STRING_CONSTANT, 
+        "\" \\ \n");
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, numbers) {
@@ -141,11 +142,11 @@ TEST (LexerSimple, numbers) {
     )";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    assertTokenTypeAndValue(interpreter.lexer, INT_NUMBER, 1234);
-    assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 24.0f);
-    assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 3.5f);
-    assertTokenTypeAndValue(interpreter.lexer, FLOAT_NUMBER, 103.23f);
-    assertTokenType(interpreter.lexer, EOT);
+    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 1234);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 24.0f);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 3.5f);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 103.23f);
+    assertTokenType(interpreter.parser.lexer, EOT);
 }
 
 TEST (LexerSimple, leadingZeroError) {
@@ -157,8 +158,8 @@ TEST (LexerSimple, leadingZeroError) {
     *inStream << "01";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    while(!interpreter.lexer.getIsProcessed())
-        const std::optional<Token> token = interpreter.lexer.getToken();
+    while(!interpreter.parser.lexer.getIsProcessed())
+        const std::optional<Token> token = interpreter.parser.lexer.getToken();
     GTEST_ASSERT_EQ(errStream.str(), 
         "Line: 1 Column: 2 -> Leading zeros not allowed\n");
 }
@@ -174,7 +175,7 @@ TEST (LexerSimple, numberTooBigError) {
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
     
-    interpreter.lexer.getToken();
+    interpreter.parser.lexer.getToken();
     
     GTEST_ASSERT_EQ(errStream.str(), 
         "Line: 1 Column: 10 -> Number too big\n");
@@ -189,8 +190,8 @@ TEST (LexerSimple, andError) {
     *inStream << "\n\nif(1 == 1 & 3 > 2);\nprint(\"OK\");";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    while(!interpreter.lexer.getIsProcessed())
-        const std::optional<Token> token = interpreter.lexer.getToken();
+    while(!interpreter.parser.lexer.getIsProcessed())
+        const std::optional<Token> token = interpreter.parser.lexer.getToken();
     GTEST_ASSERT_EQ(errStream.str(), 
         "Line: 3 Column: 12 -> Got '&' but another '&' did not follow\n");
 }
@@ -203,11 +204,11 @@ TEST (LexerSimple, tokenPosition) {
     *inStream << "int a = \n10;";
     Interpreter interpreter = Interpreter(std::move(inStream), 
         errStream, outStream);
-    assertTokenPosition(interpreter.lexer, 1, 1);
-    assertTokenPosition(interpreter.lexer, 1, 5);
-    assertTokenPosition(interpreter.lexer, 1, 7);
-    assertTokenPosition(interpreter.lexer, 2, 1);
-    assertTokenPosition(interpreter.lexer, 2, 3);
-    assertTokenPosition(interpreter.lexer, 2, 4);
+    assertTokenPosition(interpreter.parser.lexer, 1, 1);
+    assertTokenPosition(interpreter.parser.lexer, 1, 5);
+    assertTokenPosition(interpreter.parser.lexer, 1, 7);
+    assertTokenPosition(interpreter.parser.lexer, 2, 1);
+    assertTokenPosition(interpreter.parser.lexer, 2, 3);
+    assertTokenPosition(interpreter.parser.lexer, 2, 4);
 }
 

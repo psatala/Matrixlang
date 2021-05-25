@@ -10,12 +10,14 @@ include_directories(googletest/include)
 # all source files
 file(GLOB SOURCES
     src/*.cpp
+    src/LanguageObjects/*.cpp
 )
 
 # all test files
 file(GLOB TESTS
     tests/*.cpp
     src/*.cpp
+    src/LanguageObjects/*.cpp
 )
 
 list(FILTER TESTS EXCLUDE REGEX ".*src/main.cpp")
@@ -26,5 +28,5 @@ add_executable(MatrixlangTests ${TESTS}) # add test executable
 # link google test to this executable
 target_link_libraries(MatrixlangTests PRIVATE gtest) 
 
-set_property(TARGET Matrixlang PROPERTY CXX_STANDARD 17)
-set_property(TARGET MatrixlangTests PROPERTY CXX_STANDARD 17)
+set_property(TARGET Matrixlang PROPERTY CXX_STANDARD 20)
+set_property(TARGET MatrixlangTests PROPERTY CXX_STANDARD 20)
