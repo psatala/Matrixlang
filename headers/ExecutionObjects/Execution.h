@@ -15,4 +15,20 @@ namespace VariableManagement{
             return std::make_unique<MatrixVariable>(MatrixVariable(matrixType));
         return std::unique_ptr<Variable>(nullptr);
     }
+
+    std::unique_ptr<Variable> copyVariable(Variable* variable) {
+        if(SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+            (variable))
+            return std::make_unique<SimpleVariable>(SimpleVariable
+                (simpleVariable));
+        if(VectorVariable* vectorVariable = dynamic_cast<VectorVariable*>
+            (variable))
+            return std::make_unique<VectorVariable>(VectorVariable
+                (vectorVariable));
+        if(MatrixVariable* matrixVariable = dynamic_cast<MatrixVariable*>
+            (variable))
+            return std::make_unique<MatrixVariable>(MatrixVariable
+                (matrixVariable));
+        return std::unique_ptr<Variable>(nullptr);
+    }
 }

@@ -9,6 +9,7 @@
 // namespace definition in Execution.h
 namespace VariableManagement {
     std::unique_ptr<Variable> createVariable(Type* type);
+    std::unique_ptr<Variable> copyVariable(Variable* variable);
 }
 
 
@@ -23,6 +24,15 @@ public:
         for(unsigned int i = 0; i < length; ++i) {
             values.push_back(std::move(
                 VariableManagement::createVariable(vectorType->type.get())));
+        }
+    }
+
+    VectorVariable(const VectorVariable* vectorVariable) {
+        type = vectorVariable->type;
+        length = vectorVariable->length;
+        for(unsigned int i = 0; i < length; ++i) {
+            values.push_back(std::move(VariableManagement::
+                copyVariable(vectorVariable->values[i].get())));
         }
     }
 
