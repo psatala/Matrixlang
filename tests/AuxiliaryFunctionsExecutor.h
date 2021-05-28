@@ -10,10 +10,28 @@ std::unique_ptr<Variable> createIntVariable() {
     return VariableManagement::createVariable(simpleType.get());
 }
 
+std::unique_ptr<Variable> createFloatVariable() {
+     std::unique_ptr<SimpleType> simpleType = 
+        std::make_unique<SimpleType>(SimpleType(FLOAT));
+    
+    return VariableManagement::createVariable(simpleType.get());
+}
 
 std::unique_ptr<Variable> createVectorFloatVariable() {
     std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(FLOAT));
+    std::unique_ptr<LiteralExpression> expression = 
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 2)));
+    std::unique_ptr<VectorType> vectorType = 
+    std::make_unique<VectorType>(VectorType(std::move(simpleType), 
+        std::move(expression)));
+    
+    return VariableManagement::createVariable(vectorType.get());
+}
+
+std::unique_ptr<Variable> createVectorIntVariable() {
+    std::unique_ptr<SimpleType> simpleType = 
+        std::make_unique<SimpleType>(SimpleType(INT));
     std::unique_ptr<LiteralExpression> expression = 
         std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 2)));
     std::unique_ptr<VectorType> vectorType = 

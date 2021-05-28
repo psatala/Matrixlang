@@ -31,4 +31,29 @@ namespace VariableManagement{
                 (matrixVariable));
         return std::unique_ptr<Variable>(nullptr);
     }
+
+    bool areOfSameType(Variable* firstVariable, Variable* secondVariable) {
+        if(firstVariable->type != secondVariable->type)
+            return false;
+        
+        if(VECTOR == firstVariable->type) {
+            VectorVariable* firstVectorVariable = dynamic_cast<VectorVariable*>
+                (firstVariable);
+            VectorVariable* secondVectorVariable = dynamic_cast<VectorVariable*>
+                (secondVariable);
+            return areOfSameType((firstVectorVariable->values[0]).get(), 
+                (secondVectorVariable->values[0]).get());
+        }
+
+        if(MATRIX == firstVariable->type) {
+            MatrixVariable* firstMatrixVariable = dynamic_cast<MatrixVariable*>
+                (firstVariable);
+            MatrixVariable* secondMatrixVariable = dynamic_cast<MatrixVariable*>
+                (secondVariable);
+            return areOfSameType((firstMatrixVariable->values[0][0]).get(), 
+                (secondMatrixVariable->values[0][0]).get());
+        }
+
+        return true; // int, float, string
+    }
 }

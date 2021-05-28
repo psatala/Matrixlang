@@ -204,3 +204,49 @@ TEST(ExecutionVariables, simpleVariableStringLiteral) {
     GTEST_ASSERT_EQ(simpleVariable->type, STRING);
     GTEST_ASSERT_EQ(std::get<std::string>(simpleVariable->value), "abc");
 }
+
+
+
+TEST(ExecutionVariables, typeComparisonTrue) {
+    std::unique_ptr<Variable> firstIntVariable = createIntVariable();
+    std::unique_ptr<Variable> secondIntVariable = createIntVariable();
+    ASSERT_TRUE(VariableManagement::areOfSameType(firstIntVariable.get(), 
+        secondIntVariable.get()));
+
+    std::unique_ptr<Variable> firstVectorFloatVariable = 
+        createVectorFloatVariable();
+    std::unique_ptr<Variable> secondVectorFloatVariable = 
+        createVectorFloatVariable();
+    ASSERT_TRUE(VariableManagement::areOfSameType(
+        firstVectorFloatVariable.get(), secondVectorFloatVariable.get()));
+
+    std::unique_ptr<Variable> firstMatrixStringVariable = 
+        createMatrixStringVariable();
+    std::unique_ptr<Variable> secondMatrixStringVariable = 
+        createMatrixStringVariable();
+    ASSERT_TRUE(VariableManagement::areOfSameType(
+        firstMatrixStringVariable.get(), secondMatrixStringVariable.get()));
+
+}
+
+TEST(ExecutionVariables, typeComparisonFalse) {
+    std::unique_ptr<Variable> intVariable = createIntVariable();
+    std::unique_ptr<Variable> floatVariable = createFloatVariable();
+    ASSERT_FALSE(VariableManagement::areOfSameType(intVariable.get(), 
+        floatVariable.get()));
+
+    std::unique_ptr<Variable> vectorFloatVariable = 
+        createVectorFloatVariable();
+    std::unique_ptr<Variable> vectorIntVariable = 
+        createVectorIntVariable();
+    ASSERT_FALSE(VariableManagement::areOfSameType(
+        vectorFloatVariable.get(), vectorIntVariable.get()));
+
+    std::unique_ptr<Variable> matrixStringVariable = 
+        createMatrixStringVariable();
+    std::unique_ptr<Variable> vectorVectorFloatVariable = 
+        createVectorVectorFloatVariable();
+    ASSERT_FALSE(VariableManagement::areOfSameType(
+        matrixStringVariable.get(), vectorVectorFloatVariable.get()));
+
+}
