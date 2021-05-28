@@ -1,24 +1,25 @@
+#pragma once
+
 #include <gtest/gtest.h>
 
 #include "../headers/ExecutionObjects/Execution.h"
-#include "../headers/ExecutionObjects/OperatorExecution.h"
 #include "../headers/LanguageObjects/LiteralExpression.h"
 
-std::unique_ptr<Variable> createIntVariable() {
+inline std::unique_ptr<Variable> createIntVariable() {
      std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(INT));
     
     return VariableManagement::createVariable(simpleType.get());
 }
 
-std::unique_ptr<Variable> createFloatVariable() {
+inline std::unique_ptr<Variable> createFloatVariable() {
      std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(FLOAT));
     
     return VariableManagement::createVariable(simpleType.get());
 }
 
-std::unique_ptr<Variable> createVectorFloatVariable() {
+inline std::unique_ptr<Variable> createVectorFloatVariable() {
     std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(FLOAT));
     std::unique_ptr<LiteralExpression> expression = 
@@ -30,7 +31,7 @@ std::unique_ptr<Variable> createVectorFloatVariable() {
     return VariableManagement::createVariable(vectorType.get());
 }
 
-std::unique_ptr<Variable> createVectorIntVariable() {
+inline std::unique_ptr<Variable> createVectorIntVariable() {
     std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(INT));
     std::unique_ptr<LiteralExpression> expression = 
@@ -42,7 +43,7 @@ std::unique_ptr<Variable> createVectorIntVariable() {
     return VariableManagement::createVariable(vectorType.get());
 }
 
-std::unique_ptr<Variable> createMatrixStringVariable() {
+inline std::unique_ptr<Variable> createMatrixStringVariable() {
     std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(STRING));
     std::unique_ptr<LiteralExpression> firstExpression = 
@@ -56,7 +57,7 @@ std::unique_ptr<Variable> createMatrixStringVariable() {
     return VariableManagement::createVariable(matrixType.get());
 }
 
-std::unique_ptr<Variable> createVectorVectorFloatVariable() {
+inline std::unique_ptr<Variable> createVectorVectorFloatVariable() {
     std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(FLOAT));
     std::unique_ptr<LiteralExpression> innerExpression = 

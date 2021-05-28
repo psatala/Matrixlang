@@ -6,7 +6,8 @@
 #include "MatrixVariable.h"
 
 namespace VariableManagement{
-    std::unique_ptr<Variable> createVariable(Type* type) {
+
+    inline std::unique_ptr<Variable> createVariable(Type* type) {
         if(SimpleType* simpleType = dynamic_cast<SimpleType*>(type))
             return std::make_unique<SimpleVariable>(SimpleVariable(simpleType));
         if(VectorType* vectorType = dynamic_cast<VectorType*>(type))
@@ -16,7 +17,7 @@ namespace VariableManagement{
         return std::unique_ptr<Variable>(nullptr);
     }
 
-    std::unique_ptr<Variable> copyVariable(Variable* variable) {
+    inline std::unique_ptr<Variable> copyVariable(Variable* variable) {
         if(SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
             (variable))
             return std::make_unique<SimpleVariable>(SimpleVariable
@@ -32,7 +33,9 @@ namespace VariableManagement{
         return std::unique_ptr<Variable>(nullptr);
     }
 
-    bool areOfSameType(Variable* firstVariable, Variable* secondVariable) {
+    inline bool areOfSameType(Variable* firstVariable, 
+        Variable* secondVariable) {
+        
         if(firstVariable->type != secondVariable->type)
             return false;
         
@@ -56,4 +59,10 @@ namespace VariableManagement{
 
         return true; // int, float, string
     }
+
+    inline std::unique_ptr<Variable> createLogicalVariable(bool isTrue) {
+        return std::make_unique<SimpleVariable>
+            (SimpleVariable(static_cast<int>(isTrue)));
+    }
+    
 }
