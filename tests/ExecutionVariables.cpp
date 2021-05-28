@@ -250,3 +250,46 @@ TEST(ExecutionVariables, typeComparisonFalse) {
         matrixStringVariable.get(), vectorVectorFloatVariable.get()));
 
 }
+
+TEST(ExecutionVariables, additionInt) {
+    std::unique_ptr<Variable> intVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable(3));
+    std::unique_ptr<Variable> intVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable(4));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::add(intVariable1.get(), intVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<int>(simpleResultVariable->value), 7);
+}
+
+TEST(ExecutionVariables, additionFloat) {
+    std::unique_ptr<Variable> floatVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable(1.5f));
+    std::unique_ptr<Variable> floatVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable(1.25f));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::add(floatVariable1.get(), floatVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<float>(simpleResultVariable->value), 2.75f);
+}
+
+TEST(ExecutionVariables, additionString) {
+    std::unique_ptr<Variable> stringVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable("abc"));
+    std::unique_ptr<Variable> stringVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable("def"));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::add(stringVariable1.get(), stringVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<std::string>(simpleResultVariable->value), 
+        "abcdef");
+}

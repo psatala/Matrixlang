@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../headers/ExecutionObjects/Execution.h"
+#include "../headers/ExecutionObjects/OperatorExecution.h"
 #include "../headers/LanguageObjects/LiteralExpression.h"
 
 std::unique_ptr<Variable> createIntVariable() {
