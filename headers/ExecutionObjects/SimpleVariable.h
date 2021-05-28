@@ -28,5 +28,25 @@ public:
         value = simpleVariable->value;
     }
 
-    void overrideMe() override {}
+    // void overrideMe() override {}
+
+    bool getLogicalValue() override {
+        if(INT == type) {
+            if(0 == std::get<int>(value))
+                return false;
+            return true;
+        }
+
+        if(FLOAT == type) {
+            if(0.0f == std::get<float>(value))
+                return false;
+            return true;
+        }
+
+        // string
+        if("" == std::get<std::string>(value))
+            return false;
+        return true;
+
+    }
 };

@@ -273,3 +273,61 @@ TEST(OperatorExecution, notEqualFloat) {
     ASSERT_TRUE(simpleResultVariable);
     GTEST_ASSERT_EQ(std::get<int>(simpleResultVariable->value), 1);
 }
+
+
+
+TEST(OperatorExecution, andInt) {
+    std::unique_ptr<Variable> intVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable(1));
+    std::unique_ptr<Variable> intVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable(1));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::andOp(intVariable1.get(), intVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<int>(simpleResultVariable->value), 1);
+}
+
+TEST(OperatorExecution, andFloat) {
+    std::unique_ptr<Variable> intVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable(0.0f));
+    std::unique_ptr<Variable> intVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable(0.1f));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::andOp(intVariable1.get(), intVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<int>(simpleResultVariable->value), 0);
+}
+
+TEST(OperatorExecution, orInt) {
+    std::unique_ptr<Variable> intVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable(""));
+    std::unique_ptr<Variable> intVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable(""));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::orOp(intVariable1.get(), intVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<int>(simpleResultVariable->value), 0);
+}
+
+TEST(OperatorExecution, orFloat) {
+    std::unique_ptr<Variable> intVariable1 = std::make_unique<SimpleVariable>
+        (SimpleVariable(0.0f));
+    std::unique_ptr<Variable> intVariable2 = std::make_unique<SimpleVariable>
+        (SimpleVariable(0.1f));
+    std::unique_ptr<Variable> resultVariable = 
+        VariableOperators::orOp(intVariable1.get(), intVariable2.get());
+    
+    SimpleVariable* simpleResultVariable = 
+        dynamic_cast<SimpleVariable*>(resultVariable.get());
+    ASSERT_TRUE(simpleResultVariable);
+    GTEST_ASSERT_EQ(std::get<int>(simpleResultVariable->value), 1);
+}

@@ -64,5 +64,5 @@ namespace VariableManagement{
         return std::make_unique<SimpleVariable>
             (SimpleVariable(static_cast<int>(isTrue)));
     }
-    
+
 }

@@ -282,5 +282,26 @@ namespace VariableOperators {
             std::not_equal_to<>(), std::not_equal_to<>(), std::not_equal_to<>(), 
             std::string("not equal"));
     }
+
+
+
+    std::unique_ptr<Variable> andOp(Variable* firstVariable, 
+        Variable* secondVariable) {
+
+        return VariableManagement::createLogicalVariable(
+            firstVariable->getLogicalValue() &&
+            secondVariable->getLogicalValue()
+        );
+    }
+
+    std::unique_ptr<Variable> orOp(Variable* firstVariable, 
+        Variable* secondVariable) {
+
+        return VariableManagement::createLogicalVariable(
+            firstVariable->getLogicalValue() ||
+            secondVariable->getLogicalValue()
+        );
+    }
+
 }
 
