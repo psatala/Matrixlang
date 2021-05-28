@@ -28,7 +28,6 @@ public:
         value = simpleVariable->value;
     }
 
-    // void overrideMe() override {}
 
     bool getLogicalValue() override {
         if(INT == type) {

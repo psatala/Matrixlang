@@ -5,6 +5,5 @@
 class Variable {
 public:
     TokenType type;
-    // virtual void overrideMe() = 0;
-    virtual bool getLogicalValue() = 0;
+    virtual bool getLogicalValue() { return false; }// = 0;
 };

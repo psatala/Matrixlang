@@ -47,6 +47,5 @@ public:
         }
     }
 
-    // void overrideMe() override {}
     bool getLogicalValue() override { return true; }
 };

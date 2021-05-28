@@ -285,7 +285,7 @@ namespace VariableOperators {
 
 
 
-    std::unique_ptr<Variable> andOp(Variable* firstVariable, 
+    std::unique_ptr<Variable> logicalAnd(Variable* firstVariable, 
         Variable* secondVariable) {
 
         return VariableManagement::createLogicalVariable(
@@ -294,13 +294,98 @@ namespace VariableOperators {
         );
     }
 
-    std::unique_ptr<Variable> orOp(Variable* firstVariable, 
+    std::unique_ptr<Variable> logicalOr(Variable* firstVariable, 
         Variable* secondVariable) {
 
         return VariableManagement::createLogicalVariable(
             firstVariable->getLogicalValue() ||
             secondVariable->getLogicalValue()
         );
+    }
+
+    std::unique_ptr<Variable> logicalNot(Variable* firstVariable) {
+
+        return VariableManagement::createLogicalVariable(
+            !firstVariable->getLogicalValue()
+        );
+    }
+    
+
+    std::unique_ptr<Variable> unaryPlus(Variable* firstVariable) {
+        
+        if(SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+            (firstVariable)) {
+            
+            if(INT == simpleVariable->type) {
+                return std::make_unique<SimpleVariable>(SimpleVariable(
+                    std::get<int>(simpleVariable->value)
+                ));
+            }
+
+            if(FLOAT == simpleVariable->type) {
+                return std::make_unique<SimpleVariable>(SimpleVariable(
+                    std::get<float>(simpleVariable->value)
+                ));
+            }
+
+        }
+
+        // vector, matrix, string
+        throw std::string("Unary plus operator not supported for those "
+            "types");
+    }
+
+    std::unique_ptr<Variable> unaryMinus(Variable* firstVariable) {
+        
+        if(SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+            (firstVariable)) {
+            
+            if(INT == simpleVariable->type) {
+                return std::make_unique<SimpleVariable>(SimpleVariable(
+                    -std::get<int>(simpleVariable->value)
+                ));
+            }
+
+            if(FLOAT == simpleVariable->type) {
+                return std::make_unique<SimpleVariable>(SimpleVariable(
+                    -std::get<float>(simpleVariable->value)
+                ));
+            }
+
+        }
+
+        // vector, matrix, string
+        throw std::string("Unary minus operator not supported for those "
+            "types");
+    }
+
+    std::unique_ptr<Variable> vectorIndexAccess(Variable* firstVariable, 
+        unsigned int position) {
+
+        if(VECTOR != firstVariable->type)
+            throw std::string("Vector index access can only be applied to a "
+                "Vector");
+        
+        VectorVariable* vectorVariable = dynamic_cast<VectorVariable*>
+            (firstVariable);
+        
+        return VariableManagement::copyVariable(
+            vectorVariable->values[position].get());
+    }
+
+
+    std::unique_ptr<Variable> matrixIndexAccess(Variable* firstVariable, 
+        unsigned int firstPosition, unsigned int secondPosition) {
+
+        if(MATRIX != firstVariable->type)
+            throw std::string("Matrix index access can only be applied to a "
+                "Matrix");
+        
+        MatrixVariable* matrixVariable = dynamic_cast<MatrixVariable*>
+            (firstVariable);
+        
+        return VariableManagement::copyVariable(
+            matrixVariable->values[firstPosition][secondPosition].get());
     }
 
 }
