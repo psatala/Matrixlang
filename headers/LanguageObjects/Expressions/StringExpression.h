@@ -39,4 +39,31 @@ public:
     bool isLValue() const override {
         return false;
     }
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+        
+        std::string stringExpressionValue;
+        
+        for(int i = 0; i < stringLiteralsAndExpressions.size(); ++i) {
+            
+            //string
+            if(std::string* stringLiteral = std::get_if<std::string> 
+                (&stringLiteralsAndExpressions[i])) {
+
+                stringExpressionValue += *stringLiteral;
+                continue;
+            }
+
+            //expression
+            std::unique_ptr<Variable> innerVariable = 
+                std::get<std::unique_ptr<Expression>>
+                (stringLiteralsAndExpressions[i])->value(scopeManager);
+            stringExpressionValue += 
+                VariableManagement::getStringFromVariable(innerVariable.get());
+            
+        }
+        return std::make_unique<SimpleVariable>
+            (SimpleVariable(stringExpressionValue));
+    }
+
 };

@@ -2,13 +2,17 @@
 
 namespace VariableManagement{
 
-    std::unique_ptr<Variable> createVariable(Type* type) {
+    std::unique_ptr<Variable> createVariable(Type* type, 
+        ScopeManager* scopeManager) {
+
         if(SimpleType* simpleType = dynamic_cast<SimpleType*>(type))
             return std::make_unique<SimpleVariable>(SimpleVariable(simpleType));
         if(VectorType* vectorType = dynamic_cast<VectorType*>(type))
-            return std::make_unique<VectorVariable>(VectorVariable(vectorType));
+            return std::make_unique<VectorVariable>(VectorVariable(vectorType, 
+                scopeManager));
         if(MatrixType* matrixType = dynamic_cast<MatrixType*>(type))
-            return std::make_unique<MatrixVariable>(MatrixVariable(matrixType));
+            return std::make_unique<MatrixVariable>(MatrixVariable(matrixType, 
+                scopeManager));
         return std::unique_ptr<Variable>(nullptr);
     }
 
@@ -152,5 +156,36 @@ namespace VariableManagement{
         }
         simpleVariable->value = std::get<float>(simpleVariable->value) - 1;
         return;
+    }
+
+    std::string getStringFromVariable(Variable* variable) {
+        SimpleVariable* simpleVariable = 
+            dynamic_cast<SimpleVariable*>(variable);
+        if(!simpleVariable)
+            throw std::string("Cannot get string value for Vector or Matrix");
+
+        if(INT == simpleVariable->type)
+            return std::to_string(std::get<int>(simpleVariable->value));
+        if(FLOAT == simpleVariable->type)
+            return std::to_string(std::get<float>(simpleVariable->value));
+        return std::get<std::string>(simpleVariable->value);
+    }
+
+    unsigned int getUnsignedIntValueFromVariable(Variable* variable) {
+        SimpleVariable* simpleVariable = 
+            dynamic_cast<SimpleVariable*>(variable);
+        if(!simpleVariable)
+            throw std::string("Cannot get unsigned int value for "
+                "Vector or Matrix");
+
+        if(INT != simpleVariable->type)
+            throw std::string("Cannot get unsigned int value for "
+                "float or string");
+
+        int value = std::get<int>(simpleVariable->value);
+        if(value < 0)
+            throw std::string("Value must not be negative");
+        
+        return static_cast<unsigned int>(value);
     }
 }

@@ -12,3 +12,9 @@ std::string VectorType::print(int identLevel) {
         ident(identLevel) + "Expression: " + 
             expression->print(identLevel + 1);
 }
+
+unsigned int VectorType::getExpressionPosition(ScopeManager* scopeManager) {
+    return VariableManagement::getUnsignedIntValueFromVariable(
+        expression->value(scopeManager).get());
+}
+    

@@ -16,6 +16,11 @@ public:
     }
     virtual ~Expression() {}
 
+    std::unique_ptr<Variable> logicalValue(ScopeManager* scopeManager) {
+        return VariableManagement::createLogicalVariable(
+            value(scopeManager)->getLogicalValue());
+    }
+
     virtual std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
         throw std::string("Not implemented exception");
     }

@@ -47,10 +47,12 @@ public:
             dynamic_cast<MatrixVariable*>(innerVariable);
         
 
-        // unsigned int firstIndex = (unsigned int)indexExpression.value();
-        // unsigned int secondIndex = (unsigned int)indexExpression.value();
-        unsigned int firstIndex = 1; // placeholder
-        unsigned int secondIndex = 1; // placeholder
+        unsigned int firstIndex = VariableManagement::
+            getUnsignedIntValueFromVariable(firstIndexExpression->
+            value(scopeManager).get());
+        unsigned int secondIndex = VariableManagement::
+            getUnsignedIntValueFromVariable(secondIndexExpression->
+            value(scopeManager).get());
         
         return innerMatrixVariable->values[firstIndex][secondIndex].get();
     }

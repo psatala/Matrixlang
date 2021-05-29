@@ -8,7 +8,8 @@
 
 namespace VariableManagement{
 
-    std::unique_ptr<Variable> createVariable(Type* type);
+    std::unique_ptr<Variable> createVariable(Type* type, 
+        ScopeManager* scopeManager);
     std::unique_ptr<Variable> copyVariable(Variable* variable);
     void copyVariableContent(Variable* changedVariable, 
         Variable* targetVariable);
@@ -17,4 +18,6 @@ namespace VariableManagement{
     std::unique_ptr<Variable> variablePtrToUniquePtr(Variable* variable);
     void incrementValue(SimpleVariable* simpleVariable, 
         Operator* incrementalOperator);
+    std::string getStringFromVariable(Variable* variable);
+    unsigned int getUnsignedIntValueFromVariable(Variable* variable);
 }

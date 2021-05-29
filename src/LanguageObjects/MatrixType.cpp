@@ -16,3 +16,17 @@ std::string MatrixType::print(int identLevel) {
         ident(identLevel) + "Second expression" + 
             secondExpression->print(identLevel + 1);
 }
+
+unsigned int MatrixType::getFirstExpressionPosition(ScopeManager* 
+    scopeManager) {
+
+    return VariableManagement::getUnsignedIntValueFromVariable(
+        firstExpression->value(scopeManager).get());
+}
+
+unsigned int MatrixType::getSecondExpressionPosition(ScopeManager* 
+    scopeManager) {
+
+    return VariableManagement::getUnsignedIntValueFromVariable(
+        secondExpression->value(scopeManager).get());
+}

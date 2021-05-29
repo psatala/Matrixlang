@@ -4,6 +4,7 @@
 
 #include "../LanguageObjects.h"
 #include "Type.h"
+#include "../ExecutionObjects/ScopeManager.h"
 
 class Expression;
 
@@ -16,4 +17,6 @@ public:
         std::unique_ptr<Expression> firstExpression, 
         std::unique_ptr<Expression> secondExpression);
     std::string print(int identLevel) override;
+    unsigned int getFirstExpressionPosition(ScopeManager* scopeManager);
+    unsigned int getSecondExpressionPosition(ScopeManager* scopeManager);
 };

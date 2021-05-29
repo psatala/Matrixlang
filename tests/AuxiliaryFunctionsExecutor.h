@@ -9,14 +9,14 @@ inline std::unique_ptr<Variable> createIntVariable() {
      std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(INT));
     
-    return VariableManagement::createVariable(simpleType.get());
+    return VariableManagement::createVariable(simpleType.get(), nullptr);
 }
 
 inline std::unique_ptr<Variable> createFloatVariable() {
      std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(FLOAT));
     
-    return VariableManagement::createVariable(simpleType.get());
+    return VariableManagement::createVariable(simpleType.get(), nullptr);
 }
 
 inline std::unique_ptr<Variable> createVectorFloatVariable() {
@@ -28,7 +28,7 @@ inline std::unique_ptr<Variable> createVectorFloatVariable() {
     std::make_unique<VectorType>(VectorType(std::move(simpleType), 
         std::move(expression)));
     
-    return VariableManagement::createVariable(vectorType.get());
+    return VariableManagement::createVariable(vectorType.get(), nullptr);
 }
 
 inline std::unique_ptr<Variable> createVectorIntVariable() {
@@ -40,7 +40,7 @@ inline std::unique_ptr<Variable> createVectorIntVariable() {
     std::make_unique<VectorType>(VectorType(std::move(simpleType), 
         std::move(expression)));
     
-    return VariableManagement::createVariable(vectorType.get());
+    return VariableManagement::createVariable(vectorType.get(), nullptr);
 }
 
 inline std::unique_ptr<Variable> createMatrixStringVariable() {
@@ -54,7 +54,7 @@ inline std::unique_ptr<Variable> createMatrixStringVariable() {
     std::make_unique<MatrixType>(MatrixType(std::move(simpleType), 
         std::move(firstExpression), std::move(secondExpression)));
     
-    return VariableManagement::createVariable(matrixType.get());
+    return VariableManagement::createVariable(matrixType.get(), nullptr);
 }
 
 inline std::unique_ptr<Variable> createMatrixIntVariable() {
@@ -68,7 +68,7 @@ inline std::unique_ptr<Variable> createMatrixIntVariable() {
     std::make_unique<MatrixType>(MatrixType(std::move(simpleType), 
         std::move(firstExpression), std::move(secondExpression)));
     
-    return VariableManagement::createVariable(matrixType.get());
+    return VariableManagement::createVariable(matrixType.get(), nullptr);
 }
 
 inline std::unique_ptr<Variable> createVectorVectorFloatVariable() {
@@ -85,5 +85,5 @@ inline std::unique_ptr<Variable> createVectorVectorFloatVariable() {
     std::make_unique<VectorType>(VectorType(std::move(innerVectorType), 
         std::move(outerExpression)));
 
-    return VariableManagement::createVariable(outerVectorType.get());
+    return VariableManagement::createVariable(outerVectorType.get(), nullptr);
 }

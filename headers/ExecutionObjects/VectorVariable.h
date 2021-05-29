@@ -8,7 +8,8 @@
 
 // namespace definition in Execution.h
 namespace VariableManagement {
-    std::unique_ptr<Variable> createVariable(Type* type);
+    std::unique_ptr<Variable> createVariable(Type* type, 
+        ScopeManager* scopeManager);
     std::unique_ptr<Variable> copyVariable(Variable* variable);
 }
 
@@ -18,12 +19,12 @@ public:
     std::vector<std::unique_ptr<Variable>> values;
     unsigned int length;
 
-    VectorVariable(VectorType* vectorType) {
+    VectorVariable(VectorType* vectorType, ScopeManager* scopeManager) {
         type = VECTOR;
-        length = 2; // placeholder
+        length = vectorType->getExpressionPosition(scopeManager);
         for(unsigned int i = 0; i < length; ++i) {
-            values.push_back(std::move(
-                VariableManagement::createVariable(vectorType->type.get())));
+            values.push_back(std::move(VariableManagement::
+                createVariable(vectorType->type.get(), scopeManager)));
         }
     }
 

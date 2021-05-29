@@ -42,8 +42,8 @@ public:
             dynamic_cast<VectorVariable*>(innerVariable);
         
 
-        // unsigned int index = (unsigned int)indexExpression.value();
-        unsigned int index = 1; // placeholder
+        unsigned int index = VariableManagement::getUnsignedIntValueFromVariable
+            (indexExpression->value(scopeManager).get());
         
         return innerVectorVariable->values[index].get();
     }

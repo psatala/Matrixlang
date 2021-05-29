@@ -8,7 +8,8 @@
 
 // namespace definition in Execution.h
 namespace VariableManagement {
-    std::unique_ptr<Variable> createVariable(Type* type);
+    std::unique_ptr<Variable> createVariable(Type* type, 
+        ScopeManager* scopeManager);
     std::unique_ptr<Variable> copyVariable(Variable* variable);
 }
 
@@ -19,15 +20,15 @@ public:
     unsigned int firstLength;
     unsigned int secondLength;
 
-    MatrixVariable(MatrixType* matrixType) {
+    MatrixVariable(MatrixType* matrixType, ScopeManager* scopeManager) {
         type = MATRIX;
-        firstLength = 2; // placeholder
-        secondLength = 2; // placeholder
+        firstLength = matrixType->getFirstExpressionPosition(scopeManager);
+        secondLength = matrixType->getSecondExpressionPosition(scopeManager);
         for(unsigned int i = 0; i < firstLength; ++i) {
             std::vector<std::unique_ptr<Variable>> innerValues;
             for(unsigned int j = 0; j < secondLength; ++j) {
                 innerValues.push_back(std::move(VariableManagement::
-                    createVariable(matrixType->type.get())));
+                    createVariable(matrixType->type.get(), scopeManager)));
             }
             values.push_back(std::move(innerValues));
         }
