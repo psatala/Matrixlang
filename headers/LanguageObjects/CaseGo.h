@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../LanguageObjects.h"
-#include "Expression.h"
+#include "Expressions/Expression.h"
 #include "InstructionList.h"
 
 class CaseGo {

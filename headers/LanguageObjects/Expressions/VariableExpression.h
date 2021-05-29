@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../LanguageObjects.h"
+#include "../../LanguageObjects.h"
 #include "Expression.h"
 
 class VariableExpression : public Expression {

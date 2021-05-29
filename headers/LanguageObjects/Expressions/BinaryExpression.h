@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "Operator.h"
+#include "../Operator.h"
 #include "Expression.h"
-#include "../LanguageObjects.h"
+#include "../../LanguageObjects.h"
 
 class BinaryExpression : public Expression {
 public:    

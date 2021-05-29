@@ -4,7 +4,7 @@
 #include <variant>
 
 #include "../LanguageObjects.h"
-#include "Expression.h"
+#include "Expressions/Expression.h"
 #include "If.h"
 #include "Switch.h"
 #include "For.h"

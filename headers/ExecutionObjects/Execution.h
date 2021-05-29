@@ -17,6 +17,7 @@ namespace VariableManagement{
         return std::unique_ptr<Variable>(nullptr);
     }
 
+
     inline std::unique_ptr<Variable> copyVariable(Variable* variable) {
         if(SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
             (variable))
@@ -33,52 +34,54 @@ namespace VariableManagement{
         return std::unique_ptr<Variable>(nullptr);
     }
 
-    inline void copyVariableContent(Variable* copiedVariable, 
+
+    inline void copyVariableContent(Variable* changedVariable, 
         Variable* targetVariable) {
         
-        if(VECTOR == copiedVariable->type) {
-            VectorVariable* copiedVectorVariable = dynamic_cast<VectorVariable*>
-                (copiedVariable);
+        if(VECTOR == changedVariable->type) {
+            VectorVariable* changedVectorVariable = dynamic_cast<VectorVariable*>
+                (changedVariable);
             VectorVariable* targetVectorVariable = dynamic_cast<VectorVariable*>
                 (targetVariable);
-            copiedVectorVariable->length = targetVectorVariable->length;
-            copiedVectorVariable->values.clear();
-            for(int i = 0; i < copiedVectorVariable->length; ++i) {
-                copiedVectorVariable->values.push_back(std::move(
+            changedVectorVariable->length = targetVectorVariable->length;
+            changedVectorVariable->values.clear();
+            for(int i = 0; i < changedVectorVariable->length; ++i) {
+                changedVectorVariable->values.push_back(std::move(
                     copyVariable(targetVectorVariable->values[i].get())));
             }
             return;
         }
 
-        if(MATRIX == copiedVariable->type) {
-            MatrixVariable* copiedMatrixVariable = dynamic_cast<MatrixVariable*>
-                (copiedVariable);
+        if(MATRIX == changedVariable->type) {
+            MatrixVariable* changedMatrixVariable = dynamic_cast<MatrixVariable*>
+                (changedVariable);
             MatrixVariable* targetMatrixVariable = dynamic_cast<MatrixVariable*>
                 (targetVariable);
-            copiedMatrixVariable->firstLength = 
+            changedMatrixVariable->firstLength = 
                 targetMatrixVariable->firstLength;
-            copiedMatrixVariable->secondLength = 
+            changedMatrixVariable->secondLength = 
                 targetMatrixVariable->secondLength;
-            copiedMatrixVariable->values.clear();
-            for(unsigned int i = 0; i < copiedMatrixVariable->firstLength; 
+            changedMatrixVariable->values.clear();
+            for(unsigned int i = 0; i < changedMatrixVariable->firstLength; 
                 ++i) {
                 std::vector<std::unique_ptr<Variable>> innerValues;
-                for(unsigned int j = 0; j < copiedMatrixVariable->secondLength; 
+                for(unsigned int j = 0; j < changedMatrixVariable->secondLength; 
                     ++j) {
                     
                     innerValues.push_back(std::move(copyVariable((
                         targetMatrixVariable->values[i][j]).get())));
                 }
-                copiedMatrixVariable->values.push_back(std::move(innerValues));
+                changedMatrixVariable->values.push_back(std::move(innerValues));
             }
             return;
         }
-        SimpleVariable* copiedSimpleVariable = dynamic_cast<SimpleVariable*>
-            (copiedVariable);
+        SimpleVariable* changedSimpleVariable = dynamic_cast<SimpleVariable*>
+            (changedVariable);
         SimpleVariable* targetSimpleVariable = dynamic_cast<SimpleVariable*>
             (targetVariable);
-        copiedSimpleVariable->value = targetSimpleVariable->value;
+        changedSimpleVariable->value = targetSimpleVariable->value;
     }
+
 
     inline bool areOfSameType(Variable* firstVariable, 
         Variable* secondVariable) {
@@ -106,6 +109,7 @@ namespace VariableManagement{
 
         return true; // int, float, string
     }
+
 
     inline std::unique_ptr<Variable> createLogicalVariable(bool isTrue) {
         return std::make_unique<SimpleVariable>

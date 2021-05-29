@@ -1,12 +1,12 @@
 
 std::unique_ptr<Variable> value();
-Variable** rawValue(ScopeManager* scopeManager);
+Variable* rawValue(ScopeManager* scopeManager);
 
 
 // assignment
-Variable** leftVar = lhs.rawValue(scopeManager);
-std::unique_ptr<Variable> rightVar = rhs.value();
-*leftVar = std::move(rightVar);
+// Variable** leftVar = lhs.rawValue(scopeManager);
+// std::unique_ptr<Variable> rightVar = rhs.value();
+// *leftVar = std::move(rightVar);
 
 Variable* leftVar = lhs.rawValue(scopeManager);
 std::unique_ptr<Variable> rightVar = rhs.value();
@@ -14,25 +14,25 @@ copyVariableContent(rightVar.get(), leftVar);
 
 
 // variable expression
-Variable** rawValue(ScopeManager* scopeManager) {
-    return scopeManager->getVariableLocation(this->identifier);
+Variable* rawValue(ScopeManager* scopeManager) {
+    return scopeManager->getVariable(this->identifier);
 }
 
 // vector index expression
-Variable** rawValue(ScopeManager* scopeManager) {
-    Variable** innerVariable = 
+Variable* rawValue(ScopeManager* scopeManager) {
+    Variable* innerVariable = 
         innerExpression->rawValue(scopeManager);
     if(innerVariable.type != VECTOR)
         error();
     
     VectorVariable* innerVectorVariable = 
-        dynamic_cast<VectorVariable*>(*innerVariable);
+        dynamic_cast<VectorVariable*>(innerVariable);
     
 
     // unsigned int index = (unsigned int)indexExpression.value();
     unsigned int index = 1; // placeholder
     
-    return &innerVectorVariable->values[index].get();
+    return innerVectorVariable->values[index].get();
 }
 
 // post expression
@@ -40,16 +40,16 @@ std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
     if(dynamic_cast<PostExpression>(innerExpression.get()))
         error("Nested post expressions not allowed");
 
-    Variable** innerVariable = 
+    Variable* innerVariable = 
         innerExpression->rawValue(scopeManager);
-    if(innerVariable.type != INT && innerVariable.type != FLOAT)
+    if(innerVariable->type != INT && innerVariable->type != FLOAT)
         error();
 
-    std::unique_ptr<Variable> copy = copyVariable(*innerVariable);
+    std::unique_ptr<Variable> copy = copyVariable(innerVariable);
 
     // only int here for simplicity
     SimpleVariable* simpleVariable = 
-        dynamic_cast<SimpleVariable*>(*innerVariable);
+        dynamic_cast<SimpleVariable*>(innerVariable);
     
     simpleVariable->value = std::get<int>(simpleVariable->value)++;
 
@@ -57,11 +57,11 @@ std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
 }
 
 // unary expression
-Variable** rawValue(ScopeManager* scopeManager) {
+Variable* rawValue(ScopeManager* scopeManager) {
 
-    Variable** innerVariable = 
+    Variable* innerVariable = 
         innerExpression->rawValue(scopeManager);
-    if(innerVariable.type != INT && innerVariable.type != FLOAT)
+    if(innerVariable->type != INT && innerVariable->type != FLOAT)
         error();
 
     
@@ -75,5 +75,5 @@ Variable** rawValue(ScopeManager* scopeManager) {
 }
 
 std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
-    return copyVariable(*rawValue(scopeManager));
+    return copyVariable(rawValue(scopeManager));
 }

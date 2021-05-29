@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "../headers/ExecutionObjects/Execution.h"
-#include "../headers/LanguageObjects/LiteralExpression.h"
+#include "../headers/LanguageObjects/Expressions/LiteralExpression.h"
 
 inline std::unique_ptr<Variable> createIntVariable() {
      std::unique_ptr<SimpleType> simpleType = 

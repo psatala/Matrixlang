@@ -4,7 +4,7 @@
 #include <string>
 
 #include "Type.h"
-#include "Expression.h"
+#include "Expressions/Expression.h"
 #include "../LanguageObjects.h"
 
 class Declaration {

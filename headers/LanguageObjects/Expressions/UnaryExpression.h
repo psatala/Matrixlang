@@ -3,8 +3,8 @@
 #include <memory>
 
 #include "Expression.h"
-#include "Operator.h"
-#include "../LanguageObjects.h"
+#include "../Operator.h"
+#include "../../LanguageObjects.h"
 
 class UnaryExpression: public Expression {
 public:

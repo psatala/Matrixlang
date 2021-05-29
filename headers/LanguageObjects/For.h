@@ -6,7 +6,7 @@ class Statement;
 
 #include "../LanguageObjects.h"
 #include "Declaration.h"
-#include "Expression.h"
+#include "Expressions/Expression.h"
 
 class For {
 

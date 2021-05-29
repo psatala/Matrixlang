@@ -278,19 +278,19 @@ TEST(ExecutionVariables, typeComparisonFalse) {
 
 
 TEST(ExecutionVariables, simpleVariableContentCopy) {
-    std::unique_ptr<Variable> copiedVariable = std::make_unique<SimpleVariable>
+    std::unique_ptr<Variable> changedVariable = std::make_unique<SimpleVariable>
         (SimpleVariable(3));
     std::unique_ptr<Variable> targetVariable = std::make_unique<SimpleVariable>
         (SimpleVariable(5));
-    Variable* copiedPointer = copiedVariable.get();
-    VariableManagement::copyVariableContent(copiedVariable.get(), 
+    Variable* changedPointer = changedVariable.get();
+    VariableManagement::copyVariableContent(changedVariable.get(), 
         targetVariable.get());
     
     // pointer should not be reassigned
-    GTEST_ASSERT_EQ(copiedVariable.get(), copiedPointer);
+    GTEST_ASSERT_EQ(changedVariable.get(), changedPointer);
 
     SimpleVariable* simpleVariable = 
-        dynamic_cast<SimpleVariable*>(copiedVariable.get());
+        dynamic_cast<SimpleVariable*>(changedVariable.get());
     
     ASSERT_TRUE(simpleVariable);
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
@@ -305,19 +305,19 @@ TEST(ExecutionVariables, simpleVariableContentCopy) {
 
 TEST(ExecutionVariables, vectorVariableContentCopy) {
     // note: normally types should be the same
-    std::unique_ptr<Variable> copiedVariable = createVectorIntVariable();
+    std::unique_ptr<Variable> changedVariable = createVectorIntVariable();
     std::unique_ptr<Variable> targetVariable = createVectorFloatVariable();
     
-    Variable* copiedPointer = copiedVariable.get();
-    VariableManagement::copyVariableContent(copiedVariable.get(), 
+    Variable* changedPointer = changedVariable.get();
+    VariableManagement::copyVariableContent(changedVariable.get(), 
         targetVariable.get());
     
     // pointer should not be reassigned
-    GTEST_ASSERT_EQ(copiedVariable.get(), copiedPointer);
+    GTEST_ASSERT_EQ(changedVariable.get(), changedPointer);
 
 
     VectorVariable* vectorVariable = 
-        dynamic_cast<VectorVariable*>(copiedVariable.get());
+        dynamic_cast<VectorVariable*>(changedVariable.get());
     
     ASSERT_TRUE(vectorVariable);
     GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
@@ -353,18 +353,18 @@ TEST(ExecutionVariables, vectorVariableContentCopy) {
 
 TEST(ExecutionVariables, matrixVariableContentCopy) {
     // note: normally types should be the same
-    std::unique_ptr<Variable> copiedVariable = createMatrixIntVariable();
+    std::unique_ptr<Variable> changedVariable = createMatrixIntVariable();
     std::unique_ptr<Variable> targetVariable = createMatrixStringVariable();
     
-    Variable* copiedPointer = copiedVariable.get();
-    VariableManagement::copyVariableContent(copiedVariable.get(), 
+    Variable* changedPointer = changedVariable.get();
+    VariableManagement::copyVariableContent(changedVariable.get(), 
         targetVariable.get());
     
     // pointer should not be reassigned
-    GTEST_ASSERT_EQ(copiedVariable.get(), copiedPointer);
+    GTEST_ASSERT_EQ(changedVariable.get(), changedPointer);
 
     MatrixVariable* matrixVariable = 
-        dynamic_cast<MatrixVariable*>(copiedVariable.get());
+        dynamic_cast<MatrixVariable*>(changedVariable.get());
     
     ASSERT_TRUE(matrixVariable);
     GTEST_ASSERT_EQ(matrixVariable->type, MATRIX);

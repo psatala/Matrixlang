@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "Expression.h"
-#include "../LanguageObjects.h"
+#include "../../LanguageObjects.h"
 
 class VectorIndexExpression : public Expression {
 public:

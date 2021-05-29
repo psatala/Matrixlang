@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "Expression.h"
-#include "../Token.h"
+#include "../../Token.h"
 
 class LiteralExpression : public Expression {
 
