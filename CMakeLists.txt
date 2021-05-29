@@ -18,6 +18,7 @@ file(GLOB TESTS
     tests/*.cpp
     src/*.cpp
     src/LanguageObjects/*.cpp
+    src/ExecutionObjects/*.cpp
 )
 
 list(FILTER TESTS EXCLUDE REGEX ".*src/main.cpp")

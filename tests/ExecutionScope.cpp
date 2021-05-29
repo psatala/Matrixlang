@@ -1,5 +1,6 @@
 #include "AuxiliaryFunctionsExecutor.h"
 #include "../headers/ExecutionObjects/ScopeManager.h"
+#include "../headers/Interpreter.h"
 
 TEST(ExecutionScope, basicScopeInt) {
     Scope scope;
@@ -243,4 +244,21 @@ TEST(ExecutionScope, vectorVariableChange) {
     GTEST_ASSERT_EQ(innerSimpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(innerSimpleVariable->value), 13);
     
+}
+
+TEST(ExecutionScope, variableExpression) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(12)));
+    
+    VariableExpression variableExpression = VariableExpression("a");
+    std::unique_ptr<Variable> returnedVariable = 
+        variableExpression.value(&scopeManager);
+
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 12);
 }

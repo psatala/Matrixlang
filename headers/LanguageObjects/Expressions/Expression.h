@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../../ExecutionObjects/ScopeManager.h"
+#include "../../ExecutionObjects/Execution.h"
 
 
 class Expression {
@@ -18,7 +19,7 @@ public:
         throw std::string("Not implemented exception");
     }
     
-    virtual Variable** rawValue(ScopeManager* scopeManager) {
+    virtual Variable* rawValue(ScopeManager* scopeManager) {
         throw std::string("Not implemented exception");
     }
 
