@@ -27,4 +27,27 @@ public:
     bool isLValue() const override {
         return false;
     }
+
+    // post expression
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+
+        if(dynamic_cast<PostExpression*>(expression.get()))
+            throw std::string("Nested post expressions not allowed");
+
+        Variable* innerVariable = expression->rawValue(scopeManager);
+        if(innerVariable->type != INT && innerVariable->type != FLOAT)
+            throw std::string("Post expression can only be applied to variables"
+                " of type int or float");
+
+        std::unique_ptr<Variable> copy = 
+            VariableManagement::copyVariable(innerVariable);
+
+        SimpleVariable* simpleVariable = 
+            dynamic_cast<SimpleVariable*>(innerVariable);
+        
+
+        VariableManagement::incrementValue(simpleVariable, postOperator.get());
+
+        return std::move(copy);
+    }
 };

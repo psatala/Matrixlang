@@ -5,6 +5,7 @@
 
 #include "../../ExecutionObjects/ScopeManager.h"
 #include "../../ExecutionObjects/Execution.h"
+#include "../../ExecutionObjects/OperatorExecution.h"
 
 
 class Expression {

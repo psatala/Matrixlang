@@ -246,7 +246,7 @@ TEST(ExecutionScope, vectorVariableChange) {
     
 }
 
-TEST(ExecutionScope, variableExpression) {
+TEST(ExecutionScope, variableExpressionInt) {
     ScopeManager scopeManager;
     scopeManager.addGlobalVariable("a", 
         std::make_unique<SimpleVariable>(SimpleVariable(12)));
@@ -261,4 +261,232 @@ TEST(ExecutionScope, variableExpression) {
     ASSERT_TRUE(simpleVariable);
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 12);
+}
+
+TEST(ExecutionScope, variableExpressionVectorInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("v", 
+        createVectorIntVariable());
+    
+    VariableExpression variableExpression = VariableExpression("v");
+    std::unique_ptr<Variable> returnedVariable = 
+        variableExpression.value(&scopeManager);
+
+    VectorVariable* vectorVariable = 
+        dynamic_cast<VectorVariable*>(returnedVariable.get());
+    
+    ASSERT_TRUE(vectorVariable);
+    GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
+    GTEST_ASSERT_EQ(vectorVariable->length, 2);
+    
+    for(unsigned int i = 0; i < vectorVariable->length; ++i) {
+        SimpleVariable* innerSimpleVariable = 
+            dynamic_cast<SimpleVariable*>(vectorVariable->values[i].get());
+        
+        ASSERT_TRUE(innerSimpleVariable);
+        GTEST_ASSERT_EQ(innerSimpleVariable->type, INT);
+        GTEST_ASSERT_EQ(std::get<int>(innerSimpleVariable->value), 0);
+    }
+}
+
+TEST(ExecutionScope, vectorIndexExpressionVectorInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("v", createVectorIntVariable());
+    
+    VariableExpression variableExpression = VariableExpression("v");
+    LiteralExpression literalExpression = LiteralExpression(Token(INT, 1));
+    VectorIndexExpression vectorIndexExpression = VectorIndexExpression(
+        std::make_unique<VariableExpression>(variableExpression),
+        std::make_unique<LiteralExpression>(literalExpression)
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        vectorIndexExpression.value(&scopeManager);
+
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+}
+
+TEST(ExecutionScope, matrixIndexExpressionMatrixString) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("m", createMatrixStringVariable());
+    
+    VariableExpression variableExpression = VariableExpression("m");
+    LiteralExpression literalExpression1 = LiteralExpression(Token(INT, 1));
+    LiteralExpression literalExpression2 = LiteralExpression(Token(INT, 1));
+    MatrixIndexExpression matrixIndexExpression = MatrixIndexExpression(
+        std::make_unique<VariableExpression>(variableExpression),
+        std::make_unique<LiteralExpression>(literalExpression1),
+        std::make_unique<LiteralExpression>(literalExpression2)
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        matrixIndexExpression.value(&scopeManager);
+
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, STRING);
+    GTEST_ASSERT_EQ(std::get<std::string>(simpleVariable->value), "");
+}
+
+TEST(ExecutionScope, literalExpressionInt) {
+    ScopeManager scopeManager;
+    
+    LiteralExpression literalExpression = LiteralExpression(Token(INT, 14));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        literalExpression.value(&scopeManager);
+
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 14);
+}
+
+TEST(ExecutionScope, literalExpressionFloat) {
+    ScopeManager scopeManager;
+    
+    LiteralExpression literalExpression = 
+        LiteralExpression(Token(FLOAT, 2.71f));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        literalExpression.value(&scopeManager);
+
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, FLOAT);
+    GTEST_ASSERT_EQ(std::get<float>(simpleVariable->value), 2.71f);
+}
+
+TEST(ExecutionScope, postExpressionInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(16)));
+    
+    PostExpression postExpression = PostExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<Operator>(Operator(INCREMENT))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        postExpression.value(&scopeManager);
+
+    // same value returned
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 16);
+
+
+    // incremented value in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 17);
+
+}
+
+TEST(ExecutionScope, unaryExpressionInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(18)));
+    
+    UnaryIncrementalExpression unaryIncrementalExpression = 
+        UnaryIncrementalExpression(
+        std::make_unique<Operator>(Operator(INCREMENT)),
+        std::make_unique<VariableExpression>(VariableExpression("a"))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        unaryIncrementalExpression.value(&scopeManager);
+
+    // incremented value returned
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 19);
+
+
+    // incremented value in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 19);
+
+}
+
+TEST(ExecutionScope, unaryMinusExpression) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(18)));
+    
+    UnaryExpression unaryExpression = UnaryExpression(
+        std::make_unique<Operator>(Operator(MINUS)),
+        std::make_unique<VariableExpression>(VariableExpression("a"))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        unaryExpression.value(&scopeManager);
+
+    // incremented value returned
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), -18);
+
+
+    // incremented value in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 18);
+
+}
+
+TEST(ExecutionScope, unaryNotExpression) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(18)));
+    
+    UnaryExpression unaryExpression = UnaryExpression(
+        std::make_unique<Operator>(Operator(NOT)),
+        std::make_unique<VariableExpression>(VariableExpression("a"))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        unaryExpression.value(&scopeManager);
+
+    // incremented value returned
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+
+
+    // incremented value in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 18);
+
 }

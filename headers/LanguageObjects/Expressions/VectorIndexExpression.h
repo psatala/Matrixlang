@@ -25,4 +25,27 @@ public:
     bool isLValue() const override {
         return true;
     }
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+        return std::move(VariableManagement::copyVariable(
+            rawValue(scopeManager)));
+    }
+
+    Variable* rawValue(ScopeManager* scopeManager) {
+        Variable* innerVariable = 
+            innerExpression->rawValue(scopeManager);
+        if(innerVariable->type != VECTOR)
+            throw std::string("Vector index access can only be applied to a "
+                "Vector");
+        
+        VectorVariable* innerVectorVariable = 
+            dynamic_cast<VectorVariable*>(innerVariable);
+        
+
+        // unsigned int index = (unsigned int)indexExpression.value();
+        unsigned int index = 1; // placeholder
+        
+        return innerVectorVariable->values[index].get();
+    }
+
 };

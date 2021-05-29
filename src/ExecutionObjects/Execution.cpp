@@ -132,4 +132,25 @@ namespace VariableManagement{
 
         return std::unique_ptr<Variable>(nullptr);
     }
+
+    void incrementValue(SimpleVariable* simpleVariable, 
+        Operator* incrementalOperator) {
+
+        if(INT == simpleVariable->type) {
+            if(incrementalOperator->type == INCREMENT) {
+                simpleVariable->value = 
+                    std::get<int>(simpleVariable->value) + 1;
+                return;
+            }
+            simpleVariable->value = std::get<int>(simpleVariable->value) - 1;
+            return;
+        }
+
+        if(incrementalOperator->type == INCREMENT) {
+            simpleVariable->value = std::get<float>(simpleVariable->value) + 1;
+            return;
+        }
+        simpleVariable->value = std::get<float>(simpleVariable->value) - 1;
+        return;
+    }
 }

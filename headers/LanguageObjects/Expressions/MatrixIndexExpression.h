@@ -30,4 +30,28 @@ public:
     bool isLValue() const override {
         return true;
     }
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+        return std::move(VariableManagement::copyVariable(
+            rawValue(scopeManager)));
+    }
+
+    Variable* rawValue(ScopeManager* scopeManager) {
+        Variable* innerVariable = 
+            innerExpression->rawValue(scopeManager);
+        if(innerVariable->type != MATRIX)
+            throw std::string("Matrix index access can only be applied to a "
+                "Matrix");
+        
+        MatrixVariable* innerMatrixVariable = 
+            dynamic_cast<MatrixVariable*>(innerVariable);
+        
+
+        // unsigned int firstIndex = (unsigned int)indexExpression.value();
+        // unsigned int secondIndex = (unsigned int)indexExpression.value();
+        unsigned int firstIndex = 1; // placeholder
+        unsigned int secondIndex = 1; // placeholder
+        
+        return innerMatrixVariable->values[firstIndex][secondIndex].get();
+    }
 };

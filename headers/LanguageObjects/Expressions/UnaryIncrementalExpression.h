@@ -27,4 +27,26 @@ public:
     bool isLValue() const override {
         return false;
     }
+
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
+        return VariableManagement::copyVariable(rawValue(scopeManager));
+    }
+
+    Variable* rawValue(ScopeManager* scopeManager) {
+
+        Variable* innerVariable = 
+            expression->rawValue(scopeManager);
+        if(innerVariable->type != INT && innerVariable->type != FLOAT)
+            throw std::string("Unary incremental expression can only be "
+                "applied to variables of type int or float");
+        
+        SimpleVariable* simpleVariable = 
+            dynamic_cast<SimpleVariable*>(innerVariable);
+            
+        VariableManagement::incrementValue(simpleVariable, unaryOperator.get());
+        return innerVariable;
+    }
+
+
 };

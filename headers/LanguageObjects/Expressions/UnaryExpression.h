@@ -27,4 +27,23 @@ public:
     bool isLValue() const override {
         return false;
     }
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
+        std::unique_ptr<Variable> innerVariable = 
+            expression->value(scopeManager);
+        
+        switch(unaryOperator->type) {
+
+        case PLUS:
+            return VariableOperators::unaryPlus(innerVariable.get());
+        case MINUS:
+            return VariableOperators::unaryMinus(innerVariable.get());
+        case NOT:
+            return VariableOperators::logicalNot(innerVariable.get());
+        default:
+            throw std::string("Unexpected operator in unary expression");
+        }
+        
+    }
+
 };

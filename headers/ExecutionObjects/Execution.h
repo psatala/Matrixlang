@@ -4,6 +4,7 @@
 #include "SimpleVariable.h"
 #include "VectorVariable.h"
 #include "MatrixVariable.h"
+#include "../LanguageObjects/Operator.h"
 
 namespace VariableManagement{
 
@@ -14,4 +15,6 @@ namespace VariableManagement{
     bool areOfSameType(Variable* firstVariable, Variable* secondVariable);
     std::unique_ptr<Variable> createLogicalVariable(bool isTrue);
     std::unique_ptr<Variable> variablePtrToUniquePtr(Variable* variable);
+    void incrementValue(SimpleVariable* simpleVariable, 
+        Operator* incrementalOperator);
 }

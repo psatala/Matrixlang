@@ -23,7 +23,6 @@ public:
     }
     
     Variable* rawValue(ScopeManager* scopeManager) override {
-        Variable* v = scopeManager->getVariable(identifier);
         return scopeManager->getVariable(identifier);
     }
 };
