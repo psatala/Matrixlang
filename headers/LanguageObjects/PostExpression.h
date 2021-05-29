@@ -25,6 +25,6 @@ public:
     }
 
     bool isLValue() const override {
-        return true;
+        return false;
     }
 };
