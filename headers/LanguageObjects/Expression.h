@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <memory>
+
+#include "../ExecutionObjects/ScopeManager.h"
+
 
 class Expression {
 public:
@@ -9,4 +13,13 @@ public:
         return false;
     }
     virtual ~Expression() {}
+
+    virtual std::unique_ptr<Variable> value(ScopeManager* scopeManager) {
+        throw std::string("Not implemented exception");
+    }
+    
+    virtual Variable** rawValue(ScopeManager* scopeManager) {
+        throw std::string("Not implemented exception");
+    }
+
 };

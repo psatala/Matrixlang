@@ -33,6 +33,53 @@ namespace VariableManagement{
         return std::unique_ptr<Variable>(nullptr);
     }
 
+    inline void copyVariableContent(Variable* copiedVariable, 
+        Variable* targetVariable) {
+        
+        if(VECTOR == copiedVariable->type) {
+            VectorVariable* copiedVectorVariable = dynamic_cast<VectorVariable*>
+                (copiedVariable);
+            VectorVariable* targetVectorVariable = dynamic_cast<VectorVariable*>
+                (targetVariable);
+            copiedVectorVariable->length = targetVectorVariable->length;
+            copiedVectorVariable->values.clear();
+            for(int i = 0; i < copiedVectorVariable->length; ++i) {
+                copiedVectorVariable->values.push_back(std::move(
+                    copyVariable(targetVectorVariable->values[i].get())));
+            }
+            return;
+        }
+
+        if(MATRIX == copiedVariable->type) {
+            MatrixVariable* copiedMatrixVariable = dynamic_cast<MatrixVariable*>
+                (copiedVariable);
+            MatrixVariable* targetMatrixVariable = dynamic_cast<MatrixVariable*>
+                (targetVariable);
+            copiedMatrixVariable->firstLength = 
+                targetMatrixVariable->firstLength;
+            copiedMatrixVariable->secondLength = 
+                targetMatrixVariable->secondLength;
+            copiedMatrixVariable->values.clear();
+            for(unsigned int i = 0; i < copiedMatrixVariable->firstLength; 
+                ++i) {
+                std::vector<std::unique_ptr<Variable>> innerValues;
+                for(unsigned int j = 0; j < copiedMatrixVariable->secondLength; 
+                    ++j) {
+                    
+                    innerValues.push_back(std::move(copyVariable((
+                        targetMatrixVariable->values[i][j]).get())));
+                }
+                copiedMatrixVariable->values.push_back(std::move(innerValues));
+            }
+            return;
+        }
+        SimpleVariable* copiedSimpleVariable = dynamic_cast<SimpleVariable*>
+            (copiedVariable);
+        SimpleVariable* targetSimpleVariable = dynamic_cast<SimpleVariable*>
+            (targetVariable);
+        copiedSimpleVariable->value = targetSimpleVariable->value;
+    }
+
     inline bool areOfSameType(Variable* firstVariable, 
         Variable* secondVariable) {
         

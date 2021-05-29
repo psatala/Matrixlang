@@ -55,7 +55,7 @@ public:
         globalScope.setVariable(identifier, std::move(variable));
     }
 
-
+    
 
     Variable* getVariable(std::string identifier) {
 

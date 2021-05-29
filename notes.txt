@@ -8,6 +8,11 @@ Variable** leftVar = lhs.rawValue(scopeManager);
 std::unique_ptr<Variable> rightVar = rhs.value();
 *leftVar = std::move(rightVar);
 
+Variable* leftVar = lhs.rawValue(scopeManager);
+std::unique_ptr<Variable> rightVar = rhs.value();
+copyVariableContent(rightVar.get(), leftVar);
+
+
 // variable expression
 Variable** rawValue(ScopeManager* scopeManager) {
     return scopeManager->getVariableLocation(this->identifier);

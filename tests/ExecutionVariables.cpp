@@ -95,6 +95,12 @@ TEST(ExecutionVariables, simpleVariableCopy) {
     ASSERT_TRUE(simpleVariable);
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+
+    // check original
+    simpleVariable = dynamic_cast<SimpleVariable*>(originalVariable.get());    
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
 }
 
 TEST(ExecutionVariables, vectorVariableCopy) {
@@ -103,6 +109,23 @@ TEST(ExecutionVariables, vectorVariableCopy) {
         (originalVariable.get());
     VectorVariable* vectorVariable = 
         dynamic_cast<VectorVariable*>(copiedVariable.get());
+    
+    ASSERT_TRUE(vectorVariable);
+    GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
+    GTEST_ASSERT_EQ(vectorVariable->length, 2);
+    
+    for(unsigned int i = 0; i < vectorVariable->length; ++i) {
+        SimpleVariable* innerSimpleVariable = 
+            dynamic_cast<SimpleVariable*>(vectorVariable->values[i].get());
+        
+        ASSERT_TRUE(innerSimpleVariable);
+        GTEST_ASSERT_EQ(innerSimpleVariable->type, FLOAT);
+        GTEST_ASSERT_EQ(std::get<float>(innerSimpleVariable->value), 0.0f);
+    }
+
+
+    // check original
+    vectorVariable = dynamic_cast<VectorVariable*>(originalVariable.get());
     
     ASSERT_TRUE(vectorVariable);
     GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
@@ -146,7 +169,8 @@ TEST(ExecutionVariables, matrixVariableCopy) {
 }
 
 TEST(ExecutionVariables, nestedVariableCopy) {
-    std::unique_ptr<Variable> originalVariable = createVectorVectorFloatVariable();
+    std::unique_ptr<Variable> originalVariable = 
+        createVectorVectorFloatVariable();
     std::unique_ptr<Variable> copiedVariable = VariableManagement::copyVariable
         (originalVariable.get());
     VectorVariable* outerVectorVariable = 
@@ -249,4 +273,135 @@ TEST(ExecutionVariables, typeComparisonFalse) {
     ASSERT_FALSE(VariableManagement::areOfSameType(
         matrixStringVariable.get(), vectorVectorFloatVariable.get()));
 
+}
+
+
+
+TEST(ExecutionVariables, simpleVariableContentCopy) {
+    std::unique_ptr<Variable> copiedVariable = std::make_unique<SimpleVariable>
+        (SimpleVariable(3));
+    std::unique_ptr<Variable> targetVariable = std::make_unique<SimpleVariable>
+        (SimpleVariable(5));
+    Variable* copiedPointer = copiedVariable.get();
+    VariableManagement::copyVariableContent(copiedVariable.get(), 
+        targetVariable.get());
+    
+    // pointer should not be reassigned
+    GTEST_ASSERT_EQ(copiedVariable.get(), copiedPointer);
+
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(copiedVariable.get());
+    
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
+
+    // check original
+    simpleVariable = dynamic_cast<SimpleVariable*>(targetVariable.get());    
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
+}
+
+TEST(ExecutionVariables, vectorVariableContentCopy) {
+    // note: normally types should be the same
+    std::unique_ptr<Variable> copiedVariable = createVectorIntVariable();
+    std::unique_ptr<Variable> targetVariable = createVectorFloatVariable();
+    
+    Variable* copiedPointer = copiedVariable.get();
+    VariableManagement::copyVariableContent(copiedVariable.get(), 
+        targetVariable.get());
+    
+    // pointer should not be reassigned
+    GTEST_ASSERT_EQ(copiedVariable.get(), copiedPointer);
+
+
+    VectorVariable* vectorVariable = 
+        dynamic_cast<VectorVariable*>(copiedVariable.get());
+    
+    ASSERT_TRUE(vectorVariable);
+    GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
+    GTEST_ASSERT_EQ(vectorVariable->length, 2);
+    
+    for(unsigned int i = 0; i < vectorVariable->length; ++i) {
+        SimpleVariable* innerSimpleVariable = 
+            dynamic_cast<SimpleVariable*>(vectorVariable->values[i].get());
+        
+        ASSERT_TRUE(innerSimpleVariable);
+        GTEST_ASSERT_EQ(innerSimpleVariable->type, FLOAT);
+        GTEST_ASSERT_EQ(std::get<float>(innerSimpleVariable->value), 0.0f);
+    }
+
+
+    // check original
+    vectorVariable = dynamic_cast<VectorVariable*>(targetVariable.get());
+    
+    ASSERT_TRUE(vectorVariable);
+    GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
+    GTEST_ASSERT_EQ(vectorVariable->length, 2);
+    
+    for(unsigned int i = 0; i < vectorVariable->length; ++i) {
+        SimpleVariable* innerSimpleVariable = 
+            dynamic_cast<SimpleVariable*>(vectorVariable->values[i].get());
+        
+        ASSERT_TRUE(innerSimpleVariable);
+        GTEST_ASSERT_EQ(innerSimpleVariable->type, FLOAT);
+        GTEST_ASSERT_EQ(std::get<float>(innerSimpleVariable->value), 0.0f);
+    }
+    
+}
+
+TEST(ExecutionVariables, matrixVariableContentCopy) {
+    // note: normally types should be the same
+    std::unique_ptr<Variable> copiedVariable = createMatrixIntVariable();
+    std::unique_ptr<Variable> targetVariable = createMatrixStringVariable();
+    
+    Variable* copiedPointer = copiedVariable.get();
+    VariableManagement::copyVariableContent(copiedVariable.get(), 
+        targetVariable.get());
+    
+    // pointer should not be reassigned
+    GTEST_ASSERT_EQ(copiedVariable.get(), copiedPointer);
+
+    MatrixVariable* matrixVariable = 
+        dynamic_cast<MatrixVariable*>(copiedVariable.get());
+    
+    ASSERT_TRUE(matrixVariable);
+    GTEST_ASSERT_EQ(matrixVariable->type, MATRIX);
+    GTEST_ASSERT_EQ(matrixVariable->firstLength, 2);
+    GTEST_ASSERT_EQ(matrixVariable->secondLength, 2);
+    
+    for(unsigned int i = 0; i < matrixVariable->firstLength; ++i) {
+        for(unsigned int j = 0; j < matrixVariable->secondLength; ++j) {
+            SimpleVariable* innerSimpleVariable = dynamic_cast<SimpleVariable*>
+                (matrixVariable->values[i][j].get());
+            
+            ASSERT_TRUE(innerSimpleVariable);
+            GTEST_ASSERT_EQ(innerSimpleVariable->type, STRING);
+            GTEST_ASSERT_EQ(std::get<std::string>(innerSimpleVariable->value), 
+                "");
+        }
+    }
+
+
+    // check original
+    matrixVariable = dynamic_cast<MatrixVariable*>(targetVariable.get());
+    
+    ASSERT_TRUE(matrixVariable);
+    GTEST_ASSERT_EQ(matrixVariable->type, MATRIX);
+    GTEST_ASSERT_EQ(matrixVariable->firstLength, 2);
+    GTEST_ASSERT_EQ(matrixVariable->secondLength, 2);
+    
+    for(unsigned int i = 0; i < matrixVariable->firstLength; ++i) {
+        for(unsigned int j = 0; j < matrixVariable->secondLength; ++j) {
+            SimpleVariable* innerSimpleVariable = dynamic_cast<SimpleVariable*>
+                (matrixVariable->values[i][j].get());
+            
+            ASSERT_TRUE(innerSimpleVariable);
+            GTEST_ASSERT_EQ(innerSimpleVariable->type, STRING);
+            GTEST_ASSERT_EQ(std::get<std::string>(innerSimpleVariable->value), 
+                "");
+        }
+    }
+    
 }

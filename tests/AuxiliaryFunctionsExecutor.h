@@ -57,6 +57,20 @@ inline std::unique_ptr<Variable> createMatrixStringVariable() {
     return VariableManagement::createVariable(matrixType.get());
 }
 
+inline std::unique_ptr<Variable> createMatrixIntVariable() {
+    std::unique_ptr<SimpleType> simpleType = 
+        std::make_unique<SimpleType>(SimpleType(INT));
+    std::unique_ptr<LiteralExpression> firstExpression = 
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 2)));
+    std::unique_ptr<LiteralExpression> secondExpression = 
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 2)));
+    std::unique_ptr<MatrixType> matrixType = 
+    std::make_unique<MatrixType>(MatrixType(std::move(simpleType), 
+        std::move(firstExpression), std::move(secondExpression)));
+    
+    return VariableManagement::createVariable(matrixType.get());
+}
+
 inline std::unique_ptr<Variable> createVectorVectorFloatVariable() {
     std::unique_ptr<SimpleType> simpleType = 
         std::make_unique<SimpleType>(SimpleType(FLOAT));
