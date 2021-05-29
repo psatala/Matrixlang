@@ -490,3 +490,492 @@ TEST(ExecutionScope, unaryNotExpression) {
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 18);
 
 }
+
+TEST(ExecutionScope, binaryExpressionAssignInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(4)));
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 33))),
+        std::make_unique<Operator>(Operator(ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 33);
+
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 33);
+}
+
+
+TEST(ExecutionScope, binaryExpressionAssignVector) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("v", createVectorIntVariable());
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VectorIndexExpression>(VectorIndexExpression(
+        std::make_unique<VariableExpression>(VariableExpression("v")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 1))))
+        ),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 37))),
+        std::make_unique<Operator>(Operator(ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 37);
+
+
+    Variable* variable = scopeManager.getVariable("v");
+    VectorVariable* vectorVariable = dynamic_cast<VectorVariable*>(variable);
+
+    ASSERT_TRUE(vectorVariable);
+    GTEST_ASSERT_EQ(vectorVariable->type, VECTOR);
+
+    // first element
+    simpleVariable = dynamic_cast<SimpleVariable*>
+        (vectorVariable->values[0].get());
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+
+    // second element
+    simpleVariable = dynamic_cast<SimpleVariable*>
+        (vectorVariable->values[1].get());
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 37);
+}
+
+
+
+TEST(ExecutionScope, binaryExpressionPlusAssignInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(44)));
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 33))),
+        std::make_unique<Operator>(Operator(PLUS_ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 77);
+
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 77);
+}
+
+TEST(ExecutionScope, binaryExpressionMinusAssignInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(44)));
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 33))),
+        std::make_unique<Operator>(Operator(MINUS_ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 11);
+
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 11);
+}
+
+TEST(ExecutionScope, binaryExpressionMultiplyAssignInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(44)));
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 3))),
+        std::make_unique<Operator>(Operator(MULTIPLY_ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 132);
+
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 132);
+}
+
+TEST(ExecutionScope, binaryExpressionDivideAssignInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(47)));
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 6))),
+        std::make_unique<Operator>(Operator(DIVIDE_ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 7);
+
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 7);
+}
+
+TEST(ExecutionScope, binaryExpressionModuloAssignInt) {
+    ScopeManager scopeManager;
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(47)));
+    
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 6))),
+        std::make_unique<Operator>(Operator(MODULO_ASSIGN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
+
+    Variable* variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
+}
+
+
+
+
+TEST(ExecutionScope, binaryExpressionPlusInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 7))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 6))),
+        std::make_unique<Operator>(Operator(PLUS))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 13);
+}
+
+TEST(ExecutionScope, binaryExpressionMinusInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 7))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 6))),
+        std::make_unique<Operator>(Operator(MINUS))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
+
+TEST(ExecutionScope, binaryExpressionMultiplyInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 7))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 6))),
+        std::make_unique<Operator>(Operator(MULTIPLY))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 42);
+}
+
+TEST(ExecutionScope, binaryExpressionDivideInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 7))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(DIVIDE))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
+
+TEST(ExecutionScope, binaryExpressionModuloInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 7))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(MODULO))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 2);
+}
+
+
+
+TEST(ExecutionScope, binaryExpressionLessThanInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(LESS_THAN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
+
+TEST(ExecutionScope, binaryExpressionLessEqualInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<Operator>(Operator(LESS_EQUAL))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
+
+TEST(ExecutionScope, binaryExpressionMoreThanInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(MORE_THAN))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+}
+
+TEST(ExecutionScope, binaryExpressionMoreEqualInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(MORE_EQUAL))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+}
+
+TEST(ExecutionScope, binaryExpressionEqualInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<Operator>(Operator(EQUAL))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
+
+TEST(ExecutionScope, binaryExpressionNotEqualInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 4))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(NOT_EQUAL))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
+
+
+
+
+TEST(ExecutionScope, binaryExpressionAndInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 0))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(AND))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+}
+
+TEST(ExecutionScope, binaryExpressionOrInt) {
+    ScopeManager scopeManager;
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 0))),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 5))),
+        std::make_unique<Operator>(Operator(OR))
+    );
+    std::unique_ptr<Variable> returnedVariable = 
+        binaryExpression.value(&scopeManager);
+
+    
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+        (returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 1);
+}
