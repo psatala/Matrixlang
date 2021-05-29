@@ -36,6 +36,7 @@
 #include "LanguageObjects/SwitchGo.h"
 #include "LanguageObjects/SwitchC.h"
 #include "LanguageObjects/Expressions/VariableExpression.h"
+#include "LanguageObjects/Expressions/UnaryIncrementalExpression.h"
 
 
 class Parser {
@@ -63,8 +64,8 @@ class Parser {
         acceptedOperators);
     
     std::unique_ptr<Operator> parsePostOperator();
-    std::unique_ptr<Operator> parseUnaryRValueOperator();
-    std::unique_ptr<Operator> parseUnaryLValueOperator();
+    std::unique_ptr<Operator> parseUnaryOperator();
+    std::unique_ptr<Operator> parseUnaryIncrementalOperator();
     std::unique_ptr<Operator> parseMultiplicationOperator();
     std::unique_ptr<Operator> parseAdditionOperator();
     std::unique_ptr<Operator> parseRelationOperator();
@@ -86,10 +87,10 @@ class Parser {
     std::unique_ptr<Expression> parseLValueExpression();
     std::unique_ptr<Expression> parsePostExpression();
 
-    std::unique_ptr<Expression> parseUnaryExpression(
-        std::function<std::unique_ptr<Expression>()> parseLowerExpression,
-        std::function<std::unique_ptr<Operator>()> parseThisOperator);
-    std::unique_ptr<Expression> parseAllUnaryExpressions();
+    std::unique_ptr<Expression> parseUnaryIncrementalExpression();
+    std::unique_ptr<Expression> parseBelowUnaryExpression();
+    std::unique_ptr<Expression> parseUnaryExpression();
+    
 
     std::unique_ptr<Expression> parseBinaryExpression(
         std::function<std::unique_ptr<Expression>()> parseLowerExpression,

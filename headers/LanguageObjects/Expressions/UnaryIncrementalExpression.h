@@ -6,18 +6,18 @@
 #include "../Operator.h"
 #include "../../LanguageObjects.h"
 
-class UnaryExpression: public Expression {
+class UnaryIncrementalExpression: public Expression {
 public:
     std::unique_ptr<Operator> unaryOperator;
     std::unique_ptr<Expression> expression;
 
-    UnaryExpression(std::unique_ptr<Operator> unaryOperator,
+    UnaryIncrementalExpression(std::unique_ptr<Operator> unaryOperator,
         std::unique_ptr<Expression> expression) :
         unaryOperator(std::move(unaryOperator)),
         expression(std::move(expression)) {}
 
     std::string print(int identLevel) override {
-        return std::string("Unary expression")  + "\n" 
+        return std::string("Unary incremental expression")  + "\n" 
             + ident(identLevel) + "Operator: " 
                 + unaryOperator->print(identLevel + 1)
             + ident(identLevel) + "Expression: "

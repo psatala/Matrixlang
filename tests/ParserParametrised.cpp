@@ -185,7 +185,7 @@ R"(Program
           Expression: Binary expression
             Left: Variable expression
               Identifier: a
-            Right: Unary expression
+            Right: Unary incremental expression
               Operator: ++
               Expression: Variable expression
                 Identifier: b
@@ -304,7 +304,7 @@ R"(Program
   // unary lvalue expression
   ParserInputOutput(R"(
                 int main()
-                    ++--!a;
+                    !++--a;
                 )",
 R"(Program
   Function
@@ -315,11 +315,11 @@ R"(Program
       Instruction List: Instruction list
         Instruction: Instruction
           Expression: Unary expression
-            Operator: ++
-            Expression: Unary expression
-              Operator: --
-              Expression: Unary expression
-                Operator: !
+            Operator: !
+            Expression: Unary incremental expression
+              Operator: ++
+              Expression: Unary incremental expression
+                Operator: --
                 Expression: Variable expression
                   Identifier: a
 )")
@@ -456,7 +456,7 @@ const ParserInputOutput otherLanguageObjects[] = {
               Right: Variable expression
                 Identifier: n
               Operator: <
-            Incremental expression: Unary expression
+            Incremental expression: Unary incremental expression
               Operator: ++
               Expression: Variable expression
                 Identifier: i

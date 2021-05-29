@@ -167,14 +167,13 @@ std::unique_ptr<Operator> Parser::parsePostOperator() {
 }
 
 
-std::unique_ptr<Operator> Parser::parseUnaryRValueOperator() {
+std::unique_ptr<Operator> Parser::parseUnaryOperator() {
     return parseOperator(std::vector<TokenType> {PLUS, MINUS, NOT});
 }
 
 
-std::unique_ptr<Operator> Parser::parseUnaryLValueOperator() {
-    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT, PLUS, 
-        MINUS, NOT});
+std::unique_ptr<Operator> Parser::parseUnaryIncrementalOperator() {
+    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT});
 }
 
 
@@ -402,17 +401,39 @@ std::unique_ptr<Expression> Parser::parsePostExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseUnaryIncrementalExpression() {
 
-std::unique_ptr<Expression> Parser::parseUnaryExpression(
-    std::function<std::unique_ptr<Expression>()> parseLowerExpression,
-    std::function<std::unique_ptr<Operator>()> parseThisOperator) {
-
-    std::unique_ptr<Operator> unaryOperator = parseThisOperator();
+    std::unique_ptr<Operator> unaryOperator = parseUnaryIncrementalOperator();
     if(!unaryOperator)
-        return parseLowerExpression();
+        return parsePostExpression();
 
-    std::unique_ptr<Expression> expression = 
-        parseUnaryExpression(parseLowerExpression, parseThisOperator);
+    std::unique_ptr<Expression> expression = parseUnaryIncrementalExpression();
+        
+    if(!expression)
+        generateError("Parsing unary incremental expression: got unary "
+            "operators, but an expression did not follow");
+    
+    return std::make_unique<UnaryIncrementalExpression>(
+        UnaryIncrementalExpression(std::move(unaryOperator), 
+        std::move(expression)));        
+}
+
+
+std::unique_ptr<Expression> Parser::parseBelowUnaryExpression() {
+    if(std::unique_ptr<Expression> expression = 
+        parseUnaryIncrementalExpression())
+        return std::move(expression);
+    return parsePrimaryExpression();
+}
+
+
+std::unique_ptr<Expression> Parser::parseUnaryExpression() {
+
+    std::unique_ptr<Operator> unaryOperator = parseUnaryOperator();
+    if(!unaryOperator)
+        return parseBelowUnaryExpression();
+
+    std::unique_ptr<Expression> expression = parseUnaryExpression();
         
     if(!expression)
         generateError("Parsing unary expression: got unary operators, "
@@ -423,16 +444,7 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(
 }
 
 
-std::unique_ptr<Expression> Parser::parseAllUnaryExpressions() {
-    if(std::unique_ptr<Expression> expression = parseUnaryExpression(
-        std::bind_front(&Parser::parsePrimaryExpression, this),
-        std::bind_front(&Parser::parseUnaryRValueOperator, this)))
-        return std::move(expression);
 
-    return std::move(parseUnaryExpression(
-        std::bind_front(&Parser::parsePostExpression, this),
-        std::bind_front(&Parser::parseUnaryLValueOperator, this)));
-}
 
 
 std::unique_ptr<Expression> Parser::parseBinaryExpression(
@@ -465,7 +477,7 @@ std::unique_ptr<Expression> Parser::parseBinaryExpression(
 
 std::unique_ptr<Expression> Parser::parseMultiplicationExpression() {
     return parseBinaryExpression(
-        std::bind_front(&Parser::parseAllUnaryExpressions, this),
+        std::bind_front(&Parser::parseUnaryExpression, this),
         std::bind_front(&Parser::parseMultiplicationOperator, this),
         "Parsing multiplication expression: expected another operand");
 }
