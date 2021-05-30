@@ -11,6 +11,7 @@ include_directories(googletest/include)
 file(GLOB SOURCES
     src/*.cpp
     src/LanguageObjects/*.cpp
+    src/ExecutionObjects/*.cpp
 )
 
 # all test files

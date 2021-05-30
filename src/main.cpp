@@ -12,10 +12,12 @@ int main()
         std::make_unique<std::ifstream>();
 
     std::unique_ptr<std::stringstream> inStream = 
-        std::make_unique<std::stringstream>(R"(
-                int main()
-                    !++--a;
-                )");
+        std::make_unique<std::stringstream>(
+            R"(int main() {
+                {
+                    
+                }
+            })");
 
     fileStream->open("../examples/HelloWorld.ml", std::ifstream::in);
     if(!*fileStream)

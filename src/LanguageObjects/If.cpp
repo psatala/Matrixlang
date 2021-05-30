@@ -2,6 +2,13 @@
 #include "../../headers/LanguageObjects/Statement.h"
 
 
+If::If(std::unique_ptr<Expression> conditionalExpression,
+    std::unique_ptr<Statement> trueStatement,
+    std::unique_ptr<Statement> falseStatement) : 
+    conditionalExpression(std::move(conditionalExpression)),
+    trueStatement(std::move(trueStatement)),
+    falseStatement(std::move(falseStatement)) {}
+
 std::string If::getTrueStatementInfo(int identLevel) { 
     if(trueStatement)
         return trueStatement->print(identLevel + 1);
