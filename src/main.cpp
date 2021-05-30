@@ -14,7 +14,7 @@ int main()
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(R"(
                 int main()
-                    !++--a;
+                    1 + 2 + 3;
                 )");
 
     fileStream->open("../examples/HelloWorld.ml", std::ifstream::in);

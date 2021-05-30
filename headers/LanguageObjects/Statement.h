@@ -1,20 +1,17 @@
 #pragma once
 
 #include "../LanguageObjects.h"
-#include "InstructionList.h"
 #include "Instruction.h"
+#include "Block.h"
 
 class Statement {
 public:
-    std::unique_ptr<InstructionList> instructionList;
-    Statement(std::unique_ptr<InstructionList> instructionList) : 
-        instructionList(std::move(instructionList)) {}
+    std::variant<std::unique_ptr<Instruction>, std::unique_ptr<Block>> 
+        instructions;
+    Statement(std::variant<std::unique_ptr<Instruction>, std::unique_ptr<Block>> 
+        instructions);
  
-    std::string print(int identLevel) {
-        std::string toPrintString = std::string("Statement") + "\n";
-        if(instructionList)
-            toPrintString += ident(identLevel) + "Instruction List: " + 
-                instructionList->print(identLevel + 1);
-        return toPrintString;
-    }
+    std::string print(int identLevel);
+
+    // ~Statement();
 };

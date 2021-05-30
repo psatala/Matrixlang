@@ -5,12 +5,12 @@
 #include "../LanguageObjects.h"
 #include "InstructionList.h"
 
-class Default {
+class Block {
 public:
     std::unique_ptr<InstructionList> instructionList;
-    Default(std::unique_ptr<InstructionList> instructionList);
-
+    Block(std::unique_ptr<InstructionList> instructionList);
+    
     std::string print(int identLevel);
 
-    // ~Default();
+    // ~Block();
 };

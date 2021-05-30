@@ -12,21 +12,9 @@ class SwitchGo : public Switch {
 public:
     std::vector<std::unique_ptr<CaseGo>> caseGoInstructions;
     std::unique_ptr<Default> defaultInstruction;
-    SwitchGo() {}
+    SwitchGo();
 
-    std::string print(int identLevel) override { 
-        std::string toPrintString = std::string("Switch Go") + "\n";
-        for(int i = 0; i < caseGoInstructions.size(); ++i) {
-            toPrintString += ident(identLevel) + "Case Go no. " + 
-                std::to_string(i) + ": " + 
-                caseGoInstructions[i]->print(identLevel + 1);
-        }
+    std::string print(int identLevel) override;
 
-        toPrintString += ident(identLevel) + "Default: ";
-        if(defaultInstruction) {
-            toPrintString += defaultInstruction->print(identLevel + 1);
-        }
-        
-        return toPrintString;
-    }
+    // ~SwitchGo();
 };
