@@ -5,5 +5,5 @@
 class Variable {
 public:
     TokenType type;
-    virtual bool getLogicalValue() { return false; }// = 0;
+    virtual bool getLogicalValue() { return false; }
 };

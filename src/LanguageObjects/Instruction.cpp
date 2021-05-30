@@ -93,7 +93,8 @@ std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
     if(std::unique_ptr<Expression>* expressionInstruction = 
         std::get_if<std::unique_ptr<Expression>>(&instructionVariant)) {
         
-        (*expressionInstruction)->value(scopeManager);
+        if(*expressionInstruction)
+            (*expressionInstruction)->value(scopeManager);
         return std::unique_ptr<Variable>(nullptr);
     }
 
@@ -108,6 +109,7 @@ std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
     if(std::unique_ptr<Switch>* switchInstruction = 
         std::get_if<std::unique_ptr<Switch>>(&instructionVariant)) {
         
+        return (*switchInstruction)->execute(scopeManager);
     }
 
     // for
@@ -121,6 +123,7 @@ std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
     if(std::unique_ptr<Return>* returnInstruction = 
         std::get_if<std::unique_ptr<Return>>(&instructionVariant)) {
         
+        return (*returnInstruction)->execute(scopeManager);
     }
 
     // declaration

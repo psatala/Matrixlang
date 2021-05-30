@@ -17,4 +17,10 @@ public:
             ident(identLevel) + "Expression: " + 
             expression->print(identLevel + 1);
     }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
+        if(expression)
+            return expression->value(scopeManager);
+        return std::make_unique<VoidVariable>(VoidVariable());
+    }
 };

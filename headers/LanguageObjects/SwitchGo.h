@@ -39,7 +39,7 @@ public:
             }
         }
         if(defaultInstruction)
-            defaultInstruction->execute(scopeManager);
+            return defaultInstruction->execute(scopeManager);
         return std::unique_ptr<Variable>(nullptr);
     }
 

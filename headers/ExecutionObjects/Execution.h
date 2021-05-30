@@ -4,6 +4,7 @@
 #include "SimpleVariable.h"
 #include "VectorVariable.h"
 #include "MatrixVariable.h"
+#include "VoidVariable.h"
 #include "../LanguageObjects/Operator.h"
 
 namespace VariableManagement{
@@ -20,4 +21,5 @@ namespace VariableManagement{
         Operator* incrementalOperator);
     std::string getStringFromVariable(Variable* variable);
     unsigned int getUnsignedIntValueFromVariable(Variable* variable);
+    bool isVariableMatchingLiteral(Variable* variable, Token literal);
 }

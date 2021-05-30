@@ -188,4 +188,37 @@ namespace VariableManagement{
         
         return static_cast<unsigned int>(value);
     }
+
+    bool isVariableMatchingLiteral(Variable* variable, Token literal) {
+        if(SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>
+            (variable)) {
+            
+            if(INT == simpleVariable->type && INT_NUMBER == literal.type) {
+                if(std::get<int>(simpleVariable->value) == 
+                    std::get<int>(literal.value))
+                    return true;
+                return false;
+            }
+            if(FLOAT == simpleVariable->type && FLOAT_NUMBER == literal.type) {
+                if(std::get<float>(simpleVariable->value) == 
+                    std::get<float>(literal.value))
+                    return true;
+                return false;
+            }
+            if(STRING == simpleVariable->type && 
+                STRING_CONSTANT == literal.type) {
+                if(std::get<std::string>(simpleVariable->value) == 
+                    std::get<std::string>(literal.value))
+                    return true;
+                return false;
+            }
+
+            return false; // type mismatch
+        }
+
+        // vector or matrix
+        throw std::string("Cannot match to a variable of type vector or "
+            "matrix");
+    }
+
 }
