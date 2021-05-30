@@ -23,6 +23,4 @@ public:
         std::unique_ptr<Statement> statement);
 
     std::string print(int identLevel);
-
-    // ~For();
 };

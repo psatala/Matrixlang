@@ -14,12 +14,10 @@ public:
     std::unique_ptr<Expression> conditionalExpression;
     std::unique_ptr<Statement> trueStatement;
     std::unique_ptr<Statement> falseStatement;
-    
     If(std::unique_ptr<Expression> conditionalExpression,
         std::unique_ptr<Statement> trueStatement,
         std::unique_ptr<Statement> falseStatement);
 
     std::string print(int identLevel);
-
-    // ~If();
+    
 };

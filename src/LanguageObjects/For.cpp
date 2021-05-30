@@ -27,5 +27,3 @@ std::string For::print(int identLevel) {
         ident(identLevel) + "Statement: " + 
             getStatementInfo(identLevel);
 }
-
-// For::~For() {}
