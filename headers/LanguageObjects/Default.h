@@ -8,12 +8,9 @@
 class Default {
 public:
     std::unique_ptr<InstructionList> instructionList;
-    Default(std::unique_ptr<InstructionList> instructionList) : 
-        instructionList(std::move(instructionList)) {}
+    Default(std::unique_ptr<InstructionList> instructionList);
 
-    std::string print(int identLevel) {
-        return std::string("Default") + "\n" + 
-            ident(identLevel) + "Instruction list: " + 
-                instructionList->print(identLevel + 1);
-    }
+    std::string print(int identLevel);
+
+    // ~Default();
 };

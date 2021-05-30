@@ -11,15 +11,9 @@ public:
     std::unique_ptr<Expression> expression;
     std::unique_ptr<InstructionList> instructionList;
     CaseGo(std::unique_ptr<Expression> expression,
-        std::unique_ptr<InstructionList> instructionList) : 
-        expression(std::move(expression)), 
-        instructionList(std::move(instructionList)) {}
+        std::unique_ptr<InstructionList> instructionList);
 
-    std::string print(int identLevel) { 
-        return std::string("Case Go") + "\n" + 
-            ident(identLevel) + "Expression: " + 
-                expression->print(identLevel + 1) +
-            ident(identLevel) + "Instruction list: " + 
-                instructionList->print(identLevel + 1);
-    }
+    std::string print(int identLevel);
+
+    // ~CaseGo();
 };

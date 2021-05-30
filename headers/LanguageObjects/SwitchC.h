@@ -14,25 +14,9 @@ public:
     std::unique_ptr<Expression> postExpression;
     std::vector<std::unique_ptr<CaseC>> caseCInstructions;
     std::unique_ptr<Default> defaultInstruction;
-    SwitchC() {}
+    SwitchC();
 
-    std::string print(int identLevel) override { 
-        std::string toPrintString = std::string("Switch C") + "\n";
-        
-        toPrintString += ident(identLevel) + "Expression: " + 
-            postExpression->print(identLevel + 1);
-        
-        for(int i = 0; i < caseCInstructions.size(); ++i) {
-            toPrintString += ident(identLevel) + "Case C no. " + 
-                std::to_string(i) + ": " + 
-                caseCInstructions[i]->print(identLevel + 1);
-        }
+    std::string print(int identLevel) override;
 
-        toPrintString += ident(identLevel) + "Default: ";
-        if(defaultInstruction) {
-            toPrintString += defaultInstruction->print(identLevel + 1);
-        }
-        
-        return toPrintString;
-    }
+    // ~SwitchC();
 };

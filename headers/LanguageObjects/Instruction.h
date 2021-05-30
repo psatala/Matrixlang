@@ -3,6 +3,8 @@
 #include <memory>
 #include <variant>
 
+// class Block;
+
 #include "../LanguageObjects.h"
 #include "Expressions/Expression.h"
 #include "If.h"
