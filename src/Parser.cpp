@@ -725,11 +725,6 @@ std::unique_ptr<Instruction> Parser::parseInstruction() {
         return std::make_unique<Instruction>
             (Instruction(std::move(declarationInstruction)));
     
-    // std::unique_ptr<Block> blockInstruction = parseBlock();
-    // if(blockInstruction)
-    //     return std::make_unique<Instruction>
-    //         (Instruction(std::move(blockInstruction)));
-
     std::unique_ptr<Expression> expressionInstruction = parseExpression();
     if(expressionInstruction) {
         expectToken(SEMICOLON, "Parsing instruction: expected \";\"");
@@ -760,9 +755,9 @@ std::unique_ptr<InstructionList> Parser::parseInstructionList() {
 }
 
 
-std::unique_ptr<Block> Parser::parseBlock() {
+std::unique_ptr<InstructionList> Parser::parseBlock() {
     if(L_BRACKET != currentToken.type)
-        return std::unique_ptr<Block>(nullptr);
+        return std::unique_ptr<InstructionList>(nullptr);
     getNextToken();
 
     // cannot be null, but may be empty
@@ -770,22 +765,23 @@ std::unique_ptr<Block> Parser::parseBlock() {
 
     expectToken(R_BRACKET, "Parsing block: expected \"}\"");
     
-    return std::make_unique<Block>(Block(std::move(instructionList)));
+    return std::move(instructionList);
 }
 
 
 std::unique_ptr<Statement> Parser::parseStatement() {
-
+    std::unique_ptr<InstructionList> instructionList = 
+        std::make_unique<InstructionList>(InstructionList());
     if(std::unique_ptr<Instruction> instruction = parseInstruction()) {
+        instructionList->instructions.push_back(std::move(instruction));
         return std::make_unique<Statement>(
-            Statement(std::move(instruction)));
+            Statement(std::move(instructionList)));
     }
         
-    if(std::unique_ptr<Block> block = parseBlock()) {
+    if(instructionList = parseBlock())
         return std::make_unique<Statement>(
-            Statement(std::move(block)));
-    }
-        
+            Statement(std::move(instructionList)));
+
     generateError("Parsing statement: expected instruction or block");
     return std::unique_ptr<Statement>(nullptr);
 }

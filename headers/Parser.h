@@ -37,7 +37,6 @@
 #include "LanguageObjects/SwitchC.h"
 #include "LanguageObjects/Expressions/VariableExpression.h"
 #include "LanguageObjects/Expressions/UnaryIncrementalExpression.h"
-#include "LanguageObjects/Block.h"
 
 
 class Parser {
@@ -124,7 +123,7 @@ class Parser {
 
     std::unique_ptr<Instruction> parseInstruction();
     std::unique_ptr<InstructionList> parseInstructionList();
-    std::unique_ptr<Block> parseBlock();
+    std::unique_ptr<InstructionList> parseBlock();
     std::unique_ptr<Statement> parseStatement();
 
     std::unique_ptr<If> parseIf();
