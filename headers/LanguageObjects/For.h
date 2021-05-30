@@ -23,4 +23,5 @@ public:
         std::unique_ptr<Statement> statement);
 
     std::string print(int identLevel);
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager);
 };

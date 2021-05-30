@@ -21,6 +21,15 @@ std::string If::getFalseStatementInfo(int identLevel) {
     return std::string("\n");
 }
 
+std::unique_ptr<Variable> If::executeStatement(Statement* statement, 
+    ScopeManager* scopeManager) {
+    
+    scopeManager->addBlock();
+    std::unique_ptr<Variable> variable = statement->execute(scopeManager);
+    scopeManager->endBlock();
+    return std::move(variable);
+}
+
 
 std::string If::print(int identLevel) { 
     return std::string("If") + "\n" + 
@@ -37,10 +46,10 @@ std::unique_ptr<Variable> If::execute(ScopeManager* scopeManager) {
         getLogicalValue()) {
         
         if(trueStatement)
-            return trueStatement->execute(scopeManager);
+            return executeStatement(trueStatement.get(), scopeManager);
         return std::unique_ptr<Variable>(nullptr);
     }
     if(falseStatement)
-        return falseStatement->execute(scopeManager);
+        return executeStatement(falseStatement.get(), scopeManager);
     return std::unique_ptr<Variable>(nullptr);
 }

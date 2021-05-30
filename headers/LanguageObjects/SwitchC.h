@@ -11,7 +11,7 @@
 
 class SwitchC : public Switch {
 public:
-    std::unique_ptr<Expression> postExpression;
+    std::unique_ptr<Expression> expression;
     std::vector<std::unique_ptr<CaseC>> caseCInstructions;
     std::unique_ptr<Default> defaultInstruction;
     SwitchC() {}
@@ -20,7 +20,7 @@ public:
         std::string toPrintString = std::string("Switch C") + "\n";
         
         toPrintString += ident(identLevel) + "Expression: " + 
-            postExpression->print(identLevel + 1);
+            expression->print(identLevel + 1);
         
         for(int i = 0; i < caseCInstructions.size(); ++i) {
             toPrintString += ident(identLevel) + "Case C no. " + 

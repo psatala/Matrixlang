@@ -29,4 +29,18 @@ public:
         
         return toPrintString;
     }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager) override {
+        for(unsigned int i = 0; i < caseGoInstructions.size(); ++i) {
+            if(caseGoInstructions[i]->expression->value(scopeManager)->
+                getLogicalValue()) {
+                
+                return caseGoInstructions[i]->execute(scopeManager);
+            }
+        }
+        if(defaultInstruction)
+            defaultInstruction->execute(scopeManager);
+        return std::unique_ptr<Variable>(nullptr);
+    }
+
 };

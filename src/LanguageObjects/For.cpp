@@ -27,3 +27,18 @@ std::string For::print(int identLevel) {
         ident(identLevel) + "Statement: " + 
             getStatementInfo(identLevel);
 }
+
+std::unique_ptr<Variable> For::execute(ScopeManager* scopeManager) {
+    scopeManager->addBlock();
+    if(declaration)
+        declaration->execute(scopeManager);
+    if(!conditionalExpression)
+        throw std::string("Infinite loop detected");
+    while(conditionalExpression->value(scopeManager)->getLogicalValue()) {
+        statement->execute(scopeManager);
+        if(incrementalExpression)
+            incrementalExpression->value(scopeManager);
+    }
+    scopeManager->endBlock();
+    return std::unique_ptr<Variable>(nullptr);
+}

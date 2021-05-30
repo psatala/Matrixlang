@@ -114,6 +114,7 @@ std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
     if(std::unique_ptr<For>* forInstruction = 
         std::get_if<std::unique_ptr<For>>(&instructionVariant)) {
         
+        return (*forInstruction)->execute(scopeManager);
     }
 
     // return

@@ -10,6 +10,8 @@ class Statement;
 class If {
     std::string getTrueStatementInfo(int identLevel);
     std::string getFalseStatementInfo(int identLevel);
+    std::unique_ptr<Variable> executeStatement(Statement* statement, 
+        ScopeManager* scopeManager);
 public:
     std::unique_ptr<Expression> conditionalExpression;
     std::unique_ptr<Statement> trueStatement;

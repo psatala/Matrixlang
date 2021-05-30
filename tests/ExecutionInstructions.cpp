@@ -311,3 +311,139 @@ TEST(ExecutionInstructions, globalDeclarationExpressionExecution) {
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 23);
 }
+
+TEST(ExecutionInstructions, forExecution) {
+    ScopeManager scopeManager;
+    scopeManager.init();
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(12)));
+
+    Declaration declaration = Declaration(
+        std::make_unique<SimpleType>(SimpleType(INT)), "i",
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 0)))
+    );
+    
+    BinaryExpression conditionalExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("i")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 10))),
+        std::make_unique<Operator>(Operator(LESS_THAN))
+        );
+
+    UnaryIncrementalExpression incrementalExpression = 
+        UnaryIncrementalExpression(
+            std::make_unique<Operator>(Operator(INCREMENT)),
+            std::make_unique<VariableExpression>(VariableExpression("i"))
+        );
+
+    For forInstruction = For(
+        std::make_unique<Declaration>(std::move(declaration)),
+        std::make_unique<BinaryExpression>(std::move(conditionalExpression)),
+        std::make_unique<UnaryIncrementalExpression>
+            (std::move(incrementalExpression)),
+        std::move(createStatementWithAssignment("a", 2, PLUS_ASSIGN))
+    );
+
+    std::unique_ptr<Variable> returnedVariable = 
+        forInstruction.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 32);
+}
+
+TEST(ExecutionInstructions, switchGoExecution) {
+    ScopeManager scopeManager;
+    scopeManager.init();
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(5)));
+
+    CaseGo caseGo1 = CaseGo(
+        std::make_unique<BinaryExpression>(BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 10))),
+        std::make_unique<Operator>(Operator(LESS_THAN)))),
+        std::move(createInstructionList("a", 3, ASSIGN))
+    );
+
+    CaseGo caseGo2 = CaseGo(
+        std::make_unique<BinaryExpression>(BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression("a")),
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 20))),
+        std::make_unique<Operator>(Operator(MORE_THAN)))),
+        std::move(createInstructionList("a", 111, ASSIGN))
+    );
+    
+    Default defaultInstruction = Default(
+        std::move(createInstructionList("a", 15, ASSIGN))
+    );
+    
+    SwitchGo switchGo = SwitchGo();
+    switchGo.caseGoInstructions.push_back(std::make_unique<CaseGo>(
+        std::move(caseGo1)));
+    switchGo.caseGoInstructions.push_back(std::make_unique<CaseGo>(
+        std::move(caseGo2)));
+    switchGo.defaultInstruction = std::make_unique<Default>(
+        std::move(defaultInstruction));
+
+    std::unique_ptr<Variable> returnedVariable = 
+        switchGo.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 3);
+
+
+
+
+    // change value in scope manager and run again
+    scopeManager.setVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(23)));
+
+    returnedVariable = switchGo.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 111);
+    
+
+    
+
+    // change value in scope manager and run again
+    scopeManager.setVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(17)));
+
+    returnedVariable = switchGo.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    variable = scopeManager.getVariable("a");
+    simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 15);
+    
+}

@@ -92,13 +92,13 @@ inline std::unique_ptr<Variable> createVectorVectorFloatVariable() {
 }
 
 inline std::unique_ptr<Statement> createStatementWithAssignment(
-    std::string identifier, int valueToAssign) {
+    std::string identifier, int valueToAssign, TokenType tokenType = ASSIGN) {
 
     BinaryExpression binaryExpression = BinaryExpression(
         std::make_unique<VariableExpression>(VariableExpression(identifier)),
         std::make_unique<LiteralExpression>(LiteralExpression(
             Token(INT, valueToAssign))),
-        std::make_unique<Operator>(Operator(ASSIGN))
+        std::make_unique<Operator>(Operator(tokenType))
     );
     Statement statement = Statement(std::make_unique<Instruction>(
         Instruction(
@@ -107,4 +107,19 @@ inline std::unique_ptr<Statement> createStatementWithAssignment(
     ));
 
     return std::make_unique<Statement>(std::move(statement));
+}
+
+inline std::unique_ptr<InstructionList> createInstructionList(
+    std::string identifier, int value, TokenType tokenType) {
+
+    InstructionList instructionList = InstructionList();
+    instructionList.instructions.push_back(std::make_unique<Instruction>(
+        Instruction(std::make_unique<BinaryExpression>(BinaryExpression(
+            std::make_unique<VariableExpression>(VariableExpression(
+                identifier)),
+            std::make_unique<LiteralExpression>(LiteralExpression(
+                Token(INT, value))),
+            std::make_unique<Operator>(Operator(tokenType)))    
+        ))));
+    return std::make_unique<InstructionList>(std::move(instructionList));
 }

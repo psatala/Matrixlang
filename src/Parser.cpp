@@ -959,8 +959,8 @@ std::unique_ptr<SwitchC> Parser::parseSwitchCEnd() {
 
     std::unique_ptr<SwitchC> switchC = std::make_unique<SwitchC>(SwitchC());
     
-    switchC->postExpression = parsePostExpression();
-    if(!switchC->postExpression)
+    switchC->expression = parsePostExpression();
+    if(!switchC->expression)
         generateError("Parsing switch c: expected expression");
     
     expectToken(R_PARENT, "Parsing switch c: expected \")\"");
