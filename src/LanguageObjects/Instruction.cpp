@@ -101,6 +101,7 @@ std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
     if(std::unique_ptr<If>* ifInstruction = 
         std::get_if<std::unique_ptr<If>>(&instructionVariant)) {
         
+        return (*ifInstruction)->execute(scopeManager);
     }
 
     // switch
@@ -125,12 +126,14 @@ std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
     if(std::unique_ptr<Declaration>* declarationInstruction = 
         std::get_if<std::unique_ptr<Declaration>>(&instructionVariant)) {
         
+        return (*declarationInstruction)->execute(scopeManager);
     }
 
     // block
     if(std::unique_ptr<Block>* blockInstruction = 
         std::get_if<std::unique_ptr<Block>>(&instructionVariant)) {
         
+        return (*blockInstruction)->execute(scopeManager);
     }
 
     // unknown

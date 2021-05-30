@@ -128,6 +128,7 @@ TEST(ExecutionInstructions, blockExecution) {
 
 TEST(ExecutionInstructions, statementInstructionExecution) {
     ScopeManager scopeManager;
+    scopeManager.init();
     scopeManager.addGlobalVariable("a", 
         std::make_unique<SimpleVariable>(SimpleVariable(10)));
     
@@ -160,6 +161,7 @@ TEST(ExecutionInstructions, statementInstructionExecution) {
 
 TEST(ExecutionInstructions, statmentBlockExecution) {
     ScopeManager scopeManager;
+    scopeManager.init();
     scopeManager.addGlobalVariable("a", 
         std::make_unique<SimpleVariable>(SimpleVariable(12)));
     
@@ -207,4 +209,105 @@ TEST(ExecutionInstructions, statmentBlockExecution) {
     ASSERT_TRUE(simpleVariable);
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 111);
+}
+
+TEST(ExecutionInstructions, ifExecutionTrue) {
+    ScopeManager scopeManager;
+    scopeManager.init();
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(12)));
+    
+    If ifInstruction = If(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 1))), 
+        std::move(createStatementWithAssignment("a", 24)), 
+        std::move(createStatementWithAssignment("a", 456)));
+
+    std::unique_ptr<Variable> returnedVariable = 
+        ifInstruction.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 24);
+}
+
+TEST(ExecutionInstructions, ifExecutionFalse) {
+    ScopeManager scopeManager;
+    scopeManager.init();
+    scopeManager.addGlobalVariable("a", 
+        std::make_unique<SimpleVariable>(SimpleVariable(12)));
+    
+    If ifInstruction = If(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 0))), 
+        std::move(createStatementWithAssignment("a", 24)), 
+        std::move(createStatementWithAssignment("a", 456)));
+
+    std::unique_ptr<Variable> returnedVariable = 
+        ifInstruction.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 456);
+}
+
+TEST(ExecutionInstructions, localDeclarationEmptyExecution) {
+    ScopeManager scopeManager;
+    scopeManager.addFuncall();
+
+    Declaration declaration = Declaration(
+        std::make_unique<SimpleType>(SimpleType(INT)), "a",
+        std::unique_ptr<Expression>(nullptr)
+    );
+    
+
+    std::unique_ptr<Variable> returnedVariable = 
+        declaration.execute(&scopeManager);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 0);
+}
+
+TEST(ExecutionInstructions, globalDeclarationExpressionExecution) {
+    ScopeManager scopeManager;
+
+    Declaration declaration = Declaration(
+        std::make_unique<SimpleType>(SimpleType(INT)), "a",
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 23)))
+    );
+    
+
+    std::unique_ptr<Variable> returnedVariable = 
+        declaration.execute(&scopeManager, false);
+
+    // nullptr returned for expressions
+    ASSERT_FALSE(returnedVariable);
+    
+    // variable changed in scope manager
+    Variable* variable = scopeManager.getVariable("a");
+    SimpleVariable* simpleVariable = dynamic_cast<SimpleVariable*>(variable);
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 23);
 }

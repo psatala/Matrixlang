@@ -4,6 +4,9 @@
 
 #include "../headers/ExecutionObjects/Execution.h"
 #include "../headers/LanguageObjects/Expressions/LiteralExpression.h"
+#include "../headers/LanguageObjects/Expressions/BinaryExpression.h"
+#include "../headers/LanguageObjects/Expressions/VariableExpression.h"
+#include "../headers/LanguageObjects/Statement.h"
 
 inline std::unique_ptr<Variable> createIntVariable() {
      std::unique_ptr<SimpleType> simpleType = 
@@ -86,4 +89,22 @@ inline std::unique_ptr<Variable> createVectorVectorFloatVariable() {
         std::move(outerExpression)));
 
     return VariableManagement::createVariable(outerVectorType.get(), nullptr);
+}
+
+inline std::unique_ptr<Statement> createStatementWithAssignment(
+    std::string identifier, int valueToAssign) {
+
+    BinaryExpression binaryExpression = BinaryExpression(
+        std::make_unique<VariableExpression>(VariableExpression(identifier)),
+        std::make_unique<LiteralExpression>(LiteralExpression(
+            Token(INT, valueToAssign))),
+        std::make_unique<Operator>(Operator(ASSIGN))
+    );
+    Statement statement = Statement(std::make_unique<Instruction>(
+        Instruction(
+            std::make_unique<BinaryExpression>(std::move(binaryExpression))
+        )
+    ));
+
+    return std::make_unique<Statement>(std::move(statement));
 }

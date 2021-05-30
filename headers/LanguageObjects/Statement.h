@@ -5,6 +5,21 @@
 #include "Block.h"
 
 class Statement {
+
+    std::unique_ptr<Variable> innerExecute(ScopeManager* scopeManager) {
+        // instruction
+        if(std::unique_ptr<Instruction>* instruction = 
+            std::get_if<std::unique_ptr<Instruction>>
+            (&instructions)) {
+
+            return (*instruction)->execute(scopeManager);
+        }
+
+        // block
+        return std::get<std::unique_ptr<Block>>(instructions)->
+            execute(scopeManager);
+    }
+
 public:
     std::variant<std::unique_ptr<Instruction>, std::unique_ptr<Block>> 
         instructions;
@@ -32,17 +47,10 @@ public:
     }
 
     std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
-        // instruction
-        if(std::unique_ptr<Instruction>* instruction = 
-            std::get_if<std::unique_ptr<Instruction>>
-            (&instructions)) {
-
-            return (*instruction)->execute(scopeManager);
-        }
-
-        // block
-        return std::get<std::unique_ptr<Block>>(instructions)->
-            execute(scopeManager);
+        scopeManager->addBlock();
+        std::unique_ptr<Variable> executionResult = innerExecute(scopeManager);
+        scopeManager->endBlock();
+        return std::move(executionResult);
     }
 
 };

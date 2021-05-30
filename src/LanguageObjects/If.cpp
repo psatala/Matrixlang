@@ -31,3 +31,16 @@ std::string If::print(int identLevel) {
         ident(identLevel) + "False statement: " + 
             getFalseStatementInfo(identLevel);
 }
+
+std::unique_ptr<Variable> If::execute(ScopeManager* scopeManager) {
+    if(conditionalExpression->logicalValue(scopeManager)->
+        getLogicalValue()) {
+        
+        if(trueStatement)
+            return trueStatement->execute(scopeManager);
+        return std::unique_ptr<Variable>(nullptr);
+    }
+    if(falseStatement)
+        return falseStatement->execute(scopeManager);
+    return std::unique_ptr<Variable>(nullptr);
+}

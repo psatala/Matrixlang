@@ -8,6 +8,17 @@
 #include "../LanguageObjects.h"
 
 class Declaration {
+
+    void innerExecute(ScopeManager* scopeManager, bool isLocal) {
+        std::unique_ptr<Variable> variable = 
+            VariableManagement::createVariable(type.get(), scopeManager);
+        if(isLocal) {
+            scopeManager->addLocalVariable(identifier, std::move(variable));
+            return;
+        }
+        scopeManager->addGlobalVariable(identifier, std::move(variable));
+    }
+
 public:
     std::unique_ptr<Type> type;
     const std::string identifier;
@@ -25,5 +36,15 @@ public:
             toPrintString += ident(identLevel) + "Expression: " + 
                 expression->print(identLevel + 1);
         return toPrintString;
+    }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager, 
+        bool isLocal = true) {
+        
+        innerExecute(scopeManager, isLocal);
+        if(expression)
+            scopeManager->setVariable(identifier, std::move(expression->
+                value(scopeManager)));
+        return std::unique_ptr<Variable>(nullptr);
     }
 };

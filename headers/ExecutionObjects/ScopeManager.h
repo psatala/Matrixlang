@@ -13,6 +13,10 @@ class ScopeManager {
 public:
     ScopeManager() {}
     
+    void init() {
+        scopeStructure.push(std::move(std::vector<Scope>()));
+    }
+
     void addFuncall() {
         std::vector<Scope> blockVector;
         blockVector.push_back(std::move(Scope()));
@@ -31,8 +35,8 @@ public:
 
     void endBlock() {
         scopeStructure.top().pop_back();
-        if(scopeStructure.top().empty())
-            endFuncall();
+        // if(scopeStructure.top().empty())
+        //     endFuncall();
     }
 
     bool isStackEmpty() const {
