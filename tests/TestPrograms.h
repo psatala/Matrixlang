@@ -166,7 +166,7 @@ namespace TestPrograms {
 
     inline std::string scope = R"(
     int main() {
-    	if(1) {
+    	{
     		int a = 10;
     	}
     	print(intToString(a));	#error - no such variable "a"

@@ -1048,10 +1048,6 @@ TEST (LexerComplex, scope) {
     assertTokenType(interpreter.parser.lexer, R_PARENT);
     assertTokenType(interpreter.parser.lexer, L_BRACKET);
 
-    assertTokenType(interpreter.parser.lexer, IF);
-    assertTokenType(interpreter.parser.lexer, L_PARENT);
-    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 1);
-    assertTokenType(interpreter.parser.lexer, R_PARENT);
     assertTokenType(interpreter.parser.lexer, L_BRACKET);
 
     assertTokenType(interpreter.parser.lexer, INT);
