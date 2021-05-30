@@ -19,4 +19,13 @@ public:
         }
         return toPrintString;
     }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
+        for(int i = 0; i < instructions.size(); ++i) {
+            if(std::unique_ptr<Variable> variable = 
+                instructions[i]->execute(scopeManager))
+                return std::move(variable);
+        }
+        return std::unique_ptr<Variable>(nullptr);
+    }
 };

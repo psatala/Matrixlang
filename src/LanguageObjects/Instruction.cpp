@@ -84,3 +84,55 @@ std::string Instruction::print(int identLevel) {
     // unknown
     return toPrintString + ident(identLevel) + "Unknown content";
 }
+
+
+
+
+std::unique_ptr<Variable> Instruction::execute(ScopeManager* scopeManager) {
+    // expression
+    if(std::unique_ptr<Expression>* expressionInstruction = 
+        std::get_if<std::unique_ptr<Expression>>(&instructionVariant)) {
+        
+        (*expressionInstruction)->value(scopeManager);
+        return std::unique_ptr<Variable>(nullptr);
+    }
+
+    // if
+    if(std::unique_ptr<If>* ifInstruction = 
+        std::get_if<std::unique_ptr<If>>(&instructionVariant)) {
+        
+    }
+
+    // switch
+    if(std::unique_ptr<Switch>* switchInstruction = 
+        std::get_if<std::unique_ptr<Switch>>(&instructionVariant)) {
+        
+    }
+
+    // for
+    if(std::unique_ptr<For>* forInstruction = 
+        std::get_if<std::unique_ptr<For>>(&instructionVariant)) {
+        
+    }
+
+    // return
+    if(std::unique_ptr<Return>* returnInstruction = 
+        std::get_if<std::unique_ptr<Return>>(&instructionVariant)) {
+        
+    }
+
+    // declaration
+    if(std::unique_ptr<Declaration>* declarationInstruction = 
+        std::get_if<std::unique_ptr<Declaration>>(&instructionVariant)) {
+        
+    }
+
+    // block
+    if(std::unique_ptr<Block>* blockInstruction = 
+        std::get_if<std::unique_ptr<Block>>(&instructionVariant)) {
+        
+    }
+
+    // unknown
+    return std::unique_ptr<Variable>(nullptr);
+}

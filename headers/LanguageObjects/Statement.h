@@ -15,7 +15,7 @@ public:
 
     std::string print(int identLevel) {
         std::string toPrintString = std::string("Statement") + "\n";
-        // instructions
+        // instruction
         if(std::unique_ptr<Instruction>* instruction = 
             std::get_if<std::unique_ptr<Instruction>>
             (&instructions)) {
@@ -29,6 +29,20 @@ public:
             std::get<std::unique_ptr<Block>>
             (instructions)->print(identLevel + 1);
 
+    }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
+        // instruction
+        if(std::unique_ptr<Instruction>* instruction = 
+            std::get_if<std::unique_ptr<Instruction>>
+            (&instructions)) {
+
+            return (*instruction)->execute(scopeManager);
+        }
+
+        // block
+        return std::get<std::unique_ptr<Block>>(instructions)->
+            execute(scopeManager);
     }
 
 };

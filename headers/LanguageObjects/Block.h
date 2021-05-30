@@ -16,4 +16,8 @@ public:
             ident(identLevel) + "Instruction List: " + 
             instructionList->print(identLevel + 1);
     }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
+        return instructionList->execute(scopeManager);
+    }
 };
