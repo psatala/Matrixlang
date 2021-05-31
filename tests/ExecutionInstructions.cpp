@@ -764,3 +764,165 @@ TEST(ExecutionInstructions, inputEmbeddedFunction) {
     GTEST_ASSERT_EQ(std::get<std::string>(simpleVariable->value), "Hello");
     
 }
+
+
+
+TEST(ExecutionInstructions, intToFloatEmbeddedFunction) {
+    ScopeManager scopeManager;
+
+    // function call
+    LiteralExpression literalExpression = LiteralExpression((Token(INT, 3)));
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<LiteralExpression>(
+        std::move(literalExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("intToFloat", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, FLOAT);
+    GTEST_ASSERT_EQ(std::get<float>(simpleVariable->value), 3.0f);
+
+}
+
+TEST(ExecutionInstructions, floatToIntEmbeddedFunction) {
+    ScopeManager scopeManager;
+
+    // function call
+    LiteralExpression literalExpression = LiteralExpression((
+        Token(FLOAT, 3.14f)));
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<LiteralExpression>(
+        std::move(literalExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("floatToInt", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 3);
+
+}
+
+TEST(ExecutionInstructions, intToStringEmbeddedFunction) {
+    ScopeManager scopeManager;
+
+    // function call
+    LiteralExpression literalExpression = LiteralExpression((Token(INT, 3)));
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<LiteralExpression>(
+        std::move(literalExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("intToString", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, STRING);
+    GTEST_ASSERT_EQ(std::get<std::string>(simpleVariable->value), "3");
+
+}
+
+TEST(ExecutionInstructions, stringToIntEmbeddedFunction) {
+    ScopeManager scopeManager;
+
+    // function call
+    StringExpression stringExpression = StringExpression();
+    stringExpression.stringLiteralsAndExpressions.push_back("3");
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<StringExpression>(
+        std::move(stringExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("stringToInt", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 3);
+
+}
+
+TEST(ExecutionInstructions, floatToStringEmbeddedFunction) {
+    ScopeManager scopeManager;
+
+    // function call
+    LiteralExpression literalExpression = LiteralExpression((
+        Token(FLOAT, 3.14f)));
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<LiteralExpression>(
+        std::move(literalExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("floatToString", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, STRING);
+    GTEST_ASSERT_EQ(std::get<std::string>(simpleVariable->value), "3.140000");
+
+}
+
+TEST(ExecutionInstructions, stringToFloatEmbeddedFunction) {
+    ScopeManager scopeManager;
+
+    // function call
+    StringExpression stringExpression = StringExpression();
+    stringExpression.stringLiteralsAndExpressions.push_back("3.14");
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<StringExpression>(
+        std::move(stringExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("stringToFloat", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, FLOAT);
+    GTEST_ASSERT_EQ(std::get<float>(simpleVariable->value), 3.14f);
+
+}
