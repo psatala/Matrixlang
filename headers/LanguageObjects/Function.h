@@ -14,6 +14,8 @@ public:
     std::string identifier;
     std::unique_ptr<ArgumentList> argumentList;
     std::unique_ptr<Statement> statement;
+
+    std::vector<std::unique_ptr<Variable>> expressionVariables;
     
 
     Function(std::unique_ptr<Type> type, std::string identifier, 
@@ -42,7 +44,7 @@ public:
         ExpressionList* expressionList) {
         
         // execute expressions in funcall
-        std::vector<std::unique_ptr<Variable>> expressionVariables;
+        expressionVariables.clear();
         for(int i = 0; i < expressionList->size(); ++i) {
             expressionVariables.push_back(std::move(
                 (*expressionList)[i]->value(scopeManager)));
@@ -76,7 +78,7 @@ public:
 
         // execute statement inside
         std::unique_ptr<Variable> returnedVariable = 
-            statement->execute(scopeManager);
+            executeInnerStatement(scopeManager);
 
         scopeManager->endFuncall();
 
@@ -88,6 +90,12 @@ public:
             throw std::string("Type mismatch of return variable");
 
         return std::move(returnedVariable);
+    }
+
+    virtual std::unique_ptr<Variable> executeInnerStatement(
+        ScopeManager* scopeManager) {
+
+        return statement->execute(scopeManager);
     }
 
 };

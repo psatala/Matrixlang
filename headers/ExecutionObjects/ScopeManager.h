@@ -4,6 +4,7 @@
 #include <stack>
 
 #include "Scope.h"
+#include "EmbeddedFunctionsDeclarations.h"
 
 class Function;
 class Expression;

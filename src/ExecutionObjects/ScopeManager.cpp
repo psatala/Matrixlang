@@ -2,7 +2,9 @@
 #include "../../headers/LanguageObjects/Function.h"
 #include "../../headers/LanguageObjects/Expressions/Expression.h"
 
-ScopeManager::ScopeManager() {}
+ScopeManager::ScopeManager() {
+    EmbeddedFunctionsDeclarations::addAllEmbeddedFunctions(this);
+}
 
 void ScopeManager::init() {
     scopeStructure.push(std::move(std::vector<Scope>()));

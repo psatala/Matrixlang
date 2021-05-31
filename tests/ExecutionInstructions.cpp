@@ -1,5 +1,8 @@
+#include <sstream>
+
 #include "AuxiliaryFunctionsExecutor.h"
 #include "../headers/Interpreter.h"
+#include "../headers/LanguageObjects/EmbeddedFunction.h"
 
 TEST(ExecutionInstructions, expressionExecution) {
     ScopeManager scopeManager;
@@ -705,4 +708,37 @@ TEST(ExecutionInstructions, addFunction) {
     ASSERT_TRUE(simpleVariable);
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
+}
+
+
+
+
+TEST(ExecutionInstructions, printEmbeddedFunction) {
+    ScopeManager scopeManager;
+    std::stringstream outStream = std::stringstream("");
+    EmbeddedFunction::outputStream = &outStream;
+
+    // function call
+    StringExpression stringExpression = StringExpression();
+    stringExpression.stringLiteralsAndExpressions.push_back("Hello world");
+    ExpressionList expressionList;
+    expressionList.push_back(std::make_unique<StringExpression>(
+        std::move(stringExpression)));
+
+    FuncallExpression funcallExpression = FuncallExpression("print", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    VoidVariable* voidVariable = 
+        dynamic_cast<VoidVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(voidVariable);
+    GTEST_ASSERT_EQ(voidVariable->type, VOID);
+
+    // output stream content
+    GTEST_ASSERT_EQ(outStream.str(), "Hello world");
 }
