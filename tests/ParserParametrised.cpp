@@ -10,9 +10,10 @@ TEST_P(ParserParametrised, checkParsedTree)
 
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(parserInputOutput.input);
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
     std::unique_ptr<Program> program = interpreter.parser.parseProgram();

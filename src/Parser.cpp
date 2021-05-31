@@ -30,7 +30,6 @@ void Parser::generateError(std::string message) {
         + std::to_string(currentToken.lineNumber)
         + " Column: " + std::to_string(currentToken.columnNumber) + " -> " 
         + message + "\n";
-    errStream << completeMessage;
     throw static_cast<std::string>("Parsing stopped, error: " 
         + completeMessage);
 

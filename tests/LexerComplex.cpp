@@ -4,10 +4,11 @@
 TEST (LexerComplex, fibonacciRec) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::fibonacciRec;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -94,10 +95,11 @@ TEST (LexerComplex, fibonacciRec) {
 TEST (LexerComplex, fibonacciIter) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::fibonacciIter;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -228,10 +230,11 @@ TEST (LexerComplex, fibonacciIter) {
 TEST (LexerComplex, findMax) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::findMax;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "findMax");
@@ -410,10 +413,11 @@ TEST (LexerComplex, findMax) {
 TEST (LexerComplex, concatStringMatrix) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::concatStringMatrix;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, STRING);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -574,10 +578,11 @@ TEST (LexerComplex, concatStringMatrix) {
 TEST (LexerComplex, average) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::average;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, FLOAT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "average");
@@ -694,10 +699,11 @@ TEST (LexerComplex, average) {
 TEST (LexerComplex, printAgeDescription) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::printAgeDescription;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, VOID);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -807,10 +813,11 @@ TEST (LexerComplex, printAgeDescription) {
 TEST (LexerComplex, includeFile) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::includeFile;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, LEXER_COMMAND);
     assertTokenType(interpreter.parser.lexer, VOID);
@@ -859,10 +866,11 @@ TEST (LexerComplex, includeFile) {
 TEST (LexerComplex, copyByValue) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::copyByValue;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "addOne");
@@ -941,10 +949,11 @@ TEST (LexerComplex, copyByValue) {
 TEST (LexerComplex, copying) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::copying;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1037,10 +1046,11 @@ TEST (LexerComplex, copying) {
 TEST (LexerComplex, scope) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::scope;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1081,10 +1091,11 @@ TEST (LexerComplex, scope) {
 TEST (LexerComplex, divideByZero) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::divideByZero;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1113,10 +1124,11 @@ TEST (LexerComplex, divideByZero) {
 TEST (LexerComplex, strongTyping) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::strongTyping;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");

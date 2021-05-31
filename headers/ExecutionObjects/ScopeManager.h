@@ -24,6 +24,7 @@ public:
     void addFunction(std::unique_ptr<Function> function);
     std::unique_ptr<Variable> callFunction(std::string identifier, 
         ExpressionList* expressionList);
+    Function* getFunction(std::string identifier);
 
     void addFuncall();
     void endFuncall();

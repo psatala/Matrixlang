@@ -3,10 +3,11 @@
 TEST (LexerSimple, basic) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "int a = 10;";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
 
@@ -23,11 +24,12 @@ TEST (LexerSimple, operatorSequence) {
     // if a sequence of operators is parsed correctly.
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "+ += ++ - -= -- * *= / /= % %= < <= > >= ! != = == && || \
     : ; , . { } [ ] ( )";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
 
     assertTokenType(interpreter.parser.lexer, PLUS);
@@ -68,13 +70,14 @@ TEST (LexerSimple, operatorSequence) {
 TEST (LexerSimple, comments) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "# This is a single line comment\n\
         ``` This is a multi\nline comment```\n\
         ``` Multiline with `` in the middle```\n\
         # This is yet another single line comment";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenTypeAndValue(interpreter.parser.lexer, COMMENT, 
         " This is a single line comment");
@@ -91,10 +94,11 @@ TEST (LexerSimple, stringConstants) {
     //No real Matrixlang code here either
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "\"My string literal\"";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenTypeAndValue(interpreter.parser.lexer, STRING_CONSTANT, 
         "My string literal");
@@ -105,10 +109,11 @@ TEST (LexerSimple, unterminatedString)
 {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "\"abc";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INCORRECT);
     assertTokenType(interpreter.parser.lexer, EOT);
@@ -118,10 +123,11 @@ TEST (LexerSimple, escapingCharacters)
 {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << R"("\" \\ \n")";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenTypeAndValue(interpreter.parser.lexer, STRING_CONSTANT, 
         "\" \\ \n");
@@ -132,6 +138,7 @@ TEST (LexerSimple, numbers) {
     //No real Matrixlang code here either
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << 
@@ -140,7 +147,7 @@ TEST (LexerSimple, numbers) {
         3.5
         103.23
     )";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 1234);
     assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 24.0f);
@@ -153,10 +160,11 @@ TEST (LexerSimple, leadingZeroError) {
     //No real Matrixlang code here either
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "01";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     while(!interpreter.parser.lexer.getIsProcessed())
         const std::optional<Token> token = interpreter.parser.lexer.getToken();
@@ -169,10 +177,11 @@ TEST (LexerSimple, numberTooBigError) {
     //No real Matrixlang code here either
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "999999999999999999999999";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
     interpreter.parser.lexer.getToken();
@@ -185,10 +194,11 @@ TEST (LexerSimple, andError) {
     //No real Matrixlang code here either
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "\n\nif(1 == 1 & 3 > 2);\nprint(\"OK\");";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     while(!interpreter.parser.lexer.getIsProcessed())
         const std::optional<Token> token = interpreter.parser.lexer.getToken();
@@ -199,10 +209,11 @@ TEST (LexerSimple, andError) {
 TEST (LexerSimple, tokenPosition) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << "int a = \n10;";
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenPosition(interpreter.parser.lexer, 1, 1);
     assertTokenPosition(interpreter.parser.lexer, 1, 5);

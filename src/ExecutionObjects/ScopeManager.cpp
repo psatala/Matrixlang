@@ -27,6 +27,14 @@ std::unique_ptr<Variable> ScopeManager::callFunction(std::string identifier,
 }
 
 
+Function* ScopeManager::getFunction(std::string identifier) {
+    if(functions[identifier])
+        return functions[identifier].get();
+    return nullptr;
+}
+
+
+
 void ScopeManager::addFuncall() {
     std::vector<Scope> blockVector;
     blockVector.push_back(std::move(Scope()));
@@ -45,8 +53,6 @@ void ScopeManager::addBlock() {
 
 void ScopeManager::endBlock() {
     scopeStructure.top().pop_back();
-    // if(scopeStructure.top().empty())
-    //     endFuncall();
 }
 
 bool ScopeManager::isStackEmpty() const {
