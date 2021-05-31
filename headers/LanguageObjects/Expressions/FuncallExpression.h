@@ -12,7 +12,9 @@ public:
     std::string identifier;
     std::unique_ptr<ExpressionList> expressionList;
 
-    FuncallExpression(std::string identifier) : identifier(identifier) {}
+    FuncallExpression(std::string identifier) : identifier(identifier) {
+        expressionList = std::make_unique<ExpressionList>(ExpressionList());
+    }
 
     FuncallExpression(std::string identifier, std::unique_ptr<ExpressionList> 
         expressionList) : identifier(identifier), 
@@ -21,9 +23,7 @@ public:
     std::string print(int identLevel) override {
         std::string toPrintString = std::string("Funcall expression") + "\n";
         toPrintString += ident(identLevel) + "Identifier: " + identifier + "\n";
-        if(!expressionList)
-            return toPrintString;
-            
+        
         for(int i = 0; i < expressionList->size(); ++i) {
             toPrintString += ident(identLevel) + "Expression no. " + 
                 std::to_string(i) + ": " + 
@@ -34,6 +34,10 @@ public:
 
     bool isLValue() const override {
         return false;
+    }
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+        return scopeManager->callFunction(identifier, expressionList.get());
     }
 
 };

@@ -620,3 +620,89 @@ TEST(ExecutionInstructions, returnStoppingExecution) {
     GTEST_ASSERT_EQ(simpleVariable->type, INT);
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 10);
 }
+
+
+
+
+TEST(ExecutionInstructions, emptyFunction) {
+    ScopeManager scopeManager;
+    scopeManager.addFunction(
+        std::make_unique<Function>(Function(
+            std::make_unique<SimpleType>(SimpleType(VOID)), "f", 
+            std::unique_ptr<ArgumentList>(nullptr),
+            std::make_unique<Statement>(Statement(
+                std::make_unique<Instruction>(Instruction(
+                    std::make_unique<Return>(Return(
+                        std::unique_ptr<Expression>(nullptr)
+                    ))
+                ))
+            ))
+        ))
+    );
+    FuncallExpression funcallExpression = FuncallExpression("f");
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    VoidVariable* voidVariable = 
+        dynamic_cast<VoidVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(voidVariable);
+    GTEST_ASSERT_EQ(voidVariable->type, VOID);
+}
+
+TEST(ExecutionInstructions, addFunction) {
+    ScopeManager scopeManager;
+
+    // function definition
+    ArgumentList argumentList;
+    argumentList.typeVector.push_back(
+        std::make_unique<SimpleType>(SimpleType(INT)));
+    argumentList.identifierVector.push_back("a");
+    argumentList.typeVector.push_back(
+        std::make_unique<SimpleType>(SimpleType(INT)));
+    argumentList.identifierVector.push_back("b");
+
+    scopeManager.addFunction(
+        std::make_unique<Function>(Function(
+            std::make_unique<SimpleType>(SimpleType(INT)), "add", 
+            std::make_unique<ArgumentList>(ArgumentList(
+                std::move(argumentList))),
+            std::make_unique<Statement>(Statement(
+                std::make_unique<Instruction>(Instruction(
+                    std::make_unique<Return>(Return(
+                        std::make_unique<BinaryExpression>(BinaryExpression(
+                            std::make_unique<VariableExpression>(
+                                VariableExpression("a")),
+                            std::make_unique<VariableExpression>(
+                                VariableExpression("b")),
+                            std::make_unique<Operator>(Operator(PLUS))
+                        ))
+                    ))
+                ))
+            ))
+        ))
+    );
+
+    // function call
+    ExpressionList expressionList;
+    expressionList.push_back(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 3))));
+    expressionList.push_back(
+        std::make_unique<LiteralExpression>(LiteralExpression(Token(INT, 2))));
+    FuncallExpression funcallExpression = FuncallExpression("add", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+    
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
+}

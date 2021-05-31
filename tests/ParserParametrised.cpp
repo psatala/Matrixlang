@@ -31,7 +31,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -52,7 +52,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -76,7 +76,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -100,7 +100,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -124,7 +124,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -151,7 +151,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Unary expression
@@ -172,7 +172,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -194,7 +194,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Binary expression
@@ -215,7 +215,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: String Expression: 
@@ -236,7 +236,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Funcall expression
@@ -257,7 +257,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Matrix index expression
@@ -278,7 +278,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Post expression
@@ -298,7 +298,7 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Expression: Unary expression
@@ -372,7 +372,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         Return: Return
@@ -385,7 +385,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         If: If
@@ -402,7 +402,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         If: If
@@ -421,7 +421,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Instruction: Instruction
         For: For
@@ -455,7 +455,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Block: Block
         Instruction List: Instruction list
@@ -497,7 +497,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Block: Block
         Instruction List: Instruction list
@@ -556,7 +556,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Block: Block
         Instruction List: Instruction list
@@ -602,7 +602,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Block: Block
         Instruction List: Instruction list
@@ -622,7 +622,7 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
       Block: Block
         Instruction List: Instruction list

@@ -5,110 +5,37 @@
 
 #include "Scope.h"
 
+class Function;
+class Expression;
+
+using ExpressionList = std::vector<std::unique_ptr<Expression>>;
+
 class ScopeManager {
 
     std::stack<std::vector<Scope>> scopeStructure;
+    std::map<std::string, std::unique_ptr<Function>> functions;
     Scope globalScope;
 
 public:
-    ScopeManager() {}
+    ScopeManager();
+    void init();
     
-    void init() {
-        scopeStructure.push(std::move(std::vector<Scope>()));
-    }
+    void addFunction(std::unique_ptr<Function> function);
+    std::unique_ptr<Variable> callFunction(std::string identifier, 
+        ExpressionList* expressionList);
 
-    void addFuncall() {
-        std::vector<Scope> blockVector;
-        blockVector.push_back(std::move(Scope()));
-        scopeStructure.push(std::move(blockVector));
-    }
+    void addFuncall();
+    void endFuncall();
+    void addBlock();
+    void endBlock();
+    bool isStackEmpty() const;
     
-    void endFuncall() {
-        if(scopeStructure.empty())
-            throw std::string("Scope stack already empty");
-        scopeStructure.pop();
-    }
-
-    void addBlock() {
-        scopeStructure.top().push_back(Scope());
-    }
-
-    void endBlock() {
-        scopeStructure.top().pop_back();
-        // if(scopeStructure.top().empty())
-        //     endFuncall();
-    }
-
-    bool isStackEmpty() const {
-        return scopeStructure.empty();
-    }
-
     void addLocalVariable(std::string identifier, 
-        std::unique_ptr<Variable> variable) {
-        
-        if(scopeStructure.empty())
-            throw std::string("Scope stack is empty");
-
-        scopeStructure.top().back().setVariable(identifier, 
-            std::move(variable));
-    }
-
+        std::unique_ptr<Variable> variable);
     void addGlobalVariable(std::string identifier, 
-        std::unique_ptr<Variable> variable) {
-        
-        globalScope.setVariable(identifier, std::move(variable));
-    }
-
+        std::unique_ptr<Variable> variable);
     
-
-    Variable* getVariable(std::string identifier) {
-
-        if(!scopeStructure.empty()) {
-            
-            for(std::vector<Scope>::reverse_iterator iterator = 
-                scopeStructure.top().rbegin(); 
-                iterator != scopeStructure.top().rend(); 
-                ++iterator) {
-
-                if(Variable* variable = iterator->getVariable(identifier))
-                    return variable;
-            }
-
-        }
-        if(Variable* variable = globalScope.getVariable(identifier))
-            return variable;
-
-        throw std::string("Unknown identifier \"") + identifier + 
-            std::string("\"");
-    }
-
-
-
+    Variable* getVariable(std::string identifier);
     void setVariable(std::string identifier, 
-        std::unique_ptr<Variable> variable) {
-
-        if(!scopeStructure.empty()) {
-            
-            for(std::vector<Scope>::reverse_iterator iterator = 
-                scopeStructure.top().rbegin(); 
-                iterator != scopeStructure.top().rend(); 
-                ++iterator) {
-
-                if(iterator->getVariable(identifier)) {
-                    iterator->setVariable(identifier, std::move(variable));
-                    return;
-                }
-            }
-
-        }
-        
-        if (globalScope.getVariable(identifier)) {
-            globalScope.setVariable(identifier, std::move(variable));
-            return;
-        }
-
-        throw std::string("Unknown identifier \"") + identifier + 
-            std::string("\"");
-    }
-    
+        std::unique_ptr<Variable> variable);
 };

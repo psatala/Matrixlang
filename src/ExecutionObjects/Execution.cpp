@@ -106,7 +106,7 @@ namespace VariableManagement{
                 (secondMatrixVariable->values[0][0]).get());
         }
 
-        return true; // int, float, string
+        return true; // int, float, string, void
     }
 
 
