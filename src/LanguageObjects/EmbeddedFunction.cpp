@@ -7,10 +7,9 @@ std::ostream* EmbeddedFunction::outputStream = &std::cout;
 
 EmbeddedFunction::EmbeddedFunction(std::unique_ptr<Type> type, 
     std::string identifier, 
-    std::unique_ptr<ArgumentList> argumentList, 
-    std::unique_ptr<Statement> statement) : 
+    std::unique_ptr<ArgumentList> argumentList) : 
         Function(std::move(type), identifier, std::move(argumentList), 
-            std::move(statement)) {}
+            std::unique_ptr<Statement>(nullptr)) {}
 
 
 std::unique_ptr<Variable> EmbeddedFunction::executeInnerStatement(
@@ -22,6 +21,12 @@ std::unique_ptr<Variable> EmbeddedFunction::executeInnerStatement(
         EmbeddedFunctionsDefinitions::print(*outputStream, 
             std::get<std::string>(simpleVariable->value));
         return std::make_unique<VoidVariable>(VoidVariable());
+    }
+
+    if("input" == identifier) {
+        std::string inputString = 
+            EmbeddedFunctionsDefinitions::input(*userInputStream);
+        return std::make_unique<SimpleVariable>(SimpleVariable(inputString));
     }
 
     return std::unique_ptr<Variable>(nullptr);

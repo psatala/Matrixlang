@@ -15,8 +15,18 @@ namespace EmbeddedFunctionsDeclarations {
             EmbeddedFunction(
                 std::make_unique<SimpleType>(SimpleType(VOID)), 
                 "print", 
-                std::make_unique<ArgumentList>(std::move(printArgumentList)),
-                std::unique_ptr<Statement>(nullptr)
-            )));
+                std::make_unique<ArgumentList>(std::move(printArgumentList))
+            )
+        ));
+
+
+        // input function
+        scopeManager->addFunction(std::make_unique<EmbeddedFunction>(
+            EmbeddedFunction(
+                std::make_unique<SimpleType>(SimpleType(STRING)),
+                "input",
+                std::unique_ptr<ArgumentList>(nullptr)
+            )
+        ));
     }
 }

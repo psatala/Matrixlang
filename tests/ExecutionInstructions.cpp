@@ -742,3 +742,25 @@ TEST(ExecutionInstructions, printEmbeddedFunction) {
     // output stream content
     GTEST_ASSERT_EQ(outStream.str(), "Hello world");
 }
+
+TEST(ExecutionInstructions, inputEmbeddedFunction) {
+    ScopeManager scopeManager;
+    std::stringstream inStream = std::stringstream("Hello\nWorld");
+    EmbeddedFunction::userInputStream = &inStream;
+
+    // function call
+    FuncallExpression funcallExpression = FuncallExpression("input");
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, STRING);
+    GTEST_ASSERT_EQ(std::get<std::string>(simpleVariable->value), "Hello");
+    
+}
