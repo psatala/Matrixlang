@@ -53,7 +53,12 @@ public:
         unsigned int secondIndex = VariableManagement::
             getUnsignedIntValueFromVariable(secondIndexExpression->
             value(scopeManager).get());
-        
+
+        if(firstIndex >= innerMatrixVariable->values.size())
+            throw std::string("First index out of range");
+        if(secondIndex >= innerMatrixVariable->values[firstIndex].size())
+            throw std::string("Second index out of range");
+
         return innerMatrixVariable->values[firstIndex][secondIndex].get();
     }
 };

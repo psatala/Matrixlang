@@ -24,6 +24,8 @@ public:
         type = MATRIX;
         firstLength = matrixType->getFirstExpressionPosition(scopeManager);
         secondLength = matrixType->getSecondExpressionPosition(scopeManager);
+        if(0 == firstLength || 0 == secondLength)
+            throw std::string("Matrix lengths must be positive");
         for(unsigned int i = 0; i < firstLength; ++i) {
             std::vector<std::unique_ptr<Variable>> innerValues;
             for(unsigned int j = 0; j < secondLength; ++j) {

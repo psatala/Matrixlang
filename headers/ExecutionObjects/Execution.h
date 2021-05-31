@@ -7,6 +7,7 @@
 #include "VoidVariable.h"
 #include "../LanguageObjects/Operator.h"
 
+
 namespace VariableManagement{
 
     std::unique_ptr<Variable> createVariable(Type* type, 
@@ -22,4 +23,6 @@ namespace VariableManagement{
     std::string getStringFromVariable(Variable* variable);
     unsigned int getUnsignedIntValueFromVariable(Variable* variable);
     bool isVariableMatchingLiteral(Variable* variable, Token literal);
+    void addParameterListVariables(Type* type, Variable* variable, 
+        ScopeManager* scopeManager);
 }

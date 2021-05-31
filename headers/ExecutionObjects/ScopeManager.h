@@ -36,7 +36,7 @@ public:
     void addGlobalVariable(std::string identifier, 
         std::unique_ptr<Variable> variable);
     
-    Variable* getVariable(std::string identifier);
+    Variable* getVariable(std::string identifier, bool isThrowing = true);
     void setVariable(std::string identifier, 
         std::unique_ptr<Variable> variable);
 };

@@ -1,4 +1,5 @@
 #include "../../headers/ExecutionObjects/Execution.h"
+#include "../../headers/LanguageObjects/Expressions/VariableExpression.h"
 
 namespace VariableManagement{
 
@@ -93,6 +94,8 @@ namespace VariableManagement{
                 (firstVariable);
             VectorVariable* secondVectorVariable = dynamic_cast<VectorVariable*>
                 (secondVariable);
+            if(firstVectorVariable->length != secondVectorVariable->length)
+                return false;
             return areOfSameType((firstVectorVariable->values[0]).get(), 
                 (secondVectorVariable->values[0]).get());
         }
@@ -102,6 +105,12 @@ namespace VariableManagement{
                 (firstVariable);
             MatrixVariable* secondMatrixVariable = dynamic_cast<MatrixVariable*>
                 (secondVariable);
+            if(firstMatrixVariable->firstLength != 
+                secondMatrixVariable->firstLength)
+                return false;
+            if(firstMatrixVariable->secondLength != 
+                secondMatrixVariable->secondLength)
+                return false;
             return areOfSameType((firstMatrixVariable->values[0][0]).get(), 
                 (secondMatrixVariable->values[0][0]).get());
         }
@@ -221,4 +230,71 @@ namespace VariableManagement{
             "matrix");
     }
 
+
+
+    void addParameterListVariables(Type* type, Variable* variable, 
+        ScopeManager* scopeManager) {
+        
+        VectorType* vectorType = dynamic_cast<VectorType*>(type);
+        VectorVariable* vectorVariable = dynamic_cast<VectorVariable*>
+            (variable);
+        if(vectorType && vectorVariable) {
+            
+            // recursive call
+            addParameterListVariables(vectorType->type.get(), 
+                vectorVariable->values[0].get(), scopeManager);
+            
+            VariableExpression* variableExpression = dynamic_cast
+                <VariableExpression*>(vectorType->expression.get());
+
+            if(!variableExpression)
+                return;
+            if(scopeManager->getVariable(variableExpression->identifier, false))
+                return;
+            
+            scopeManager->addLocalVariable(variableExpression->identifier, 
+                std::make_unique<SimpleVariable>(SimpleVariable(
+                    static_cast<int>(vectorVariable->length))));
+
+        }
+
+        MatrixType* matrixType = dynamic_cast<MatrixType*>(type);
+        MatrixVariable* matrixVariable = dynamic_cast<MatrixVariable*>
+            (variable);
+        if(matrixType && matrixVariable) {
+            
+            // recursive call
+            addParameterListVariables(matrixType->type.get(), 
+                matrixVariable->values[0][0].get(), scopeManager);
+            
+            VariableExpression* firstVariableExpression = dynamic_cast
+                <VariableExpression*>(matrixType->firstExpression.get());
+
+            if(firstVariableExpression) {
+                if(!scopeManager->getVariable(firstVariableExpression->
+                    identifier, false)) {
+                    
+                    scopeManager->addLocalVariable(firstVariableExpression->
+                        identifier, std::make_unique<SimpleVariable>(
+                        SimpleVariable(
+                        static_cast<int>(matrixVariable->firstLength))));
+                }
+            }
+            
+            VariableExpression* secondVariableExpression = dynamic_cast
+                <VariableExpression*>(matrixType->secondExpression.get());
+
+            if(secondVariableExpression) {
+                if(!scopeManager->getVariable(secondVariableExpression->
+                    identifier, false)) {
+                    
+                    scopeManager->addLocalVariable(secondVariableExpression->
+                        identifier, std::make_unique<SimpleVariable>(
+                        SimpleVariable(
+                        static_cast<int>(matrixVariable->secondLength))));
+                }
+            }
+
+        }
+    }
 }

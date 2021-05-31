@@ -45,6 +45,9 @@ public:
         unsigned int index = VariableManagement::getUnsignedIntValueFromVariable
             (indexExpression->value(scopeManager).get());
         
+        if(index >= innerVectorVariable->values.size())
+            throw std::string("Index out of range");
+        
         return innerVectorVariable->values[index].get();
     }
 

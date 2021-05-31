@@ -8,7 +8,6 @@
 #include "Statement.h"
 
 class Function {
-
 public:
     std::unique_ptr<Type> type;
     std::string identifier;
@@ -62,6 +61,14 @@ public:
 
         // checking types
         for(int i = 0; i < expressionVariables.size(); ++i) {
+            
+            // add vector/matrix length variables
+            VariableManagement::addParameterListVariables(
+                argumentList->typeVector[i].get(),
+                expressionVariables[i].get(),
+                scopeManager
+            );
+
             std::unique_ptr<Variable> expectedVariable = VariableManagement::
                 createVariable(argumentList->typeVector[i].get(), scopeManager);
             if(!VariableManagement::areOfSameType(expectedVariable.get(), 

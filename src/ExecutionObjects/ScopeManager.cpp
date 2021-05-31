@@ -78,7 +78,7 @@ void ScopeManager::addGlobalVariable(std::string identifier,
 
 
 
-Variable* ScopeManager::getVariable(std::string identifier) {
+Variable* ScopeManager::getVariable(std::string identifier, bool isThrowing) {
 
     if(!scopeStructure.empty()) {
         
@@ -95,8 +95,10 @@ Variable* ScopeManager::getVariable(std::string identifier) {
     if(Variable* variable = globalScope.getVariable(identifier))
         return variable;
 
-    throw std::string("Unknown identifier \"") + identifier + 
-        std::string("\"");
+    if(isThrowing)
+        throw std::string("Unknown identifier \"") + identifier + 
+            std::string("\"");
+    return nullptr;
 }
 
 

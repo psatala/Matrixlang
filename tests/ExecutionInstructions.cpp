@@ -710,6 +710,55 @@ TEST(ExecutionInstructions, addFunction) {
     GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 5);
 }
 
+TEST(ExecutionInstructions, variableFromParameterList) {
+    ScopeManager scopeManager;
+
+    // function definition
+    ArgumentList argumentList;
+    argumentList.typeVector.push_back(
+        std::make_unique<VectorType>(VectorType(
+            std::make_unique<SimpleType>(SimpleType(INT)),
+            std::make_unique<VariableExpression>(VariableExpression("n"))
+        )));
+    argumentList.identifierVector.push_back("vector");
+
+    scopeManager.addFunction(
+        std::make_unique<Function>(Function(
+            std::make_unique<SimpleType>(SimpleType(INT)), "length", 
+            std::make_unique<ArgumentList>(ArgumentList(
+                std::move(argumentList))),
+            std::make_unique<Statement>(Statement(
+                std::make_unique<Instruction>(Instruction(
+                    std::make_unique<Return>(Return(
+                        std::make_unique<VariableExpression>(
+                            VariableExpression("n")
+                        )
+                    ))
+                ))
+            ))
+        ))
+    );
+
+    // function call
+    scopeManager.addGlobalVariable("v", std::move(createVectorIntVariable()));
+    ExpressionList expressionList;
+    expressionList.push_back(
+        std::make_unique<VariableExpression>(VariableExpression("v")));
+    FuncallExpression funcallExpression = FuncallExpression("length", 
+        std::make_unique<ExpressionList>(std::move(expressionList)));
+    
+    std::unique_ptr<Variable> returnedVariable = 
+        funcallExpression.value(&scopeManager);
+    
+    // returned variable
+    ASSERT_TRUE(returnedVariable);
+    SimpleVariable* simpleVariable = 
+        dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        
+    ASSERT_TRUE(simpleVariable);
+    GTEST_ASSERT_EQ(simpleVariable->type, INT);
+    GTEST_ASSERT_EQ(std::get<int>(simpleVariable->value), 2);
+}
 
 
 

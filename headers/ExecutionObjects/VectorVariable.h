@@ -22,6 +22,8 @@ public:
     VectorVariable(VectorType* vectorType, ScopeManager* scopeManager) {
         type = VECTOR;
         length = vectorType->getExpressionPosition(scopeManager);
+        if(0 == length)
+            throw std::string("Vector length must be positive");
         for(unsigned int i = 0; i < length; ++i) {
             values.push_back(std::move(VariableManagement::
                 createVariable(vectorType->type.get(), scopeManager)));
