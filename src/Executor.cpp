@@ -68,7 +68,7 @@ Executor::Executor(std::istream& userInputStream, std::ostream& errStream,
     }
     catch(std::string errorMessage) {
         // exception thrown during execution
-        errStream << "Execution time error: " << errorMessage << '\n';
+        errStream << "Runtime error: " << errorMessage << '\n';
     }
     catch(const std::exception& e) {
         // for all other common exceptions

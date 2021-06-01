@@ -62,11 +62,11 @@ const ExecutorInputOutput programs[] = {
     ExecutorInputOutput(TestPrograms::copying, "", "", 
         "0: 0, 1: 0\n0: 3, 1: 5\n"),
     ExecutorInputOutput(TestPrograms::scope, "", 
-        "Execution time error: Unknown identifier \"a\"\n", ""),
+        "Runtime error: Unknown identifier \"a\"\n", ""),
     ExecutorInputOutput(TestPrograms::divideByZero, "", 
-        "Execution time error: Cannot divide by zero\n", ""),
+        "Runtime error: Cannot divide by zero\n", ""),
     ExecutorInputOutput(TestPrograms::strongTyping, "", 
-        "Execution time error: Cannot perform assignment: "
+        "Runtime error: Cannot perform assignment: "
         "variables are not of the same type\n", "")
 };
 
@@ -87,3 +87,101 @@ const ExecutorInputOutput simplePrograms[] = {
 
 INSTANTIATE_TEST_SUITE_P(ExecutorSimplePrograms, ExecutorParametrised, 
     testing::ValuesIn(simplePrograms));
+
+
+
+const ExecutorInputOutput errorPrograms[] = {
+
+    // unknown identifier
+    ExecutorInputOutput(R"(int main() {
+                a = 3;
+                return 0;
+            })", "", "Runtime error: Unknown identifier \"a\"\n", ""),
+    
+    // unknown function
+    ExecutorInputOutput(R"(int main() {
+                f();
+                return 0;
+            })", "", "Runtime error: Function with "
+            "name \"f\" is undefined\n", ""),
+
+    // double declaration
+    ExecutorInputOutput(R"(int main() {
+                int a;
+                int a;
+            })", 
+            "", "Runtime error: Local variable with name \"a\" already "
+                "exists\n", ""),
+
+    // type mismatch
+    ExecutorInputOutput(R"(int main() {
+                1 < 12.3;
+                return 0;
+            })", 
+            "", "Runtime error: Cannot perform comparison (less than): "
+                "variables are not of the same type\n", ""),
+
+
+    // type mismatch in declaration
+    ExecutorInputOutput(R"(int main() {
+                int a = 123.45;
+                return 0;
+            })", 
+            "", "Runtime error: Cannot perform assignment: "
+                "variables are not of the same type\n", ""),
+
+    // operator not supported
+    ExecutorInputOutput(R"(int main() {
+                Vector<int>[2] v1;
+                Vector<int>[2] v2;
+                v1 >= v2;
+                return 0;
+            })", 
+            "", "Runtime error: Comparison operator (more equal) not "
+                "supported for those types\n", ""),
+
+    // vector of length 0
+    ExecutorInputOutput(R"(int main() {
+                Vector<int>[0] v1;
+                return 0;
+            })", 
+            "", "Runtime error: Vector length must be positive\n", ""),
+
+    // index out of range
+    ExecutorInputOutput(R"(int main() {
+                Vector<int>[2] v1;
+                v1[2];
+                return 0;
+            })", 
+            "", "Runtime error: Index out of range\n", ""),
+
+    // index of incorrect type
+    ExecutorInputOutput(R"(int main() {
+                Vector<int>[2] v1;
+                v1["abc"];
+                return 0;
+            })", 
+            "", "Runtime error: Cannot get unsigned int value for "
+                "float or string\n", ""),
+
+    // string increment
+    ExecutorInputOutput(R"(int main() {
+                string s = "abc";
+                ++s;
+                return 0;
+            })", 
+            "", "Runtime error: Unary incremental expression can only be "
+                "applied to variables of type int or float\n", ""),
+
+    // modulo by zero
+    ExecutorInputOutput(R"(int main() {
+                1 % 0;
+                return 0;
+            })", 
+            "", "Runtime error: Cannot divide (modulo) by zero\n", ""),
+    
+    
+};
+
+INSTANTIATE_TEST_SUITE_P(ExecutorErrorPrograms, ExecutorParametrised, 
+    testing::ValuesIn(errorPrograms));
