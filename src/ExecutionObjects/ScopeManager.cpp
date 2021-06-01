@@ -4,6 +4,7 @@
 
 ScopeManager::ScopeManager() {
     EmbeddedFunctionsDeclarations::addAllEmbeddedFunctions(this);
+    EnvironmentalConstants::addAllEnvironmentalConstants(this);
 }
 
 void ScopeManager::init() {
@@ -23,6 +24,9 @@ void ScopeManager::addFunction(std::unique_ptr<Function> function) {
 std::unique_ptr<Variable> ScopeManager::callFunction(std::string identifier, 
     ExpressionList* expressionList) {
     
+    if(!functions[identifier])
+        throw std::string("Function with name \"") + identifier + 
+            std::string("\" is undefined");
     return functions[identifier]->execute(this, expressionList);
 }
 

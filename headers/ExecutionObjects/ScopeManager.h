@@ -5,6 +5,7 @@
 
 #include "Scope.h"
 #include "EmbeddedFunctionsDeclarations.h"
+#include "EnvironmentalConstants.h"
 
 class Function;
 class Expression;

@@ -54,6 +54,17 @@ Executor::Executor(std::istream& userInputStream, std::ostream& errStream,
     try {
         returnedVariable = mainFunction->execute(&scopeManager, 
             std::make_unique<ExpressionList>(ExpressionList()).get());
+        
+        // check return value
+        SimpleVariable* simpleVariable = 
+            dynamic_cast<SimpleVariable*>(returnedVariable.get());
+        if(!simpleVariable)
+            throw std::string("\"main\" function must have a non-empty return "
+                "statement");
+        int returnedValue = std::get<int>(simpleVariable->value);
+        if(returnedValue != 0)
+            throw std::string("Program returned ") + 
+                std::to_string(returnedValue);
     }
     catch(std::string errorMessage) {
         // exception thrown during execution
@@ -64,16 +75,5 @@ Executor::Executor(std::istream& userInputStream, std::ostream& errStream,
         // this code should never be executed
         errStream << e.what() << '\n';
     }
-    
 
-
-    // check return value
-    SimpleVariable* simpleVariable = 
-        dynamic_cast<SimpleVariable*>(returnedVariable.get());
-    if(!simpleVariable)
-        throw std::string("\"main\" function must have a not empty return "
-            "statement");
-    int returnedValue = std::get<int>(simpleVariable->value);
-    if(returnedValue != 0)
-        throw std::string("Program returned ") + std::to_string(returnedValue);
 }

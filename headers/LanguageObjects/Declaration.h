@@ -42,9 +42,16 @@ public:
         bool isLocal = true) {
         
         innerExecute(scopeManager, isLocal);
-        if(expression)
-            scopeManager->setVariable(identifier, std::move(expression->
-                value(scopeManager)));
+        if(expression) {
+            std::unique_ptr<Variable> expressionVariable = 
+                expression->value(scopeManager);
+            if(!VariableManagement::areOfSameType(scopeManager->
+                getVariable(identifier), expressionVariable.get()))
+                throw std::string("Cannot perform assignment: variables are "
+                    "not of the same type");
+            scopeManager->setVariable(identifier, 
+                std::move(expressionVariable));
+        }
         return std::unique_ptr<Variable>(nullptr);
     }
 };

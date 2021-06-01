@@ -165,7 +165,7 @@ TEST (LexerComplex, fibonacciIter) {
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 2);
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "i");
-    assertTokenType(interpreter.parser.lexer, LESS_THAN);
+    assertTokenType(interpreter.parser.lexer, LESS_EQUAL);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "n");
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
     assertTokenType(interpreter.parser.lexer, INCREMENT);
@@ -663,7 +663,7 @@ TEST (LexerComplex, average) {
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 0);
     assertTokenType(interpreter.parser.lexer, R_SQUARE_BRACKET);
     assertTokenType(interpreter.parser.lexer, ASSIGN);
-    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 2);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 2.0f);
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
     
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "vector");
@@ -671,7 +671,7 @@ TEST (LexerComplex, average) {
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 1);
     assertTokenType(interpreter.parser.lexer, R_SQUARE_BRACKET);
     assertTokenType(interpreter.parser.lexer, ASSIGN);
-    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 3);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 3.0f);
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
 
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "print");
@@ -1146,7 +1146,7 @@ TEST (LexerComplex, strongTyping) {
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "b");
     assertTokenType(interpreter.parser.lexer, ASSIGN);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
-        "floatToInt");
+        "intToFloat");
     assertTokenType(interpreter.parser.lexer, L_PARENT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "a");
     assertTokenType(interpreter.parser.lexer, R_PARENT);

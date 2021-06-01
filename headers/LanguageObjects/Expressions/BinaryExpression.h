@@ -44,6 +44,10 @@ public:
             Variable* leftVar = lhs->rawValue(scopeManager);
             std::unique_ptr<Variable> rightVar = rhs->value(scopeManager);
 
+            if(!VariableManagement::areOfSameType(leftVar, rightVar.get()))
+                throw std::string("Cannot perform assignment: variables are "
+                    "not of the same type");
+
             switch(op->type) {
 
             case PLUS_ASSIGN:

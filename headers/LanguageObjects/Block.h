@@ -18,6 +18,10 @@ public:
     }
 
     std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
-        return instructionList->execute(scopeManager);
+        scopeManager->addBlock();
+        std::unique_ptr<Variable> variable = 
+            instructionList->execute(scopeManager);
+        scopeManager->endBlock();
+        return std::move(variable);
     }
 };

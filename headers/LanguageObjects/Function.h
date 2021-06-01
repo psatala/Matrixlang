@@ -86,6 +86,8 @@ public:
         // execute statement inside
         std::unique_ptr<Variable> returnedVariable = 
             executeInnerStatement(scopeManager);
+        if(!returnedVariable)
+            returnedVariable = std::make_unique<VoidVariable>(VoidVariable());
 
         scopeManager->endFuncall();
 

@@ -81,6 +81,7 @@ TEST(ExecutionInstructions, expressionListExecution) {
 
 TEST(ExecutionInstructions, blockExecution) {
     ScopeManager scopeManager;
+    scopeManager.init();
     scopeManager.addGlobalVariable("a", 
         std::make_unique<SimpleVariable>(SimpleVariable(12)));
     
