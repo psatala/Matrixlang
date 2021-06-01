@@ -30,12 +30,17 @@ std::string For::print(int identLevel) {
 
 std::unique_ptr<Variable> For::execute(ScopeManager* scopeManager) {
     scopeManager->addBlock();
+    std::unique_ptr<Variable> returnedVariable = 
+        std::unique_ptr<Variable>(nullptr);
     if(declaration)
         declaration->execute(scopeManager);
-    if(!conditionalExpression)
-        throw std::string("Infinite loop detected");
-    while(conditionalExpression->value(scopeManager)->getLogicalValue()) {
-        statement->execute(scopeManager);
+    while(!returnedVariable) {
+        if(conditionalExpression)
+            if(!conditionalExpression->value(scopeManager)->getLogicalValue())
+                break;
+        scopeManager->addBlock();
+        returnedVariable = statement->execute(scopeManager);
+        scopeManager->endBlock();
         if(incrementalExpression)
             incrementalExpression->value(scopeManager);
     }

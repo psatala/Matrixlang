@@ -7,6 +7,23 @@
 #include "../headers/LanguageObjects/Expressions/BinaryExpression.h"
 #include "../headers/LanguageObjects/Expressions/VariableExpression.h"
 #include "../headers/LanguageObjects/Statement.h"
+#include "../headers/Interpreter.h"
+#include "TestPrograms.h"
+
+
+//class for passing data to parametrised tests
+class ExecutorInputOutput {
+public:
+    std::string codeInput;
+    std::string userInput;
+    std::string errorOutput;
+    std::string standardOutput;
+    ExecutorInputOutput(std::string codeInput, std::string userInput, 
+        std::string errorOutput, std::string standardOutput) :
+        codeInput(codeInput), userInput(userInput), errorOutput(errorOutput), 
+        standardOutput(standardOutput) {}
+};
+
 
 inline std::unique_ptr<Variable> createIntVariable() {
      std::unique_ptr<SimpleType> simpleType = 

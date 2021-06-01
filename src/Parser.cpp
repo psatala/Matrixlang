@@ -598,6 +598,12 @@ std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>,
 std::unique_ptr<Declaration> Parser::parseDeclarationEnd(
     std::unique_ptr<Type> type, std::string identifier) {
     
+    if(SimpleType* simpleType = dynamic_cast<SimpleType*>(type.get())) {
+        if(VOID == simpleType->type)
+            generateError("Parsing declaration: cannot declare variable "
+                "of type \"void\"");
+    }
+
     std::unique_ptr<Expression> expression = std::unique_ptr<Expression>
         (nullptr);
     if(ASSIGN == currentToken.type) {
@@ -832,11 +838,15 @@ std::unique_ptr<For> Parser::parseFor() {
     
     std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>, 
         std::monostate> declarationVariant = parseDeclarationOrFunction();
-    if(!std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
-        generateError("Parsing for instruction: expected declaration");
+    if(std::get_if<std::unique_ptr<Function>>(&declarationVariant))
+        generateError("Parsing for instruction: did not expect function");
+
     // may be null
     std::unique_ptr<Declaration> declaration = 
-        std::move(std::get<std::unique_ptr<Declaration>>(declarationVariant));
+        std::unique_ptr<Declaration>(nullptr);
+    if(std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
+        declaration = std::move(std::get<std::unique_ptr<Declaration>>
+            (declarationVariant));
     
     expectToken(SEMICOLON, "Parsing for instruction: expected \";\"");
 

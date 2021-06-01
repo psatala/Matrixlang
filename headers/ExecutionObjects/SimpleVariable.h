@@ -26,6 +26,12 @@ public:
     SimpleVariable(const SimpleVariable* simpleVariable) {
         type = simpleVariable->type;
         value = simpleVariable->value;
+
+        // resolve ambiguity
+        // if(int* intValue = std::get_if<int>(&this->value)) {
+        //     if(FLOAT == type)
+        //         value = static_cast<float>(*intValue);
+        // }
     }
 
 

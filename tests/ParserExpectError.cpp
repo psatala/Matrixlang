@@ -109,7 +109,13 @@ const ParserInputOutput testPrograms[] = {
                 )",
     R"(Parsing stopped, error: Line: 4 Column: 32 -> Parsing case c: )"
     R"(expected ":"
-)")
+)"),
+
+    // void variable declaration
+    ParserInputOutput(R"(void a;)",
+    R"(Parsing stopped, error: Line: 1 Column: 7 -> )"
+    R"(Parsing declaration: cannot declare variable of type "void"
+)"),
 
 };
 
