@@ -179,7 +179,22 @@ const ExecutorInputOutput errorPrograms[] = {
                 return 0;
             })", 
             "", "Runtime error: Cannot divide (modulo) by zero\n", ""),
+
+    // vector of length 0
+    ExecutorInputOutput(R"(int main() {
+        int a = 0;
+                Vector<int>[a] v1;
+                return 0;
+            })", 
+            "", "Runtime error: Vector length must be positive\n", ""),
     
+    // modulo by zero
+    ExecutorInputOutput(R"(int main() {
+        int a = 0;
+                1 % a;
+                return 0;
+            })", 
+            "", "Runtime error: Cannot divide (modulo) by zero\n", ""),
     
 };
 
