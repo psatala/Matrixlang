@@ -82,7 +82,20 @@ const ExecutorInputOutput simplePrograms[] = {
                     int l = 3;
                 }
                 return 0;
-            })", "", "", "")
+            })", "", "", ""),
+    ExecutorInputOutput(R"(
+    int f() {
+        for(int i = 0; i < 10; ++i) {
+            if(i == 4)
+                return i;
+        }
+    }
+
+    int main() {
+        print(intToString(f()));
+        return 0;
+    }
+)", "", "", "4")
 };
 
 INSTANTIATE_TEST_SUITE_P(ExecutorSimplePrograms, ExecutorParametrised, 

@@ -45,5 +45,5 @@ std::unique_ptr<Variable> For::execute(ScopeManager* scopeManager) {
             incrementalExpression->value(scopeManager);
     }
     scopeManager->endBlock();
-    return std::unique_ptr<Variable>(nullptr);
+    return std::move(returnedVariable);
 }
