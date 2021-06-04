@@ -19,6 +19,8 @@ class ScopeManager {
     Scope globalScope;
 
 public:
+    static unsigned int MAX_STACK_DEPTH;
+
     ScopeManager();
     void init();
     

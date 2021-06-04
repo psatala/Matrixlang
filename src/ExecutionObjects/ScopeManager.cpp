@@ -2,6 +2,8 @@
 #include "../../headers/LanguageObjects/Function.h"
 #include "../../headers/LanguageObjects/Expressions/Expression.h"
 
+unsigned int ScopeManager::MAX_STACK_DEPTH = 1000;
+
 ScopeManager::ScopeManager() {
     EmbeddedFunctionsDeclarations::addAllEmbeddedFunctions(this);
     EnvironmentalConstants::addAllEnvironmentalConstants(this);
@@ -40,6 +42,8 @@ Function* ScopeManager::getFunction(std::string identifier) {
 
 
 void ScopeManager::addFuncall() {
+    if(scopeStructure.size() >= MAX_STACK_DEPTH)
+        throw std::string("Stack overflow");
     std::vector<Scope> blockVector;
     blockVector.push_back(std::move(Scope()));
     scopeStructure.push(std::move(blockVector));

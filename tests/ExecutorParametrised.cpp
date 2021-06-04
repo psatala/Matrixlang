@@ -95,7 +95,7 @@ const ExecutorInputOutput simplePrograms[] = {
         print(intToString(f()));
         return 0;
     }
-)", "", "", "4")
+    )", "", "", "4")
 };
 
 INSTANTIATE_TEST_SUITE_P(ExecutorSimplePrograms, ExecutorParametrised, 
@@ -208,6 +208,18 @@ const ExecutorInputOutput errorPrograms[] = {
                 return 0;
             })", 
             "", "Runtime error: Cannot divide (modulo) by zero\n", ""),
+
+    // stack overflow
+    ExecutorInputOutput(R"(
+    void f() {
+        f();
+    }
+
+    int main() {
+        f();
+        return 0;
+    }
+    )", "", "Runtime error: Stack overflow\n", "")
     
 };
 
