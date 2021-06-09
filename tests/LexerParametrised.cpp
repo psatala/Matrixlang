@@ -10,9 +10,10 @@ TEST_P(LexerParametrised, checkFirstTokenType)
 
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(simpleTestData.input);
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
     assertTokenType(interpreter.parser.lexer, simpleTestData.firstToken);

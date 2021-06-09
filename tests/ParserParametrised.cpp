@@ -10,9 +10,10 @@ TEST_P(ParserParametrised, checkParsedTree)
 
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(parserInputOutput.input);
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
     std::unique_ptr<Program> program = interpreter.parser.parseProgram();
@@ -31,17 +32,16 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
-            Left: Binary expression
-              Left: Literal expression: int number: 1
-              Right: Literal expression: int number: 2
-              Operator: +
-            Right: Literal expression: int number: 3
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Binary expression
+            Left: Literal expression: int number: 1
+            Right: Literal expression: int number: 2
             Operator: +
+          Right: Literal expression: int number: 3
+          Operator: +
 )"),
 
     // simple assignment expression
@@ -53,20 +53,19 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Variable expression
+            Identifier: a
+          Right: Binary expression
             Left: Variable expression
-              Identifier: a
-            Right: Binary expression
-              Left: Variable expression
-                Identifier: b
-              Right: Variable expression
-                Identifier: c
-              Operator: =
+              Identifier: b
+            Right: Variable expression
+              Identifier: c
             Operator: =
+          Operator: =
 )"),
 
     // combining mulitplication with addition
@@ -78,20 +77,19 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
-            Left: Binary expression
-              Left: Literal expression: int number: 1
-              Right: Binary expression
-                Left: Literal expression: int number: 2
-                Right: Literal expression: int number: 3
-                Operator: *
-              Operator: +
-            Right: Literal expression: int number: 4
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Binary expression
+            Left: Literal expression: int number: 1
+            Right: Binary expression
+              Left: Literal expression: int number: 2
+              Right: Literal expression: int number: 3
+              Operator: *
             Operator: +
+          Right: Literal expression: int number: 4
+          Operator: +
 )"),
 
     // another compilation of multiplication and addition
@@ -103,20 +101,19 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
-            Left: Binary expression
-              Left: Literal expression: float number: 1.000000
-              Right: Literal expression: float number: 2.000000
-              Operator: *
-            Right: Binary expression
-              Left: Literal expression: float number: 3.000000
-              Right: Literal expression: float number: 4.000000
-              Operator: *
-            Operator: +
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Binary expression
+            Left: Literal expression: float number: 1.000000
+            Right: Literal expression: float number: 2.000000
+            Operator: *
+          Right: Binary expression
+            Left: Literal expression: float number: 3.000000
+            Right: Literal expression: float number: 4.000000
+            Operator: *
+          Operator: +
 )"), 
 
     // multiple operators of different precedence levels
@@ -128,23 +125,22 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
-            Left: Literal expression: int number: 1
-            Right: Binary expression
-              Left: Binary expression
-                Left: Literal expression: int number: 2
-                Right: Binary expression
-                  Left: Literal expression: int number: 3
-                  Right: Literal expression: int number: 4
-                  Operator: *
-                Operator: +
-              Right: Literal expression: int number: 5
-              Operator: <
-            Operator: &&
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Literal expression: int number: 1
+          Right: Binary expression
+            Left: Binary expression
+              Left: Literal expression: int number: 2
+              Right: Binary expression
+                Left: Literal expression: int number: 3
+                Right: Literal expression: int number: 4
+                Operator: *
+              Operator: +
+            Right: Literal expression: int number: 5
+            Operator: <
+          Operator: &&
 )"),
 
     // unary rvalue operators
@@ -156,17 +152,16 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
+      Instruction: Instruction
+        Expression: Unary expression
+          Operator: +
           Expression: Unary expression
-            Operator: +
+            Operator: -
             Expression: Unary expression
-              Operator: -
-              Expression: Unary expression
-                Operator: !
-                Expression: Literal expression: int number: 1
+              Operator: !
+              Expression: Literal expression: int number: 1
 )"),
 
     // mix of unary and binary
@@ -178,18 +173,17 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
-            Left: Variable expression
-              Identifier: a
-            Right: Unary expression
-              Operator: ++
-              Expression: Variable expression
-                Identifier: b
-            Operator: +
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Variable expression
+            Identifier: a
+          Right: Unary incremental expression
+            Operator: ++
+            Expression: Variable expression
+              Identifier: b
+          Operator: +
 )"),
 
     // parenthesis
@@ -201,17 +195,16 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Binary expression
-            Left: Literal expression: int number: 1
-            Right: Binary expression
-              Left: Literal expression: int number: 2
-              Right: Literal expression: int number: 3
-              Operator: +
-            Operator: *
+      Instruction: Instruction
+        Expression: Binary expression
+          Left: Literal expression: int number: 1
+          Right: Binary expression
+            Left: Literal expression: int number: 2
+            Right: Literal expression: int number: 3
+            Operator: +
+          Operator: *
 )"),
 
     // string expression
@@ -223,17 +216,16 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: String Expression: 
-            Raw String: abc
-            Expression within string: Binary expression
-              Left: Literal expression: int number: 1
-              Right: Literal expression: int number: 2
-              Operator: +
-            Raw String: def
+      Instruction: Instruction
+        Expression: String Expression: 
+          Raw String: abc
+          Expression within string: Binary expression
+            Left: Literal expression: int number: 1
+            Right: Literal expression: int number: 2
+            Operator: +
+          Raw String: def
 )"),
 
   // funcall
@@ -245,17 +237,16 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Funcall expression
-            Identifier: abc
-            Expression no. 0: Literal expression: int number: 1
-            Expression no. 1: Binary expression
-              Left: Literal expression: int number: 2
-              Right: Literal expression: int number: 3
-              Operator: +
+      Instruction: Instruction
+        Expression: Funcall expression
+          Identifier: abc
+          Expression no. 0: Literal expression: int number: 1
+          Expression no. 1: Binary expression
+            Left: Literal expression: int number: 2
+            Right: Literal expression: int number: 3
+            Operator: +
 )"),
 
   // vector and matrix index access
@@ -267,17 +258,16 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Matrix index expression
-            Inner expression: Vector index expression
-              Inner expression: Variable expression
-                Identifier: a
-              Index expression: Literal expression: int number: 1
-            First index expression: Literal expression: int number: 2
-            Second index expression: Literal expression: int number: 3
+      Instruction: Instruction
+        Expression: Matrix index expression
+          Inner expression: Vector index expression
+            Inner expression: Variable expression
+              Identifier: a
+            Index expression: Literal expression: int number: 1
+          First index expression: Literal expression: int number: 2
+          Second index expression: Literal expression: int number: 3
 )"),
 
   // post expression
@@ -289,39 +279,37 @@ R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
+      Instruction: Instruction
+        Expression: Post expression
           Expression: Post expression
-            Expression: Post expression
-              Expression: Variable expression
-                Identifier: a
-              Operator: ++
-            Operator: --
+            Expression: Variable expression
+              Identifier: a
+            Operator: ++
+          Operator: --
 )"),
 
   // unary lvalue expression
   ParserInputOutput(R"(
                 int main()
-                    ++--!a;
+                    !++--a;
                 )",
 R"(Program
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Unary expression
+      Instruction: Instruction
+        Expression: Unary expression
+          Operator: !
+          Expression: Unary incremental expression
             Operator: ++
-            Expression: Unary expression
+            Expression: Unary incremental expression
               Operator: --
-              Expression: Unary expression
-                Operator: !
-                Expression: Variable expression
-                  Identifier: a
+              Expression: Variable expression
+                Identifier: a
 )")
 
 };
@@ -375,9 +363,8 @@ const ParserInputOutput otherLanguageObjects[] = {
       Type no. 1: Simple type: string
       Identifier no. 1: variable
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: 
+      Instruction: Instruction
+        Expression: 
 )"),
 
   // return
@@ -386,12 +373,11 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Return: Return
-            Expression: Literal expression: int number: 0
+      Instruction: Instruction
+        Return: Return
+          Expression: Literal expression: int number: 0
 )"),
 
   // if
@@ -400,17 +386,15 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          If: If
-            Conditional expression: Literal expression: int number: 1
-            True statement: Statement
-              Instruction List: Instruction list
-                Instruction: Instruction
-                  Expression: 
-            False statement: 
+      Instruction: Instruction
+        If: If
+          Conditional expression: Literal expression: int number: 1
+          True statement: Statement
+            Instruction: Instruction
+              Expression: 
+          False statement: 
 )"),
 
   // if else
@@ -419,20 +403,17 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          If: If
-            Conditional expression: Literal expression: int number: 1
-            True statement: Statement
-              Instruction List: Instruction list
-                Instruction: Instruction
-                  Expression: 
-            False statement: Statement
-              Instruction List: Instruction list
-                Instruction: Instruction
-                  Expression: 
+      Instruction: Instruction
+        If: If
+          Conditional expression: Literal expression: int number: 1
+          True statement: Statement
+            Instruction: Instruction
+              Expression: 
+          False statement: Statement
+            Instruction: Instruction
+              Expression: 
 )"),
 
   // for
@@ -441,29 +422,27 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          For: For
-            Declaration: Declaration
-              Type: Simple type: int
+      Instruction: Instruction
+        For: For
+          Declaration: Declaration
+            Type: Simple type: int
+            Identifier: i
+            Expression: Literal expression: int number: 0
+          Conditional expression: Binary expression
+            Left: Variable expression
               Identifier: i
-              Expression: Literal expression: int number: 0
-            Conditional expression: Binary expression
-              Left: Variable expression
-                Identifier: i
-              Right: Variable expression
-                Identifier: n
-              Operator: <
-            Incremental expression: Unary expression
-              Operator: ++
-              Expression: Variable expression
-                Identifier: i
-            Statement: Statement
-              Instruction List: Instruction list
-                Instruction: Instruction
-                  Expression: 
+            Right: Variable expression
+              Identifier: n
+            Operator: <
+          Incremental expression: Unary incremental expression
+            Operator: ++
+            Expression: Variable expression
+              Identifier: i
+          Statement: Statement
+            Instruction: Instruction
+              Expression: 
 )"),
 
   // instruction list
@@ -477,30 +456,30 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          If: If
-            Conditional expression: Literal expression: int number: 1
-            True statement: Statement
-              Instruction List: Instruction list
+      Block: Block
+        Instruction List: Instruction list
+          Instruction: Instruction
+            If: If
+              Conditional expression: Literal expression: int number: 1
+              True statement: Statement
                 Instruction: Instruction
                   Expression: Binary expression
                     Left: Variable expression
                       Identifier: a
                     Right: Literal expression: int number: 0
                     Operator: =
-            False statement: 
-        Instruction: Instruction
-          Declaration: Declaration
-            Type: Simple type: int
-            Identifier: b
-            Expression: Literal expression: int number: 1
-        Instruction: Instruction
-          Return: Return
-            Expression: Variable expression
-              Identifier: c
+              False statement: 
+          Instruction: Instruction
+            Declaration: Declaration
+              Type: Simple type: int
+              Identifier: b
+              Expression: Literal expression: int number: 1
+          Instruction: Instruction
+            Return: Return
+              Expression: Variable expression
+                Identifier: c
 )"),
 
   // switch go
@@ -519,45 +498,46 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Switch: Switch Go
-            Case Go no. 0: Case Go
-              Expression: Binary expression
-                Left: Variable expression
-                  Identifier: a
-                Right: Literal expression: int number: 1
-                Operator: <
-              Instruction list: Instruction list
-                Instruction: Instruction
-                  Expression: Binary expression
-                    Left: Variable expression
-                      Identifier: b
-                    Right: Literal expression: int number: 2
-                    Operator: =
-            Case Go no. 1: Case Go
-              Expression: Binary expression
-                Left: Variable expression
-                  Identifier: a
-                Right: Literal expression: int number: 3
-                Operator: >
-              Instruction list: Instruction list
-                Instruction: Instruction
-                  Expression: Binary expression
-                    Left: Variable expression
-                      Identifier: b
-                    Right: Literal expression: int number: 4
-                    Operator: =
-            Default: Default
-              Instruction list: Instruction list
-                Instruction: Instruction
-                  Expression: Binary expression
-                    Left: Variable expression
-                      Identifier: b
-                    Right: Literal expression: int number: 5
-                    Operator: =
+      Block: Block
+        Instruction List: Instruction list
+          Instruction: Instruction
+            Switch: Switch Go
+              Case Go no. 0: Case Go
+                Expression: Binary expression
+                  Left: Variable expression
+                    Identifier: a
+                  Right: Literal expression: int number: 1
+                  Operator: <
+                Instruction list: Instruction list
+                  Instruction: Instruction
+                    Expression: Binary expression
+                      Left: Variable expression
+                        Identifier: b
+                      Right: Literal expression: int number: 2
+                      Operator: =
+              Case Go no. 1: Case Go
+                Expression: Binary expression
+                  Left: Variable expression
+                    Identifier: a
+                  Right: Literal expression: int number: 3
+                  Operator: >
+                Instruction list: Instruction list
+                  Instruction: Instruction
+                    Expression: Binary expression
+                      Left: Variable expression
+                        Identifier: b
+                      Right: Literal expression: int number: 4
+                      Operator: =
+              Default: Default
+                Instruction list: Instruction list
+                  Instruction: Instruction
+                    Expression: Binary expression
+                      Left: Variable expression
+                        Identifier: b
+                      Right: Literal expression: int number: 5
+                      Operator: =
 )"),
 
   // switch c
@@ -577,39 +557,59 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Switch: Switch C
-            Expression: Variable expression
-              Identifier: a
-            Case C no. 0: Case C
-              Token: int number: 1
-              Instruction list: Instruction list
-                Instruction: Instruction
-                  Expression: Binary expression
-                    Left: Variable expression
-                      Identifier: b
-                    Right: Literal expression: int number: 2
-                    Operator: =
-            Case C no. 1: Case C
-              Token: int number: 3
-              Instruction list: Instruction list
-                Instruction: Instruction
-                  Expression: Binary expression
-                    Left: Variable expression
-                      Identifier: b
-                    Right: Literal expression: int number: 4
-                    Operator: =
-            Default: Default
-              Instruction list: Instruction list
-                Instruction: Instruction
-                  Expression: Binary expression
-                    Left: Variable expression
-                      Identifier: b
-                    Right: Literal expression: int number: 5
-                    Operator: =
+      Block: Block
+        Instruction List: Instruction list
+          Instruction: Instruction
+            Switch: Switch C
+              Expression: Variable expression
+                Identifier: a
+              Case C no. 0: Case C
+                Token: int number: 1
+                Instruction list: Instruction list
+                  Instruction: Instruction
+                    Expression: Binary expression
+                      Left: Variable expression
+                        Identifier: b
+                      Right: Literal expression: int number: 2
+                      Operator: =
+              Case C no. 1: Case C
+                Token: int number: 3
+                Instruction list: Instruction list
+                  Instruction: Instruction
+                    Expression: Binary expression
+                      Left: Variable expression
+                        Identifier: b
+                      Right: Literal expression: int number: 4
+                      Operator: =
+              Default: Default
+                Instruction list: Instruction list
+                  Instruction: Instruction
+                    Expression: Binary expression
+                      Left: Variable expression
+                        Identifier: b
+                      Right: Literal expression: int number: 5
+                      Operator: =
+)"),
+
+  // nested blocks
+  ParserInputOutput(R"(int main() {
+                {
+                    
+                }
+            })",
+            R"(Program
+  Function
+    Type: Simple type: int
+    Identifier: main
+    Argument list: Argument list
+    Statement: Statement
+      Block: Block
+        Instruction List: Instruction list
+          Instruction: Instruction
+            Block: Block
+              Instruction List: Instruction list
 )"),
 
   // hello world
@@ -623,17 +623,18 @@ const ParserInputOutput otherLanguageObjects[] = {
   Function
     Type: Simple type: int
     Identifier: main
-    Argument list: 
+    Argument list: Argument list
     Statement: Statement
-      Instruction List: Instruction list
-        Instruction: Instruction
-          Expression: Funcall expression
-            Identifier: print
-            Expression no. 0: String Expression: 
-              Raw String: Hello world
-        Instruction: Instruction
-          Return: Return
-            Expression: Literal expression: int number: 0
+      Block: Block
+        Instruction List: Instruction list
+          Instruction: Instruction
+            Expression: Funcall expression
+              Identifier: print
+              Expression no. 0: String Expression: 
+                Raw String: Hello world
+          Instruction: Instruction
+            Return: Return
+              Expression: Literal expression: int number: 0
 )")
 
 

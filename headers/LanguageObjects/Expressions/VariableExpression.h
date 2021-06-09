@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../LanguageObjects.h"
+#include "../../LanguageObjects.h"
 #include "Expression.h"
 
 class VariableExpression : public Expression {
@@ -15,5 +15,14 @@ public:
     
     bool isLValue() const override {
         return true;
+    }
+
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+        return std::move(VariableManagement::copyVariable(
+            rawValue(scopeManager)));
+    }
+    
+    Variable* rawValue(ScopeManager* scopeManager) override {
+        return scopeManager->getVariable(identifier);
     }
 };

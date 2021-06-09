@@ -2,27 +2,25 @@
 
 #include <memory>
 
+#include "../LanguageObjects.h"
+#include "Expressions/Expression.h"
 class Statement;
 
-#include "../LanguageObjects.h"
-#include "Expression.h"
 
 class If {
-
     std::string getTrueStatementInfo(int identLevel);
     std::string getFalseStatementInfo(int identLevel);
-
+    std::unique_ptr<Variable> executeStatement(Statement* statement, 
+        ScopeManager* scopeManager);
 public:
     std::unique_ptr<Expression> conditionalExpression;
     std::unique_ptr<Statement> trueStatement;
     std::unique_ptr<Statement> falseStatement;
     If(std::unique_ptr<Expression> conditionalExpression,
         std::unique_ptr<Statement> trueStatement,
-        std::unique_ptr<Statement> falseStatement) : 
-        conditionalExpression(std::move(conditionalExpression)),
-        trueStatement(std::move(trueStatement)),
-        falseStatement(std::move(falseStatement)) {}
+        std::unique_ptr<Statement> falseStatement);
 
     std::string print(int identLevel);
     
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager);
 };

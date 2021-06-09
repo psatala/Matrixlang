@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../LanguageObjects.h"
-#include "Expression.h"
+#include "Expressions/Expression.h"
 #include "InstructionList.h"
 
 class CaseGo {
@@ -22,4 +22,13 @@ public:
             ident(identLevel) + "Instruction list: " + 
                 instructionList->print(identLevel + 1);
     }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager) {
+        scopeManager->addBlock();
+        std::unique_ptr<Variable> variable = 
+            instructionList->execute(scopeManager);
+        scopeManager->endBlock();
+        return std::move(variable);
+    }
+    
 };

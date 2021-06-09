@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "Expression.h"
-#include "../Token.h"
+#include "../../Token.h"
 
 class LiteralExpression : public Expression {
 
@@ -28,4 +28,8 @@ public:
         return false;
     }
     
+    std::unique_ptr<Variable> value(ScopeManager* scopeManager) override {
+        return std::make_unique<SimpleVariable>(SimpleVariable(token.value));
+    }
+
 };

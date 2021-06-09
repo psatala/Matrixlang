@@ -11,9 +11,10 @@ TEST_P(ParserCheckError, checkError)
 
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(inputProgram);
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
     try {

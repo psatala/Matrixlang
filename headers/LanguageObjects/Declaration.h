@@ -4,10 +4,21 @@
 #include <string>
 
 #include "Type.h"
-#include "Expression.h"
+#include "Expressions/Expression.h"
 #include "../LanguageObjects.h"
 
 class Declaration {
+
+    void innerExecute(ScopeManager* scopeManager, bool isLocal) {
+        std::unique_ptr<Variable> variable = 
+            VariableManagement::createVariable(type.get(), scopeManager);
+        if(isLocal) {
+            scopeManager->addLocalVariable(identifier, std::move(variable));
+            return;
+        }
+        scopeManager->addGlobalVariable(identifier, std::move(variable));
+    }
+
 public:
     std::unique_ptr<Type> type;
     const std::string identifier;
@@ -25,5 +36,22 @@ public:
             toPrintString += ident(identLevel) + "Expression: " + 
                 expression->print(identLevel + 1);
         return toPrintString;
+    }
+
+    std::unique_ptr<Variable> execute(ScopeManager* scopeManager, 
+        bool isLocal = true) {
+        
+        innerExecute(scopeManager, isLocal);
+        if(expression) {
+            std::unique_ptr<Variable> expressionVariable = 
+                expression->value(scopeManager);
+            if(!VariableManagement::areOfSameType(scopeManager->
+                getVariable(identifier), expressionVariable.get()))
+                throw std::string("Cannot perform assignment: variables are "
+                    "not of the same type");
+            scopeManager->setVariable(identifier, 
+                std::move(expressionVariable));
+        }
+        return std::unique_ptr<Variable>(nullptr);
     }
 };

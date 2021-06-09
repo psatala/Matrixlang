@@ -26,7 +26,7 @@ namespace TestPrograms {
 	    int current;
 	    
 	    #main loop
-        for(int i = 2; i < n; ++i) {
+        for(int i = 2; i <= n; ++i) {
 		    current = prev + prevprev;
 		    prevprev = prev;
 		    prev = current;
@@ -96,8 +96,8 @@ namespace TestPrograms {
 
     int main() {
     	Vector<float>[2] vector;
-    	vector[0] = 2;
-    	vector[1] = 3;
+    	vector[0] = 2.0;
+    	vector[1] = 3.0;
     	print(floatToString(average(vector))); #prints 2.5
     	return 0;
     })";
@@ -166,7 +166,7 @@ namespace TestPrograms {
 
     inline std::string scope = R"(
     int main() {
-    	if(1) {
+    	{
     		int a = 10;
     	}
     	print(intToString(a));	#error - no such variable "a"
@@ -182,7 +182,7 @@ namespace TestPrograms {
     inline std::string strongTyping = R"(
     int main() {
         int a = 0;
-        float b = floatToInt(a); #ok
+        float b = intToFloat(a); #ok
         float c = a; #error
         return 0;
     })";

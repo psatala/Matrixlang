@@ -30,7 +30,6 @@ void Parser::generateError(std::string message) {
         + std::to_string(currentToken.lineNumber)
         + " Column: " + std::to_string(currentToken.columnNumber) + " -> " 
         + message + "\n";
-    errStream << completeMessage;
     throw static_cast<std::string>("Parsing stopped, error: " 
         + completeMessage);
 
@@ -167,14 +166,13 @@ std::unique_ptr<Operator> Parser::parsePostOperator() {
 }
 
 
-std::unique_ptr<Operator> Parser::parseUnaryRValueOperator() {
+std::unique_ptr<Operator> Parser::parseUnaryOperator() {
     return parseOperator(std::vector<TokenType> {PLUS, MINUS, NOT});
 }
 
 
-std::unique_ptr<Operator> Parser::parseUnaryLValueOperator() {
-    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT, PLUS, 
-        MINUS, NOT});
+std::unique_ptr<Operator> Parser::parseUnaryIncrementalOperator() {
+    return parseOperator(std::vector<TokenType> {INCREMENT, DECREMENT});
 }
 
 
@@ -402,17 +400,39 @@ std::unique_ptr<Expression> Parser::parsePostExpression() {
 }
 
 
+std::unique_ptr<Expression> Parser::parseUnaryIncrementalExpression() {
 
-std::unique_ptr<Expression> Parser::parseUnaryExpression(
-    std::function<std::unique_ptr<Expression>()> parseLowerExpression,
-    std::function<std::unique_ptr<Operator>()> parseThisOperator) {
-
-    std::unique_ptr<Operator> unaryOperator = parseThisOperator();
+    std::unique_ptr<Operator> unaryOperator = parseUnaryIncrementalOperator();
     if(!unaryOperator)
-        return parseLowerExpression();
+        return parsePostExpression();
 
-    std::unique_ptr<Expression> expression = 
-        parseUnaryExpression(parseLowerExpression, parseThisOperator);
+    std::unique_ptr<Expression> expression = parseUnaryIncrementalExpression();
+        
+    if(!expression)
+        generateError("Parsing unary incremental expression: got unary "
+            "operators, but an expression did not follow");
+    
+    return std::make_unique<UnaryIncrementalExpression>(
+        UnaryIncrementalExpression(std::move(unaryOperator), 
+        std::move(expression)));        
+}
+
+
+std::unique_ptr<Expression> Parser::parseBelowUnaryExpression() {
+    if(std::unique_ptr<Expression> expression = 
+        parseUnaryIncrementalExpression())
+        return std::move(expression);
+    return parsePrimaryExpression();
+}
+
+
+std::unique_ptr<Expression> Parser::parseUnaryExpression() {
+
+    std::unique_ptr<Operator> unaryOperator = parseUnaryOperator();
+    if(!unaryOperator)
+        return parseBelowUnaryExpression();
+
+    std::unique_ptr<Expression> expression = parseUnaryExpression();
         
     if(!expression)
         generateError("Parsing unary expression: got unary operators, "
@@ -423,16 +443,7 @@ std::unique_ptr<Expression> Parser::parseUnaryExpression(
 }
 
 
-std::unique_ptr<Expression> Parser::parseAllUnaryExpressions() {
-    if(std::unique_ptr<Expression> expression = parseUnaryExpression(
-        std::bind_front(&Parser::parsePrimaryExpression, this),
-        std::bind_front(&Parser::parseUnaryRValueOperator, this)))
-        return std::move(expression);
 
-    return std::move(parseUnaryExpression(
-        std::bind_front(&Parser::parsePostExpression, this),
-        std::bind_front(&Parser::parseUnaryLValueOperator, this)));
-}
 
 
 std::unique_ptr<Expression> Parser::parseBinaryExpression(
@@ -465,7 +476,7 @@ std::unique_ptr<Expression> Parser::parseBinaryExpression(
 
 std::unique_ptr<Expression> Parser::parseMultiplicationExpression() {
     return parseBinaryExpression(
-        std::bind_front(&Parser::parseAllUnaryExpressions, this),
+        std::bind_front(&Parser::parseUnaryExpression, this),
         std::bind_front(&Parser::parseMultiplicationOperator, this),
         "Parsing multiplication expression: expected another operand");
 }
@@ -587,6 +598,12 @@ std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>,
 std::unique_ptr<Declaration> Parser::parseDeclarationEnd(
     std::unique_ptr<Type> type, std::string identifier) {
     
+    if(SimpleType* simpleType = dynamic_cast<SimpleType*>(type.get())) {
+        if(VOID == simpleType->type)
+            generateError("Parsing declaration: cannot declare variable "
+                "of type \"void\"");
+    }
+
     std::unique_ptr<Expression> expression = std::unique_ptr<Expression>
         (nullptr);
     if(ASSIGN == currentToken.type) {
@@ -713,6 +730,11 @@ std::unique_ptr<Instruction> Parser::parseInstruction() {
         return std::make_unique<Instruction>
             (Instruction(std::move(declarationInstruction)));
     
+    std::unique_ptr<Block> blockInstruction = parseBlock();
+    if(blockInstruction)
+        return std::make_unique<Instruction>
+            (Instruction(std::move(blockInstruction)));
+
     std::unique_ptr<Expression> expressionInstruction = parseExpression();
     if(expressionInstruction) {
         expectToken(SEMICOLON, "Parsing instruction: expected \";\"");
@@ -743,9 +765,9 @@ std::unique_ptr<InstructionList> Parser::parseInstructionList() {
 }
 
 
-std::unique_ptr<InstructionList> Parser::parseBlock() {
+std::unique_ptr<Block> Parser::parseBlock() {
     if(L_BRACKET != currentToken.type)
-        return std::unique_ptr<InstructionList>(nullptr);
+        return std::unique_ptr<Block>(nullptr);
     getNextToken();
 
     // cannot be null, but may be empty
@@ -753,23 +775,23 @@ std::unique_ptr<InstructionList> Parser::parseBlock() {
 
     expectToken(R_BRACKET, "Parsing block: expected \"}\"");
     
-    return std::move(instructionList);
+    return std::make_unique<Block>(Block(std::move(instructionList)));
 }
 
 
-std::unique_ptr<Statement> Parser::parseStatement() {
-    std::unique_ptr<InstructionList> instructionList = 
-        std::make_unique<InstructionList>(InstructionList());
-    if(std::unique_ptr<Instruction> instruction = parseInstruction()) {
-        instructionList->instructions.push_back(std::move(instruction));
-        return std::make_unique<Statement>(
-            Statement(std::move(instructionList)));
-    }
-        
-    if(instructionList = parseBlock())
-        return std::make_unique<Statement>(
-            Statement(std::move(instructionList)));
 
+std::unique_ptr<Statement> Parser::parseStatement() {
+
+    if(std::unique_ptr<Block> block = parseBlock()) {
+        return std::make_unique<Statement>(
+            Statement(std::move(block)));
+    }
+
+    if(std::unique_ptr<Instruction> instruction = parseInstruction()) {
+        return std::make_unique<Statement>(
+            Statement(std::move(instruction)));
+    }
+                
     generateError("Parsing statement: expected instruction or block");
     return std::unique_ptr<Statement>(nullptr);
 }
@@ -816,11 +838,15 @@ std::unique_ptr<For> Parser::parseFor() {
     
     std::variant<std::unique_ptr<Declaration>, std::unique_ptr<Function>, 
         std::monostate> declarationVariant = parseDeclarationOrFunction();
-    if(!std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
-        generateError("Parsing for instruction: expected declaration");
+    if(std::get_if<std::unique_ptr<Function>>(&declarationVariant))
+        generateError("Parsing for instruction: did not expect function");
+
     // may be null
     std::unique_ptr<Declaration> declaration = 
-        std::move(std::get<std::unique_ptr<Declaration>>(declarationVariant));
+        std::unique_ptr<Declaration>(nullptr);
+    if(std::get_if<std::unique_ptr<Declaration>>(&declarationVariant))
+        declaration = std::move(std::get<std::unique_ptr<Declaration>>
+            (declarationVariant));
     
     expectToken(SEMICOLON, "Parsing for instruction: expected \";\"");
 
@@ -942,8 +968,8 @@ std::unique_ptr<SwitchC> Parser::parseSwitchCEnd() {
 
     std::unique_ptr<SwitchC> switchC = std::make_unique<SwitchC>(SwitchC());
     
-    switchC->postExpression = parsePostExpression();
-    if(!switchC->postExpression)
+    switchC->lValExpression = parseLValueExpression();
+    if(!switchC->lValExpression)
         generateError("Parsing switch c: expected expression");
     
     expectToken(R_PARENT, "Parsing switch c: expected \")\"");

@@ -5,19 +5,19 @@
 #include "Lexer.h"
 
 #include "LanguageObjects.h"
-#include "LanguageObjects/BinaryExpression.h"
-#include "LanguageObjects/Expression.h"
+#include "LanguageObjects/Expressions/BinaryExpression.h"
+#include "LanguageObjects/Expressions/Expression.h"
 #include "LanguageObjects/Operator.h"
-#include "LanguageObjects/LiteralExpression.h"
+#include "LanguageObjects/Expressions/LiteralExpression.h"
 #include "LanguageObjects/Program.h"
-#include "LanguageObjects/UnaryExpression.h"
-#include "LanguageObjects/FuncallExpression.h"
-#include "LanguageObjects/VectorIndexExpression.h"
-#include "LanguageObjects/MatrixIndexExpression.h"
-#include "LanguageObjects/PostExpression.h"
+#include "LanguageObjects/Expressions/UnaryExpression.h"
+#include "LanguageObjects/Expressions/FuncallExpression.h"
+#include "LanguageObjects/Expressions/VectorIndexExpression.h"
+#include "LanguageObjects/Expressions/MatrixIndexExpression.h"
+#include "LanguageObjects/Expressions/PostExpression.h"
 #include "LanguageObjects/MatrixType.h"
 #include "LanguageObjects/SimpleType.h"
-#include "LanguageObjects/StringExpression.h"
+#include "LanguageObjects/Expressions/StringExpression.h"
 #include "LanguageObjects/Type.h"
 #include "LanguageObjects/VectorType.h"
 #include "LanguageObjects/Declaration.h"
@@ -35,7 +35,8 @@
 #include "LanguageObjects/Switch.h"
 #include "LanguageObjects/SwitchGo.h"
 #include "LanguageObjects/SwitchC.h"
-#include "LanguageObjects/VariableExpression.h"
+#include "LanguageObjects/Expressions/VariableExpression.h"
+#include "LanguageObjects/Expressions/UnaryIncrementalExpression.h"
 
 
 class Parser {
@@ -63,8 +64,8 @@ class Parser {
         acceptedOperators);
     
     std::unique_ptr<Operator> parsePostOperator();
-    std::unique_ptr<Operator> parseUnaryRValueOperator();
-    std::unique_ptr<Operator> parseUnaryLValueOperator();
+    std::unique_ptr<Operator> parseUnaryOperator();
+    std::unique_ptr<Operator> parseUnaryIncrementalOperator();
     std::unique_ptr<Operator> parseMultiplicationOperator();
     std::unique_ptr<Operator> parseAdditionOperator();
     std::unique_ptr<Operator> parseRelationOperator();
@@ -86,10 +87,10 @@ class Parser {
     std::unique_ptr<Expression> parseLValueExpression();
     std::unique_ptr<Expression> parsePostExpression();
 
-    std::unique_ptr<Expression> parseUnaryExpression(
-        std::function<std::unique_ptr<Expression>()> parseLowerExpression,
-        std::function<std::unique_ptr<Operator>()> parseThisOperator);
-    std::unique_ptr<Expression> parseAllUnaryExpressions();
+    std::unique_ptr<Expression> parseUnaryIncrementalExpression();
+    std::unique_ptr<Expression> parseBelowUnaryExpression();
+    std::unique_ptr<Expression> parseUnaryExpression();
+    
 
     std::unique_ptr<Expression> parseBinaryExpression(
         std::function<std::unique_ptr<Expression>()> parseLowerExpression,
@@ -122,7 +123,7 @@ class Parser {
 
     std::unique_ptr<Instruction> parseInstruction();
     std::unique_ptr<InstructionList> parseInstructionList();
-    std::unique_ptr<InstructionList> parseBlock();
+    std::unique_ptr<Block> parseBlock();
     std::unique_ptr<Statement> parseStatement();
 
     std::unique_ptr<If> parseIf();

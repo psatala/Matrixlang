@@ -10,15 +10,16 @@ TEST_P(ParserExpectError, checkError)
 
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>(parserInputOutput.input);
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     
     try {
         std::unique_ptr<Program> program = interpreter.parser.parseProgram();
     } catch(std::string exception) {
-        GTEST_ASSERT_EQ(errStream.str(), parserInputOutput.expectedOutput);
+        GTEST_ASSERT_EQ(exception, parserInputOutput.expectedOutput);
     }
     
 }
@@ -36,15 +37,16 @@ const ParserInputOutput testPrograms[] = {
                 int main()
                     1 + 2
                 )",
-    R"(Line: 4 Column: 17 -> Parsing instruction: expected ";"
+    R"(Parsing stopped, error: Line: 4 Column: 17 -> Parsing instruction: )"
+    R"(expected ";"
 )"),
 
     // no declaration or function
     ParserInputOutput(R"(
                 1 + 2;
                 )",
-    R"(Line: 2 Column: 17 -> Parsing declaration or function: )"
-    R"(could not parse neither declaration nor function
+    R"(Parsing stopped, error: Line: 2 Column: 17 -> Parsing declaration or )"
+    R"(function: could not parse neither declaration nor function
 )"),
 
     // trying to assign to rvalue
@@ -52,8 +54,8 @@ const ParserInputOutput testPrograms[] = {
                 int main()
                     a + b = c;
                 )",
-    R"(Line: 3 Column: 29 -> Parsing assignment expression: )"
-    R"(expected lvalue operand before assignment operator
+    R"(Parsing stopped, error: Line: 3 Column: 29 -> Parsing assignment )"
+    R"(expression: expected lvalue operand before assignment operator
 )"),
 
     // missing closing bracket
@@ -61,7 +63,7 @@ const ParserInputOutput testPrograms[] = {
                 int main() {
                     return 0;
                 )",
-    R"(Line: 4 Column: 17 -> Parsing block: expected "}"
+    R"(Parsing stopped, error: Line: 4 Column: 17 -> Parsing block: expected "}"
 )"),
 
     // missing closing parenthesis
@@ -70,29 +72,31 @@ const ParserInputOutput testPrograms[] = {
                     return 0;
                 }
                 )",
-    "Line: 2 Column: 27 -> Parsing function: expected \")\"\n"),
+    "Parsing stopped, error: Line: 2 Column: 27 -> Parsing function: "
+    "expected \")\"\n"),
 
     // missing expression in declaration
     ParserInputOutput(R"(
                 int a = ;
                 )",
-    R"(Line: 2 Column: 25 -> Parsing declaration: parsed "=", )"
-    R"(but an expression did not follow
+    R"(Parsing stopped, error: Line: 2 Column: 25 -> Parsing declaration: )"
+    R"(parsed "=", but an expression did not follow
 )"),
 
     // unknown type
     ParserInputOutput(R"(
                 double a = 0;
                 )",
-    R"(Line: 2 Column: 17 -> Parsing declaration or function: )"
-    R"(could not parse neither declaration nor function
+    R"(Parsing stopped, error: Line: 2 Column: 17 -> Parsing declaration or )"
+    R"(function: could not parse neither declaration nor function
 )"),
 
     // vector without type
     ParserInputOutput(R"(
                 Vector <>[3] v;
                 )",
-    R"(Line: 2 Column: 25 -> Parsing Vector, expected Type
+    R"(Parsing stopped, error: Line: 2 Column: 25 -> Parsing Vector, expected )"
+    R"(Type
 )"),
 
     // mixing switch c with switch go
@@ -103,8 +107,15 @@ const ParserInputOutput testPrograms[] = {
                             ;
                     }
                 )",
-    R"(Line: 4 Column: 32 -> Parsing case c: expected ":"
-)")
+    R"(Parsing stopped, error: Line: 4 Column: 32 -> Parsing case c: )"
+    R"(expected ":"
+)"),
+
+    // void variable declaration
+    ParserInputOutput(R"(void a;)",
+    R"(Parsing stopped, error: Line: 1 Column: 7 -> )"
+    R"(Parsing declaration: cannot declare variable of type "void"
+)"),
 
 };
 

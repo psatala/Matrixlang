@@ -4,10 +4,11 @@
 TEST (LexerComplex, fibonacciRec) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::fibonacciRec;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -94,10 +95,11 @@ TEST (LexerComplex, fibonacciRec) {
 TEST (LexerComplex, fibonacciIter) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::fibonacciIter;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -163,7 +165,7 @@ TEST (LexerComplex, fibonacciIter) {
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 2);
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "i");
-    assertTokenType(interpreter.parser.lexer, LESS_THAN);
+    assertTokenType(interpreter.parser.lexer, LESS_EQUAL);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "n");
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
     assertTokenType(interpreter.parser.lexer, INCREMENT);
@@ -228,10 +230,11 @@ TEST (LexerComplex, fibonacciIter) {
 TEST (LexerComplex, findMax) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::findMax;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "findMax");
@@ -410,10 +413,11 @@ TEST (LexerComplex, findMax) {
 TEST (LexerComplex, concatStringMatrix) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::concatStringMatrix;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, STRING);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -574,10 +578,11 @@ TEST (LexerComplex, concatStringMatrix) {
 TEST (LexerComplex, average) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::average;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, FLOAT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "average");
@@ -658,7 +663,7 @@ TEST (LexerComplex, average) {
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 0);
     assertTokenType(interpreter.parser.lexer, R_SQUARE_BRACKET);
     assertTokenType(interpreter.parser.lexer, ASSIGN);
-    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 2);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 2.0f);
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
     
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "vector");
@@ -666,7 +671,7 @@ TEST (LexerComplex, average) {
     assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 1);
     assertTokenType(interpreter.parser.lexer, R_SQUARE_BRACKET);
     assertTokenType(interpreter.parser.lexer, ASSIGN);
-    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 3);
+    assertTokenTypeAndValue(interpreter.parser.lexer, FLOAT_NUMBER, 3.0f);
     assertTokenType(interpreter.parser.lexer, SEMICOLON);
 
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "print");
@@ -694,10 +699,11 @@ TEST (LexerComplex, average) {
 TEST (LexerComplex, printAgeDescription) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::printAgeDescription;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, VOID);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
@@ -807,10 +813,11 @@ TEST (LexerComplex, printAgeDescription) {
 TEST (LexerComplex, includeFile) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::includeFile;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, LEXER_COMMAND);
     assertTokenType(interpreter.parser.lexer, VOID);
@@ -859,10 +866,11 @@ TEST (LexerComplex, includeFile) {
 TEST (LexerComplex, copyByValue) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::copyByValue;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "addOne");
@@ -941,10 +949,11 @@ TEST (LexerComplex, copyByValue) {
 TEST (LexerComplex, copying) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::copying;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1037,10 +1046,11 @@ TEST (LexerComplex, copying) {
 TEST (LexerComplex, scope) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::scope;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1048,10 +1058,6 @@ TEST (LexerComplex, scope) {
     assertTokenType(interpreter.parser.lexer, R_PARENT);
     assertTokenType(interpreter.parser.lexer, L_BRACKET);
 
-    assertTokenType(interpreter.parser.lexer, IF);
-    assertTokenType(interpreter.parser.lexer, L_PARENT);
-    assertTokenTypeAndValue(interpreter.parser.lexer, INT_NUMBER, 1);
-    assertTokenType(interpreter.parser.lexer, R_PARENT);
     assertTokenType(interpreter.parser.lexer, L_BRACKET);
 
     assertTokenType(interpreter.parser.lexer, INT);
@@ -1085,10 +1091,11 @@ TEST (LexerComplex, scope) {
 TEST (LexerComplex, divideByZero) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::divideByZero;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1117,10 +1124,11 @@ TEST (LexerComplex, divideByZero) {
 TEST (LexerComplex, strongTyping) {
     std::unique_ptr<std::stringstream> inStream = 
         std::make_unique<std::stringstream>("");
+    std::stringstream userInputStream("");
     std::stringstream errStream("");
     std::stringstream outStream("");
     *inStream << TestPrograms::strongTyping;
-    Interpreter interpreter = Interpreter(std::move(inStream), 
+    Interpreter interpreter = Interpreter(std::move(inStream), userInputStream, 
         errStream, outStream);
     assertTokenType(interpreter.parser.lexer, INT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "main");
@@ -1138,7 +1146,7 @@ TEST (LexerComplex, strongTyping) {
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "b");
     assertTokenType(interpreter.parser.lexer, ASSIGN);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, 
-        "floatToInt");
+        "intToFloat");
     assertTokenType(interpreter.parser.lexer, L_PARENT);
     assertTokenTypeAndValue(interpreter.parser.lexer, IDENTIFIER, "a");
     assertTokenType(interpreter.parser.lexer, R_PARENT);
