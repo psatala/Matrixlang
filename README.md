@@ -1,6 +1,6 @@
 # Matrixlang
 
-Custom language with support for vectors and matrices. The following documentation is also avialable in [Polish]([PL]Dokumentacja.pdf).
+Custom language with support for vectors and matrices. The following documentation is also available in [Polish]([PL]Dokumentacja.pdf).
 
 # Functionality
 
